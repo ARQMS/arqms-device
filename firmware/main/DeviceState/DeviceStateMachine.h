@@ -1,3 +1,6 @@
+#ifndef DEVICE_STATE_MACHINE_H
+#define DEVICE_STATE_MACHINE_H
+
 /**
  * @brief The DeviceStateMachine controls the main state machine for humi device. 
  */
@@ -28,7 +31,7 @@ private:
      */
     enum State {
         INITIAL,
-        IDLE,
+        BOOT,
         SERVICE,
         WIFE_CONNECT,
         WIFI_CONFIG_HOTSPOT,
@@ -49,3 +52,4 @@ private:
     State nextState;
 };
 
+#endif // DEVICE_STATE_MACHINE_H

@@ -1,14 +1,27 @@
-#include <stdio.h>
-
-#include "DeviceStateMachine.h"
+#include "DeviceState/DeviceStateMachine.h"
+#include "DeviceState/DeviceSettings.h"
 
 static DeviceStateMachine stateMachine;
 
+/**
+ * @brief The entry point for humi device. This is called after second bootloader has 
+ * initialized all peripherals pins and c++/c domain.
+ * 
+ * It is configured as a FreeRTOS task.
+ *  
+ */
 extern "C" void app_main(void) {
-    // hw_initialize();
-    // wakeup_initialize();
-    // irq_initialize();
 
+    // initial Wake up source
+    // initial Hardware (NVS)
+    DeviceSettings::initialize();
+
+    // initial IRQ
+    // start Task:
+    // 	    HMITask
+    // 	    MQTTTask
+
+    stateMachine.reset();
 
     while (true) {
         stateMachine.process();

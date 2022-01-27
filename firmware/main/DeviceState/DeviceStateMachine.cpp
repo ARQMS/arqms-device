@@ -16,10 +16,11 @@ void DeviceStateMachine::process() {
     do {
         stateChanged = false;
 
+        // switch case to check state conditionals
         switch (currentState) {
         case INITIAL: 
             break;
-        case IDLE: 
+        case BOOT: 
             break;
         case SERVICE: 
             break;
@@ -36,7 +37,7 @@ void DeviceStateMachine::process() {
         case RECEIVE_UPDATE: 
             break;
         default:
-            ESP_LOGE("State not implemented!");
+            ESP_LOGE("StateMachine", "State not implemented!");
             reset();
             break;
         }
@@ -54,10 +55,13 @@ void DeviceStateMachine::process() {
 }
 
 void DeviceStateMachine::reset() {
-
+    currentState = State::INITIAL;
+    nextState = State::INITIAL;
 }
 
 void DeviceStateMachine::onEnterState(const State state) {
+    ESP_LOGV("StateMachine", "State %i entering", state);
+
     switch (state)     {
     default:
         // nothing to do
@@ -74,6 +78,8 @@ void DeviceStateMachine::onRunState(const State state) {
 }
 
 void DeviceStateMachine::onLeaveState(const State state) {
+    ESP_LOGV("StateMachine", "State %i leaving", state);
+
     switch (state)     {
     default:
         // nothing to do

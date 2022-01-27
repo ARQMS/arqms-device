@@ -1,3 +1,5 @@
-idf_component_register(SRCS "HumiDevice.cpp" "DeviceStateMachine.cpp"
+idf_component_register(SRCS "HumiDevice.cpp" 
+                            "DeviceState/DeviceStateMachine.cpp"
+                            "DeviceState/DeviceSettings.cpp"
                        INCLUDE_DIRS "."
-                       REQUIRES log)
+                       REQUIRES log nvs_flash)
