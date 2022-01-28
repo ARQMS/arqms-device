@@ -19,22 +19,33 @@ void DeviceStateMachine::process() {
         // switch case to check state conditionals
         switch (currentState) {
         case INITIAL: 
+            // always valid to go to boot
+            conditionalStep(true, State::BOOT);
             break;
         case BOOT: 
+            // TODO wifi valid ? WIFE_CONNECT : WIFI_CONFIG_HOTSPOT
             break;
         case SERVICE: 
+            // TODO !AnyClients ? BOOT
             break;
-        case WIFE_CONNECT: 
+        case WIFI_CONNECTING: 
+            // TODO WiFiConnected ? RUNNING
+            // TIMEOUT or Failed ? WIFI_CONFIG_HOTSPOT
             break;
         case WIFI_CONFIG_HOTSPOT: 
+            // TODO AnyClients : Service
+            // TODO TIMEOUT SLEEP
             break;
         case RUNNING: 
+            // TODO all Task at done and TIMEOUT ? SLEEP
+            // TODO !WiFiConnected ? WIFI_CONNECTING
+            // TODO NewVersionAvailable ? UPDATING
             break;
-        case SENDING_DATA: 
+        case UPDATING:
+            // TODO Update failed ? RUNNING : restart ESP
             break;
-        case SENSOR_READ: 
-            break;
-        case RECEIVE_UPDATE: 
+        case SLEEP:
+            // nothing to do 
             break;
         default:
             ESP_LOGE("StateMachine", "State not implemented!");

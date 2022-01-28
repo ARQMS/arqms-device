@@ -1,7 +1,10 @@
 #include "DeviceState/DeviceStateMachine.h"
-#include "DeviceState/DeviceSettings.h"
+#include "DeviceStorage/DeviceStorage.h"
+#include "WiFi/WiFiManager.h"
 
+static DeviceStorage storage;
 static DeviceStateMachine stateMachine;
+static WiFiManager wifiManager;
 
 /**
  * @brief The entry point for humi device. This is called after second bootloader has 
@@ -11,12 +14,14 @@ static DeviceStateMachine stateMachine;
  *  
  */
 extern "C" void app_main(void) {
-
     // initial Wake up source
+
     // initial Hardware (NVS)
-    DeviceSettings::initialize();
+    storage.initialize();
+    wifiManager.initialize();
 
     // initial IRQ
+
     // start Task:
     // 	    HMITask
     // 	    MQTTTask

@@ -3,6 +3,7 @@
 
 /**
  * @brief The DeviceStateMachine controls the main state machine for humi device. 
+ * It is highly recommended to read documentation about StateMachine
  */
 class DeviceStateMachine {
 public:
@@ -33,12 +34,11 @@ private:
         INITIAL,
         BOOT,
         SERVICE,
-        WIFE_CONNECT,
+        WIFI_CONNECTING,
         WIFI_CONFIG_HOTSPOT,
         RUNNING,
-        SENDING_DATA,
-        SENSOR_READ,
-        RECEIVE_UPDATE
+        SLEEP,
+        UPDATING,
     };
 
     void onEnterState(const State state);

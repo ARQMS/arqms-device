@@ -1,17 +1,17 @@
-#include "DeviceSettings.h"
+#include "DeviceStorage.h"
 
 #include "nvs_flash.h"
 #include "nvs.h"
 
 #define STORAGE_NAMESPACE "HumiConfStore"
 
-DeviceSettings::DeviceSettings() {
+DeviceStorage::DeviceStorage() {
 }
 
-DeviceSettings::~DeviceSettings() {
+DeviceStorage::~DeviceStorage() {
 }
 
-DeviceParameters DeviceSettings::getDeviceParameters(void) {
+DeviceParameters DeviceStorage::getDeviceParameters(void) {
     NvsLayoutV1 nvsValues;
 
     // TODO: not generic enough for other configuration parts!
@@ -21,14 +21,14 @@ DeviceParameters DeviceSettings::getDeviceParameters(void) {
     nvs_handle* pHandler = nullptr;
     nvs_open(STORAGE_NAMESPACE, NVS_READONLY, pHandler);
 
-    size_t size = sizeof(NvsLayoutV1);
-    nvs_get_blob(*pHandler, "LayoutV1", &nvsValues, &size);
+    size_t size;
+    nvs_get_blob(*pHandler, "Config", &nvsValues, &size);
     nvs_close(*pHandler);
 
     return nvsValues.deviceParameters;
 }
 
-void DeviceSettings::setDeviceParameters(const DeviceParameters& param) {
+void DeviceStorage::setDeviceParameters(const DeviceParameters& param) {
     NvsLayoutV1 nvsValues;
     nvsValues.deviceParameters = param;
 
@@ -37,12 +37,11 @@ void DeviceSettings::setDeviceParameters(const DeviceParameters& param) {
     nvs_handle* pHandler = nullptr;
     nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, pHandler);
 
-    size_t size = sizeof(NvsLayoutV1);
-    nvs_set_blob(*pHandler, "LayoutV1", &nvsValues, size);
+    nvs_set_blob(*pHandler, "Config", &nvsValues, CURRENT_LAYOUT_SIZE_BYTES);
     nvs_close(*pHandler);
 }
 
-void DeviceSettings::initialize() {
+void DeviceStorage::initialize() {
     auto error = nvs_flash_init();
     if (error == ESP_ERR_NVS_NO_FREE_PAGES || error == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         // NVS parition was truncated and needs to be erased
@@ -54,7 +53,7 @@ void DeviceSettings::initialize() {
     ESP_ERROR_CHECK(error);    
 }
 
-void DeviceSettings::factoryDefault() {
+void DeviceStorage::factoryDefault() {
     // TODO preserve DeviceParameter
     // nvs_flash_erase();
 
