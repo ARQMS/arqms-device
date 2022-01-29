@@ -2,7 +2,6 @@
 #include "freertos/FreeRTOS.h"
 
 #include "esp_log.h"
-#include "esp_event.h"
 
 DeviceStateMachine::DeviceStateMachine(DeviceHandler& deviceHandler) :
     currentState(State::INITIAL),
@@ -11,14 +10,6 @@ DeviceStateMachine::DeviceStateMachine(DeviceHandler& deviceHandler) :
 }
 
 DeviceStateMachine::~DeviceStateMachine() {
-}
-
-void DeviceStateMachine::start(esp_event_loop_handle_t handle) {
-    // Note: do not call process() here, this will start the state machine on current
-    // task (which is main task!). The state machine should be called on his own task.
-    // portMAX_DELAY just ensure the event is consumed, even the loop queue is alreay full (which 
-    // should never happen at startup)
-    esp_event_post_to(handle, STATEMACHINE_EVENTS, ESP_EVENT_ANY_ID, NULL, 0, portMAX_DELAY);
 }
 
 void DeviceStateMachine::process() {

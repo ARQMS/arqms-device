@@ -3,9 +3,6 @@
 
 #include "DeviceHandler.h"
 
-// User defined event loops
-ESP_EVENT_DECLARE_BASE(STATEMACHINE_EVENTS);
-
 /**
  * The DeviceStateMachine controls the main state machine for humi device. 
  * It is highly recommended to read documentation about StateMachine
