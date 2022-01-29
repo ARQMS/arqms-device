@@ -3,8 +3,9 @@
 #include "esp_system.h"
 #include "esp_sleep.h"
 
-DeviceHandler::DeviceHandler(WiFiManager& wifiManager, DeviceStorage& storage) :
+DeviceHandler::DeviceHandler(WiFiManager& wifiManager, SensorManager& sensor, DeviceStorage& storage) :
     wifiManager(wifiManager),
+    sensor(sensor),
     storage(storage),
     updateInstallationFailed(false),
     deviceStatePublished(false),
@@ -62,6 +63,10 @@ void DeviceHandler::enableAPMode() {
     // TODO
 
     // wifiManager.start(AP);
+}
+
+void DeviceHandler::startDataAcquisition() {
+    sensor.startDataAcquisition();
 }
 
 void DeviceHandler::startFirmwareUpdate() {

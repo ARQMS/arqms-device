@@ -4,6 +4,7 @@
 #include "Platform.h"
 #include "WiFi/WiFiManager.h"
 #include "DeviceStorage/DeviceStorage.h"
+#include "Sensor/SensorManager.h"
 
 /**
  * A handler for state machine
@@ -13,7 +14,7 @@ public:
     /**
      * Constructor
      */
-    explicit DeviceHandler(WiFiManager& wifiManager, DeviceStorage& storage);
+    explicit DeviceHandler(WiFiManager& wifi, SensorManager& sensor, DeviceStorage& storage);
 
     /**
      * Deconstructor
@@ -85,6 +86,11 @@ public:
     void startFirmwareUpdate();
 
     /**
+     * Start sensor data acquisition. 
+     */
+    void startDataAcquisition();
+
+    /**
      * Enter sleep mode
      */
     void enterSleep();
@@ -101,6 +107,7 @@ private:
 
     // Members
     WiFiManager& wifiManager;
+    SensorManager& sensor;
     DeviceStorage& storage;
 
     // internal states

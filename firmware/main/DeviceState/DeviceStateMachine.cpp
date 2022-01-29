@@ -90,6 +90,9 @@ void DeviceStateMachine::onEnterState(const State state) const {
         case UPDATING:
             handler.startFirmwareUpdate();
             break;
+        case RUNNING:
+            handler.startDataAcquisition();
+            break;
         case SLEEP:
             handler.enterSleep();
             break;
