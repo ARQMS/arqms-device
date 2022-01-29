@@ -2,39 +2,51 @@
 #define WIFI_MANAGER_H
 
 #include "Platform.h"
+#include "DeviceStorage/DeviceStorage.h"
 
 /**
- * @brief Represents the Wifi Management for HumiDevice
+ * Represents the Wifi Management for HumiDevice
  * 
  * @see https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/network/esp_wifi.html
+ * @see https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-guides/wifi.html
  */
 class WiFiManager {
 public:
     /**
-     * @brief Construct a new WifiManager object
+     * Construct a new WifiManager object
      */
-    WiFiManager();
+    explicit WiFiManager(DeviceStorage& storage);
 
     /**
-     * @brief Destroy the WifiManager object
+     * Destroy the WifiManager object
      */
     ~WiFiManager();
 
     /**
-     * @brief Initialize WiFi Allocate resource for WiFi driver, such as WiFi control structure,
+     * Initialize WiFi Allocate resource for WiFi driver, such as WiFi control structure,
      * RX/TX buffer, WiFi NVS structure etc. This WiFi also starts WiFi task. 
      * 
      * @note ensure NVS is already initialized!
      */
     void initialize();
 
+    /**
+     * Checks wifi station mode (STA) configuration. It's invalid when any mendetory 
+     * field is missing (eg factory reset, or NVS error)
+     * 
+     * @return bool true if STA configuration is valid; otherwise false
+     */
+    bool isSTACfgValid();
 private:
     /**
-     * @brief Construct a new WifiManager object
+     * Construct a new WifiManager object
      * 
      * @param copy instance
      */
     WiFiManager(const WiFiManager& copy);
+
+    // Members
+    DeviceStorage& storage;
 };
 
 #endif // WIFI_MANAGER_H

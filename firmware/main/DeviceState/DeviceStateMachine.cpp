@@ -1,13 +1,24 @@
 #include "DeviceStateMachine.h"
+#include "freertos/FreeRTOS.h"
 
 #include "esp_log.h"
+#include "esp_event.h"
 
-DeviceStateMachine::DeviceStateMachine() :
+DeviceStateMachine::DeviceStateMachine(DeviceHandler& deviceHandler) :
     currentState(State::INITIAL),
-    nextState(State::INITIAL) {
+    nextState(State::INITIAL),
+    handler(deviceHandler) {
 }
 
 DeviceStateMachine::~DeviceStateMachine() {
+}
+
+void DeviceStateMachine::start(esp_event_loop_handle_t handle) {
+    // Note: do not call process() here, this will start the state machine on current
+    // task (which is main task!). The state machine should be called on his own task.
+    // portMAX_DELAY just ensure the event is consumed, even the loop queue is alreay full (which 
+    // should never happen at startup)
+    esp_event_post_to(handle, STATEMACHINE_EVENTS, ESP_EVENT_ANY_ID, NULL, 0, portMAX_DELAY);
 }
 
 void DeviceStateMachine::process() {
@@ -22,24 +33,24 @@ void DeviceStateMachine::process() {
             // always valid to go to boot
             conditionalStep(true, State::BOOT);
             break;
-        case BOOT: 
-            // TODO wifi valid ? WIFE_CONNECT : WIFI_CONFIG_HOTSPOT
+        case BOOT:
+            branchStep(handler.isWifiCfgValid(), CONNECTING, SERVICE_INITIALIZE);
+            break;
+        case SERVICE_INITIALIZE: 
+            // TODO AnyClients : Service
+            // TODO TIMEOUT SLEEP
             break;
         case SERVICE: 
             // TODO !AnyClients ? BOOT
             break;
-        case WIFI_CONNECTING: 
-            // TODO WiFiConnected ? RUNNING
-            // TIMEOUT or Failed ? WIFI_CONFIG_HOTSPOT
-            break;
-        case WIFI_CONFIG_HOTSPOT: 
-            // TODO AnyClients : Service
-            // TODO TIMEOUT SLEEP
+        case CONNECTING: 
+            conditionalStep(handler.getWifiState() == WIFI_FAILED, SERVICE_INITIALIZE);
+            conditionalStep(handler.getWifiState() == WIFI_CONNECTED, RUNNING);
             break;
         case RUNNING: 
-            // TODO all Task at done and TIMEOUT ? SLEEP
-            // TODO !WiFiConnected ? WIFI_CONNECTING
-            // TODO NewVersionAvailable ? UPDATING
+            conditionalStep(handler.isAllTaskDone(), SLEEP);
+            conditionalStep(handler.isNewVersionAvailable(), UPDATING);
+            conditionalStep(handler.getWifiState() != WIFI_CONNECTED, CONNECTING);
             break;
         case UPDATING:
             // TODO Update failed ? RUNNING : restart ESP
@@ -49,7 +60,7 @@ void DeviceStateMachine::process() {
             break;
         default:
             ESP_LOGE("StateMachine", "State not implemented!");
-            reset();
+            initialize();
             break;
         }
 
@@ -65,7 +76,7 @@ void DeviceStateMachine::process() {
     } while (stateChanged);
 }
 
-void DeviceStateMachine::reset() {
+void DeviceStateMachine::initialize() {
     currentState = State::INITIAL;
     nextState = State::INITIAL;
 }
@@ -73,7 +84,21 @@ void DeviceStateMachine::reset() {
 void DeviceStateMachine::onEnterState(const State state) {
     ESP_LOGV("StateMachine", "State %i entering", state);
 
-    switch (state)     {
+    switch (state) {
+        case SERVICE_INITIALIZE:
+            // TODO handler.enableAPMode();
+            // TODO startTimeout(5*60); // 5 min
+            break;
+        case CONNECTING:
+            handler.connectToWiFi();
+            startTimeout(1000 * 30); // 30 sec
+            break;
+        case UPDATING:
+            // TODO handler.startFirmwareUpdate();
+            break;
+        case SLEEP:
+            // TODO handler.enterSleep();
+            break;
     default:
         // nothing to do
         break;
@@ -81,7 +106,7 @@ void DeviceStateMachine::onEnterState(const State state) {
 }
 
 void DeviceStateMachine::onRunState(const State state) {
-    switch (state)     {
+    switch (state) {
     default:
         // nothing to do
         break;
@@ -91,15 +116,24 @@ void DeviceStateMachine::onRunState(const State state) {
 void DeviceStateMachine::onLeaveState(const State state) {
     ESP_LOGV("StateMachine", "State %i leaving", state);
 
-    switch (state)     {
+    switch (state) {
     default:
         // nothing to do
         break;
     }
 }
 
-void DeviceStateMachine::conditionalStep(const bool isValid, const State state) {
-    if (isValid) {
-        nextState = state;
+void DeviceStateMachine::startTimeout(const uint32_t durationMs) {
+    // TODO Start new SW timer. After durationMs is passed, a new STATEMACHINE_EVENTS with TIMOUT_REACHED and 
+    // currentState as argument should be sent
+}
+
+void DeviceStateMachine::conditionalStep(const bool conditional, const State valid) {
+    if (conditional) {
+        nextState = valid;
     }
+}
+
+void DeviceStateMachine::branchStep(const bool conditional, const State valid, const State invalid) {
+    nextState = conditional ? valid : invalid;
 }

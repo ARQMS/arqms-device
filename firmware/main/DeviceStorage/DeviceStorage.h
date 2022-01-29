@@ -5,7 +5,7 @@
 #include "ConfigurationLayout.h"
 
 /**
- * @brief Represents the Non-Volatile storage for humi device. It uses
+ * Represents the Non-Volatile storage for humi device. It uses
  * the underlying idf component which is based on key-value pair and uses
  * a portion of main flash memory through the esp_partition
  * 
@@ -14,51 +14,70 @@
 class DeviceStorage {
 public:
     /**
-     * @brief Construct a new Device Settings object
+     * Construct a new Device Settings object
      */
-    DeviceStorage();
+    explicit DeviceStorage();
 
     /**
-     * @brief Destroy the Device Settings object
+     * Destroy the Device Settings object
      */
     ~DeviceStorage();
 
     /**
-     * @brief must be called before any r/w operation is executed.
+     * must be called before any r/w operation is executed.
      * 
      * @note Abort program if NVS can not be initialized!
      */
     void initialize();
 
     /**
-     * @brief reset all configuration (except DeviceParameters) to factory defaults.
+     * @return bool when storage is successfully initialized; otherwise false
+     */
+    bool isInitialized();
+
+    /**
+     * reset all configuration (except DeviceParameters) to factory defaults.
      */
     void factoryDefault();
 
     /**
-     * @brief Get the Device Parameters object
+     * Get the Device Parameters object
      * 
      * @return DeviceParameters 
      */
-    DeviceParameters getDeviceParameters(void);
+    DeviceParameters getDeviceParameters();
 
     /**
-     * @brief Set the Device Parameters object
+     * Set the Device Parameters object
      * 
      * @param param to set
      */
     void setDeviceParameters(const DeviceParameters& param);
     
+    /**
+     * @brief Get the Wifi Parameters object
+     * 
+     * @return WifiParameters 
+     */
+    WifiParameters getWifiParameters();
+
+    /**
+     * @brief Set the Wifi Parameters object
+     * 
+     * @param param 
+     */
+    void setWifiParameters(const WifiParameters& param);
+
 private:
     /**
-     * @brief Construct a new Device Settings object
+     * Construct a new Device Settings object
      * 
      * @param copy instance
      */
     DeviceStorage(const DeviceStorage& copy);
 
     /**
-     * @brief private assignment operator
+     * private assignment operator
      * 
      * @param other  instance
      * @return DeviceSettings& the assigned instance
@@ -66,7 +85,7 @@ private:
     DeviceStorage& operator=(const DeviceStorage& other);
 
     /**
-     * @brief 
+     * 
      */
     struct NvsLayoutV1 {
         uint16_t layoutVersion = NVS_LAYOUT_VERSION_V1;
@@ -86,6 +105,9 @@ private:
      */
     static const uint16_t CURRENT_LAYOUT_VERSION = NVS_LAYOUT_VERSION_V1;
     static const uint16_t CURRENT_LAYOUT_SIZE_BYTES = NVS_LAYOUT_SIZE_BYTES_V1;
+
+    // Members
+    bool initialized;
 };
 
 #endif // DEVICE_SETTINGS_H

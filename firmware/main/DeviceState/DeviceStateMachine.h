@@ -1,41 +1,51 @@
 #ifndef DEVICE_STATE_MACHINE_H
 #define DEVICE_STATE_MACHINE_H
 
+#include "DeviceHandler.h"
+
+// User defined event loops
+ESP_EVENT_DECLARE_BASE(STATEMACHINE_EVENTS);
+
 /**
- * @brief The DeviceStateMachine controls the main state machine for humi device. 
+ * The DeviceStateMachine controls the main state machine for humi device. 
  * It is highly recommended to read documentation about StateMachine
  */
 class DeviceStateMachine {
 public:
     /**
-     * @brief Constructor 
+     * Constructor 
      */
-    DeviceStateMachine();
+    explicit DeviceStateMachine(DeviceHandler& deviceHandler);
 
     /**
-     * @brief Destroy the Device State Machine object
+     * Destroy the Device State Machine object
      */
     ~DeviceStateMachine();
 
     /**
-     * @brief runs the state machine. Call this method for running state machine.
+     * Starts the state machine with initial states.
+     */
+    void start(esp_event_loop_handle_t handle);
+
+    /**
+     * runs the state machine. Call this method for running state machine.
      */
     void process();
 
     /**
-     * @brief reset the state machine.
+     * reset the state machine.
      */
-    void reset();
+    void initialize();
 private:
     /**
-     * @brief Represents all states
+     * Represents all states
      */
     enum State {
         INITIAL,
         BOOT,
         SERVICE,
-        WIFI_CONNECTING,
-        WIFI_CONFIG_HOTSPOT,
+        SERVICE_INITIALIZE,
+        CONNECTING,
         RUNNING,
         SLEEP,
         UPDATING,
@@ -45,11 +55,16 @@ private:
     void onRunState(const State state);
     void onLeaveState(const State state);
 
-    void conditionalStep(const bool isValid, const State state);
+    void startTimeout(const uint32_t durationMs);
+
+    inline void conditionalStep(const bool conditional, const State valid);
+    inline void branchStep(const bool conditional, const State valid, const State invalid);
 
     // Members
     State currentState;
     State nextState;
+
+    DeviceHandler& handler;
 };
 
 #endif // DEVICE_STATE_MACHINE_H
