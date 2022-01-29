@@ -1,6 +1,7 @@
 #include "SensorManager.h"
 
-SensorManager::SensorManager() {
+SensorManager::SensorManager(EventLoopIfc& eventLoop) :
+    eventLoop(eventLoop) {
 }
 
 void SensorManager::startDataAcquisition() {
@@ -15,5 +16,5 @@ void SensorManager::startDataAcquisition() {
     // sensorData.co2 = data.co2;
     // sensorData.humidity = data.humidity;
 
-    // dispatcher.sensorData(sensorData);
+    // eventLoop.sensorData(sensorData);
 }

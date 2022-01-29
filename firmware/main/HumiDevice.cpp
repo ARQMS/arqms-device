@@ -15,9 +15,9 @@
 
 static DeviceStorage storage;
 static WiFiManager wifi(storage);
-static SensorManager sensor;
-static HmiManager hmi;
 static EventDispatcher dispatcher;
+static HmiManager hmi(dispatcher);
+static SensorManager sensor(dispatcher);
 
 static DeviceHandler stateMachineHandler(wifi, sensor, storage);
 static DeviceStateMachine stateMachine(stateMachineHandler);
@@ -25,6 +25,7 @@ static DeviceStateMachine stateMachine(stateMachineHandler);
 // Event loop
 ESP_EVENT_DEFINE_BASE(HMI_EVENTS);
 ESP_EVENT_DEFINE_BASE(SENSOR_EVENTS);
+ESP_EVENT_DEFINE_BASE(TIMER_EVENTS);
 
 extern "C" void statemachine_main(void* args) {
     DeviceStateMachine* pSm = static_cast<DeviceStateMachine*>(args);
@@ -33,16 +34,6 @@ extern "C" void statemachine_main(void* args) {
         pSm->process();
 
         vTaskDelay(pdMS_TO_TICKS(1));
-    }
-}
-
-extern "C" void hmi_main(void* args) {
-    HmiManager* pHmi = static_cast<HmiManager*>(args);
-
-    while (true) {
-        pHmi->update();
-
-        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 
@@ -61,11 +52,11 @@ extern "C" void app_main(void) {
     dispatcher.initialize();
 
     // register events
+    dispatcher.registerEventHandler(TIMER_EVENTS, TIMER_ELAPSED, hmi);
     dispatcher.registerEventHandler(HMI_EVENTS, ESP_EVENT_ANY_ID, hmi);
     dispatcher.registerEventHandler(SENSOR_EVENTS, DATA_ACQUIRED, hmi);
 
     // application tasks
     xTaskCreate(statemachine_main, "StateMachineTask", SM_STACK_SIZE, &stateMachine, uxTaskPriorityGet(NULL), NULL);
-    xTaskCreate(hmi_main, "HmiTask", HMI_STACK_SIZE, &hmi, 4, NULL);
 }
 

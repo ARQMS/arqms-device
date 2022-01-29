@@ -2,8 +2,8 @@
 #define HMIMANAGER_H
 
 #include "Platform.h"
-#include "esp_event.h"
 #include "Events/EventHandlerIfc.h"
+#include "Events/EventLoopIfc.h"
 
 /**
  * The human-machine interface manager to control all the leds and buttons.
@@ -13,7 +13,7 @@ public:
     /**
      * Constructor
      */
-    explicit HmiManager();
+    explicit HmiManager(EventLoopIfc& eventLoop);
 
     /**
      * Deconstructor
@@ -26,14 +26,10 @@ public:
     void initialize();
 
     /**
-     * Updates the hmi according to current state
-     */
-    void update();
-
-    /**
      * @see EventHandlerIfc
      */
     void onEvent(esp_event_base_t base, int32_t id, void* data) override;
+    
 private:
     /**
      * Private copy constructor.
@@ -44,6 +40,14 @@ private:
      * Private assignment operator.
      */
     HmiManager& operator=(const HmiManager& other);
+
+    // private helper functions
+    void onUsrPressed();
+    void onResetTimer();
+
+    // Members
+    EventLoopIfc& eventLoop;
+    TimerId resetTimerId;
 };
 
 #endif // HMIMANAGER_H

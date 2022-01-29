@@ -10,21 +10,24 @@ extern "C" {
 
 ESP_EVENT_DECLARE_BASE(HMI_EVENTS);
 ESP_EVENT_DECLARE_BASE(SENSOR_EVENTS);
+ESP_EVENT_DECLARE_BASE(TIMER_EVENTS);
 
 /**
  * A list of supported HMI events
  */
-enum HmiEvents {
+enum AppEvents {
+    // Common
+    TIMER_ELAPSED,
+    TIMER_STARTED,
+
+    // HMI
     USR_BTN_PRESSED,
     RST_BTN_PRESSED,
-};
 
-/**
- * A list of supported sensor events.
- */
-enum SensorEvents {
+    // Sensor
     DATA_ACQUIRED,
 };
+
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,6 @@
 #include "HmiManager.h"
 
+#include "Events/Events.h"
 #include "driver/gpio.h"
 
 #define GPIO_RST_BTN        GPIO_NUM_2
@@ -8,20 +9,20 @@
 #define GPIO_GOOD_LED       GPIO_NUM_20
 #define GPIO_POOR_LED       GPIO_NUM_21
 
-volatile static bool swRstClicked = false;
-volatile static bool usrClicked = false;
-volatile static bool timerCalled = false;
-
-// ISR Handler for GPIO2
-extern "C" void gpio_isr(void* arg) {
-    uint32_t gpio_num = (uint32_t)arg;
-    switch (gpio_num) {
-        case GPIO_RST_BTN:         swRstClicked = true; break;
-        case GPIO_USR_BTN:         usrClicked   = true; break;
-    }
+// ISR Handler for GPIO3
+extern "C" void UsrPressedIsr(void* arg) {
+    EventLoopIfc* publisher = static_cast<EventLoopIfc*>(arg);
+    publisher->sendEventIsr(HMI_EVENTS, USR_BTN_PRESSED);
 }
 
-HmiManager::HmiManager() {
+// ISR Handler for GPIO2
+extern "C" void RstPressedIsr(void* arg) {
+    EventLoopIfc* publisher = static_cast<EventLoopIfc*>(arg);
+    publisher->sendEventIsr(HMI_EVENTS, RST_BTN_PRESSED);
+}
+
+HmiManager::HmiManager(EventLoopIfc& eventLoop) : 
+    eventLoop(eventLoop) {
 }
 
 void HmiManager::initialize() {
@@ -36,8 +37,8 @@ void HmiManager::initialize() {
 
     // GPIO Interrupt configuration
     gpio_install_isr_service(ESP_INTR_FLAG_LEVEL1);
-    gpio_isr_handler_add(GPIO_RST_BTN, gpio_isr, (void*)GPIO_RST_BTN);
-    gpio_isr_handler_add(GPIO_USR_BTN, gpio_isr, (void*)GPIO_USR_BTN);
+    gpio_isr_handler_add(GPIO_RST_BTN, RstPressedIsr, &eventLoop);
+    gpio_isr_handler_add(GPIO_USR_BTN, UsrPressedIsr, &eventLoop);
 
     // GPIO outputs configuration
     gpioCfg.intr_type = GPIO_INTR_DISABLE;
@@ -48,32 +49,29 @@ void HmiManager::initialize() {
     gpio_config(&gpioCfg);
 }
 
-
 void HmiManager::onEvent(esp_event_base_t base, int32_t id, void* data) {
-
+    if (base == HMI_EVENTS && id == USR_BTN_PRESSED) {
+        onUsrPressed();
+    }
+    else if (base == TIMER_EVENTS && id == TIMER_ELAPSED) {
+        TimerId* pId = static_cast<TimerId*>(data);
+        if (*pId == resetTimerId) {
+            onResetTimer();
+        }
+    }
 }
 
-void HmiManager::update() {
-    if (usrClicked) {
-        gpio_set_level(GPIO_GOOD_LED, true);
-        gpio_set_level(GPIO_MOD_LED, true);
-        gpio_set_level(GPIO_POOR_LED, true);
+void HmiManager::onUsrPressed() {
+    gpio_set_level(GPIO_GOOD_LED, true);
+    gpio_set_level(GPIO_MOD_LED, true);
+    gpio_set_level(GPIO_POOR_LED, true);
 
-        // TODO 
-        //  Var1: start timer and set timerCalled on callback
-        //  Var2: only call update on any change by eventLoop
-    } 
-    else if (usrClicked && timerCalled) {
-        gpio_set_level(GPIO_GOOD_LED, false);
-        gpio_set_level(GPIO_MOD_LED, false);
-        gpio_set_level(GPIO_POOR_LED, false);
+    // start reset timer
+    resetTimerId = eventLoop.startOneShotTimer(10 * 1000);
+}
 
-        usrClicked = false;
-    }
-
-    if (swRstClicked) {
-        // TODO
-
-        swRstClicked = false;
-    }
+void HmiManager::onResetTimer() {
+    gpio_set_level(GPIO_GOOD_LED, false);
+    gpio_set_level(GPIO_MOD_LED, false);
+    gpio_set_level(GPIO_POOR_LED, false);
 }

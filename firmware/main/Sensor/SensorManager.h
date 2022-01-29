@@ -2,6 +2,7 @@
 #define SENSORMANAGER_H
 
 #include "Platform.h"
+#include "Events/EventLoopIfc.h"
 
 /**
  * The sensor manager which communicates with all sensors
@@ -11,7 +12,7 @@ public:
     /**
      * Constructor
      */
-    explicit SensorManager(void);
+    explicit SensorManager(EventLoopIfc& eventLoop);
 
     /**
      * Deconstructor
@@ -34,6 +35,8 @@ private:
      */
     SensorManager& operator=(const SensorManager& other);
 
+    // Members
+    EventLoopIfc& eventLoop;
 };
 
 #endif // SENSORMANAGER_H
