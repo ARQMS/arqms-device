@@ -1,11 +1,13 @@
 #include "DeviceStateMachine.h"
-#include "freertos/FreeRTOS.h"
 
-#include "esp_log.h"
+// FreeRTOS includes
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 DeviceStateMachine::DeviceStateMachine(DeviceHandler& deviceHandler) :
     currentState(State::INITIAL),
     nextState(State::INITIAL),
+    timeoutExpectedEnd(),
     handler(deviceHandler) {
 }
 
@@ -28,30 +30,30 @@ void DeviceStateMachine::process() {
             branchStep(handler.isWifiCfgValid(), CONNECTING, SERVICE_INITIALIZE);
             break;
         case SERVICE_INITIALIZE: 
-            // TODO AnyClients : Service
-            // TODO TIMEOUT SLEEP
+            conditionalStep(timeoutReached(), SLEEP);
+            conditionalStep(handler.anyClientConnected(), SERVICE);
             break;
         case SERVICE: 
-            // TODO !AnyClients ? BOOT
+            conditionalStep(!handler.anyClientConnected(), BOOT);
             break;
         case CONNECTING: 
-            conditionalStep(handler.getWifiState() == WIFI_FAILED, SERVICE_INITIALIZE);
-            conditionalStep(handler.getWifiState() == WIFI_CONNECTED, RUNNING);
+            conditionalStep(handler.getWifiState() == WiFiState::FAILED, SERVICE_INITIALIZE);
+            conditionalStep(handler.getWifiState() == WiFiState::CONNECTED, RUNNING);
             break;
         case RUNNING: 
             conditionalStep(handler.isAllTaskDone(), SLEEP);
             conditionalStep(handler.isNewVersionAvailable(), UPDATING);
-            conditionalStep(handler.getWifiState() != WIFI_CONNECTED, CONNECTING);
+            conditionalStep(handler.getWifiState() != WiFiState::CONNECTED, CONNECTING);
             break;
         case UPDATING:
-            // TODO Update failed ? RUNNING : restart ESP
+            conditionalStep(handler.isFirmwareUpdateFailed(), RUNNING);
             break;
         case SLEEP:
             // nothing to do 
             break;
         default:
             ESP_LOGE("StateMachine", "State not implemented!");
-            initialize();
+            ESP_ERROR_CHECK(ESP_FAIL);
             break;
         }
 
@@ -70,25 +72,26 @@ void DeviceStateMachine::process() {
 void DeviceStateMachine::initialize() {
     currentState = State::INITIAL;
     nextState = State::INITIAL;
+
+    timeoutReset();
 }
 
-void DeviceStateMachine::onEnterState(const State state) {
+void DeviceStateMachine::onEnterState(const State state) const {
     ESP_LOGV("StateMachine", "State %i entering", state);
 
     switch (state) {
         case SERVICE_INITIALIZE:
-            // TODO handler.enableAPMode();
-            // TODO startTimeout(5*60); // 5 min
+            handler.enableAPMode();
+            timeoutStart(3 * 60); // wait for 3min
             break;
         case CONNECTING:
             handler.connectToWiFi();
-            startTimeout(1000 * 30); // 30 sec
             break;
         case UPDATING:
-            // TODO handler.startFirmwareUpdate();
+            handler.startFirmwareUpdate();
             break;
         case SLEEP:
-            // TODO handler.enterSleep();
+            handler.enterSleep();
             break;
     default:
         // nothing to do
@@ -96,7 +99,7 @@ void DeviceStateMachine::onEnterState(const State state) {
     }
 }
 
-void DeviceStateMachine::onRunState(const State state) {
+void DeviceStateMachine::onRunState(const State state) const {
     switch (state) {
     default:
         // nothing to do
@@ -104,7 +107,7 @@ void DeviceStateMachine::onRunState(const State state) {
     }
 }
 
-void DeviceStateMachine::onLeaveState(const State state) {
+void DeviceStateMachine::onLeaveState(const State state) const {
     ESP_LOGV("StateMachine", "State %i leaving", state);
 
     switch (state) {
@@ -112,11 +115,9 @@ void DeviceStateMachine::onLeaveState(const State state) {
         // nothing to do
         break;
     }
-}
 
-void DeviceStateMachine::startTimeout(const uint32_t durationMs) {
-    // TODO Start new SW timer. After durationMs is passed, a new STATEMACHINE_EVENTS with TIMOUT_REACHED and 
-    // currentState as argument should be sent
+    // ensure timeout is stopped before state changes
+    timeoutReset();
 }
 
 void DeviceStateMachine::conditionalStep(const bool conditional, const State valid) {
@@ -127,4 +128,18 @@ void DeviceStateMachine::conditionalStep(const bool conditional, const State val
 
 void DeviceStateMachine::branchStep(const bool conditional, const State valid, const State invalid) {
     nextState = conditional ? valid : invalid;
+}
+
+
+bool DeviceStateMachine::timeoutReached() const {
+    uint32_t current = static_cast<uint32_t>(xTaskGetTickCount());
+    return current >= timeoutExpectedEnd;
+}
+
+void DeviceStateMachine::timeoutReset() const {
+    timeoutExpectedEnd = portMAX_DELAY;
+}
+
+void DeviceStateMachine::timeoutStart(uint32_t durationS) const {
+    timeoutExpectedEnd = static_cast<uint32_t>(xTaskGetTickCount()) + pdMS_TO_TICKS(durationS * 1000);
 }

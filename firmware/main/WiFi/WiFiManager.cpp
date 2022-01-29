@@ -5,7 +5,8 @@
 
 
 WiFiManager::WiFiManager(DeviceStorage& storage) :
-    storage(storage) {
+    storage(storage),
+    wifiState(WiFiState::DISABLED) {
 }
 
 WiFiManager::~WiFiManager() {
@@ -23,11 +24,19 @@ void WiFiManager::initialize() {
     esp_event_loop_create_default();
 }
 
-bool WiFiManager::isSTACfgValid() {
+bool WiFiManager::isWifiCfgValid()  const {
     WifiParameters wifiConfig = storage.getWifiParameters();
     
     // After NVS is erased, the SSID is empty. so we can be sure there
     // is no valid configuration.
     bool hasSSID = strlen((char*)wifiConfig.sta.ssid) != 0;
     return hasSSID;
+}
+
+WiFiState WiFiManager::getWifiState() const {
+    return wifiState;
+}
+
+uint32_t WiFiManager::countClients() {
+    return 0; // TODO
 }

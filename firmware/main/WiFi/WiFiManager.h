@@ -5,6 +5,16 @@
 #include "DeviceStorage/DeviceStorage.h"
 
 /**
+ * Represents the wifi states 
+ */
+enum class WiFiState {
+    DISABLED,
+    CONNECTED,
+    FAILED,
+    DISCONNECTED,
+};
+
+/**
  * Represents the Wifi Management for HumiDevice
  * 
  * @see https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/network/esp_wifi.html
@@ -36,7 +46,22 @@ public:
      * 
      * @return bool true if STA configuration is valid; otherwise false
      */
-    bool isSTACfgValid();
+    bool isWifiCfgValid() const;
+
+    /**
+     * Get the Wifi State
+     * 
+     * @return WiFiState 
+     */
+    WiFiState getWifiState() const;
+
+    /**
+     * gets the number of connected clients. It's only useful number when
+     * device is in AP mode.
+     * 
+     * @return uint32_t number of connected clients.
+     */
+    uint32_t countClients();
 private:
     /**
      * Construct a new WifiManager object
@@ -47,6 +72,7 @@ private:
 
     // Members
     DeviceStorage& storage;
+    WiFiState wifiState;
 };
 
 #endif // WIFI_MANAGER_H

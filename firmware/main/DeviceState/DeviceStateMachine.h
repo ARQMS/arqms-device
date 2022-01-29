@@ -1,6 +1,7 @@
 #ifndef DEVICE_STATE_MACHINE_H
 #define DEVICE_STATE_MACHINE_H
 
+#include "Platform.h"
 #include "DeviceHandler.h"
 
 /**
@@ -48,18 +49,21 @@ private:
         UPDATING,
     };
 
-    void onEnterState(const State state);
-    void onRunState(const State state);
-    void onLeaveState(const State state);
-
-    void startTimeout(const uint32_t durationMs);
+    void onEnterState(const State state) const;
+    void onRunState(const State state) const;
+    void onLeaveState(const State state) const;
 
     inline void conditionalStep(const bool conditional, const State valid);
     inline void branchStep(const bool conditional, const State valid, const State invalid);
 
+    bool timeoutReached() const;
+    void timeoutReset() const;
+    void timeoutStart(uint32_t durationS) const;
+
     // Members
     State currentState;
     State nextState;
+    mutable uint32_t timeoutExpectedEnd;
 
     DeviceHandler& handler;
 };
