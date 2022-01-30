@@ -41,7 +41,7 @@ void DeviceStateMachine::process() {
             conditionalStep(handler.getWifiState() == WiFiState::CONNECTED, RUNNING);
             break;
         case RUNNING: 
-            conditionalStep(handler.isAllTaskDone(), SLEEP);
+            conditionalStep(handler.isAllTaskDone() && timeoutReached(), SLEEP);
             conditionalStep(handler.isNewVersionAvailable(), UPDATING);
             conditionalStep(handler.getWifiState() != WiFiState::CONNECTED, CONNECTING);
             break;
@@ -92,6 +92,7 @@ void DeviceStateMachine::onEnterState(const State state) const {
             break;
         case RUNNING:
             handler.startDataAcquisition();
+            timeoutStart(10); // wait for 10s. This ensures MQTT handler have enough time to receive any actions
             break;
         case SLEEP:
             handler.enterSleep();

@@ -3,6 +3,8 @@
 
 #include "Platform.h"
 #include "DeviceStorage/DeviceStorage.h"
+#include "Events/EventLoopIfc.h"
+#include "Events/EventHandlerIfc.h"
 
 /**
  * Represents the wifi states 
@@ -20,12 +22,12 @@ enum class WiFiState {
  * @see https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/network/esp_wifi.html
  * @see https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-guides/wifi.html
  */
-class WiFiManager {
+class WiFiManager : public EventHandlerIfc {
 public:
     /**
      * Construct a new WifiManager object
      */
-    explicit WiFiManager(DeviceStorage& storage);
+    explicit WiFiManager(DeviceStorage& storage, EventLoopIfc& eventLoop);
 
     /**
      * Destroy the WifiManager object
@@ -41,14 +43,6 @@ public:
     void initialize();
 
     /**
-     * Checks wifi station mode (STA) configuration. It's invalid when any mendetory 
-     * field is missing (eg factory reset, or NVS error)
-     * 
-     * @return bool true if STA configuration is valid; otherwise false
-     */
-    bool isWifiCfgValid() const;
-
-    /**
      * Get the Wifi State
      * 
      * @return WiFiState 
@@ -62,7 +56,30 @@ public:
      * @return uint32_t number of connected clients.
      */
     uint32_t countClients();
+
+    /**
+     * Starts the wifi peripheral in STA mode
+     * 
+     * @param cfg to use to connect
+     */
+    void startSTA(WifiParameters& cfg);
+
+    /**
+     * Starts the wifi peripheral as access point. Clients can connect to this device
+     * 
+     * @see countClients()
+     */
+    void startAP(WifiParameters& cfg);
+
+    /**
+     * @see EventHandlerIfc
+     */
+    void onEvent(esp_event_base_t base, int32_t id, void* data) override;
+
 private:
+    // the maximum retry connection
+    static const uint32_t MAXIMUM_RECONNECTING_RETRY = 5;
+
     /**
      * Construct a new WifiManager object
      * 
@@ -72,7 +89,11 @@ private:
 
     // Members
     DeviceStorage& storage;
+    EventLoopIfc& eventLoop;
     WiFiState wifiState;
+
+    uint32_t retryNum;
+    uint32_t apClients;
 };
 
 #endif // WIFI_MANAGER_H

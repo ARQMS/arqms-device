@@ -64,15 +64,15 @@ void DeviceStorage::setDeviceParameters(const DeviceParameters& param) {
 
 WifiParameters DeviceStorage::getWifiParameters() {
     // IDF already supports wifi NVS storage
-    wifi_config_t wifiConfig;
-    esp_wifi_get_config(wifi_interface_t::WIFI_IF_STA, &wifiConfig);
+    WifiParameters wifiConfig;
+    esp_wifi_get_config(wifi_interface_t::WIFI_IF_STA, &wifiConfig.config);
 
-    return static_cast<WifiParameters>(wifiConfig);
+    return wifiConfig;
 }
 
 void DeviceStorage::setWifiParameters(const WifiParameters& param) {
     // IDF already supports wifi NVS storage
-    wifi_config_t config = static_cast<wifi_config_t>(param);
+    wifi_config_t config = static_cast<wifi_config_t>(param.config);
     esp_wifi_set_config(wifi_interface_t::WIFI_IF_STA, &config);
 }
     

@@ -14,10 +14,10 @@
 #define HMI_STACK_SIZE configMINIMAL_STACK_SIZE
 
 static DeviceStorage storage;
-static WiFiManager wifi(storage);
 static EventDispatcher dispatcher;
 static HmiManager hmi(dispatcher);
 static SensorManager sensor(dispatcher);
+static WiFiManager wifi(storage, dispatcher);
 
 static DeviceHandler stateMachineHandler(wifi, sensor, storage);
 static DeviceStateMachine stateMachine(stateMachineHandler);

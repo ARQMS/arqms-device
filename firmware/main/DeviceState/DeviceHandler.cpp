@@ -1,5 +1,6 @@
 #include "DeviceHandler.h"
 
+#include "DeviceStorage/ConfigurationLayout.h"
 #include "esp_system.h"
 #include "esp_sleep.h"
 
@@ -13,7 +14,8 @@ DeviceHandler::DeviceHandler(WiFiManager& wifiManager, SensorManager& sensor, De
 }
 
 bool DeviceHandler::isWifiCfgValid() const {
-    return wifiManager.isWifiCfgValid();
+    WifiParameters wifiCfg = storage.getWifiParameters();
+    return wifiCfg.isWifiCfgValid();
 }
 
 bool DeviceHandler::isAllTaskDone() const {
@@ -52,17 +54,13 @@ WiFiState DeviceHandler::getWifiState() const {
 }
 
 void DeviceHandler::connectToWiFi() {
-    // TODO
-
-    // WifiParameters config = storage.getWifiParameters();
-    // wifiManager.start(STA);
-    // wifiManager.connect(config);
+    WifiParameters config = storage.getWifiParameters();
+    wifiManager.startSTA(config);
 }
 
 void DeviceHandler::enableAPMode() {
-    // TODO
-
-    // wifiManager.start(AP);
+    WifiParameters config = storage.getWifiParameters();
+    wifiManager.startAP(config);
 }
 
 void DeviceHandler::startDataAcquisition() {

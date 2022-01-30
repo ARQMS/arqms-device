@@ -1,12 +1,20 @@
 #include "WiFiManager.h"
-#include "DeviceStorage/ConfigurationLayout.h"
 
 #include "esp_wifi.h"
 
 
-WiFiManager::WiFiManager(DeviceStorage& storage) :
+// Event Callback mapper
+static void eventHandler(void* context, esp_event_base_t base, int32_t id, void* data) {
+    EventHandlerIfc* pHandler = static_cast<EventHandlerIfc*>(context);
+    pHandler->onEvent(base, id, data);
+}
+
+WiFiManager::WiFiManager(DeviceStorage& storage, EventLoopIfc& eventLoop) :
     storage(storage),
-    wifiState(WiFiState::DISABLED) {
+    eventLoop(eventLoop),
+    wifiState(WiFiState::DISABLED),
+    retryNum(0U),
+    apClients(0U) {
 }
 
 WiFiManager::~WiFiManager() {
@@ -21,16 +29,37 @@ void WiFiManager::initialize() {
 
     // initialize TCP stack
     esp_netif_init();
-    esp_event_loop_create_default();
+
+    // Register events from default loop
+    esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &eventHandler, this, NULL);
+    esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &eventHandler, this, NULL);
 }
 
-bool WiFiManager::isWifiCfgValid()  const {
-    WifiParameters wifiConfig = storage.getWifiParameters();
-    
-    // After NVS is erased, the SSID is empty. so we can be sure there
-    // is no valid configuration.
-    bool hasSSID = strlen((char*)wifiConfig.sta.ssid) != 0;
-    return hasSSID;
+void WiFiManager::onEvent(esp_event_base_t base, int32_t id, void* data) {
+    // STA
+    if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
+        esp_wifi_connect();
+    }
+    else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
+        if (retryNum < MAXIMUM_RECONNECTING_RETRY) {
+            esp_wifi_connect();
+            retryNum++;
+        } else {
+            wifiState = WiFiState::FAILED;
+        }
+    } 
+    else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
+        retryNum = 0;
+        wifiState = WiFiState::CONNECTED;
+    }
+
+    // AP
+    else if (base == WIFI_EVENT && id == WIFI_EVENT_AP_STACONNECTED) {
+        apClients++;
+    }
+    else if (base == WIFI_EVENT && id == WIFI_EVENT_AP_STADISCONNECTED) {
+        apClients--;
+    }
 }
 
 WiFiState WiFiManager::getWifiState() const {
@@ -38,5 +67,21 @@ WiFiState WiFiManager::getWifiState() const {
 }
 
 uint32_t WiFiManager::countClients() {
-    return 0; // TODO
+    return apClients;
+}
+
+void WiFiManager::startSTA(WifiParameters& cfg) {
+    esp_netif_create_default_wifi_sta();
+
+    esp_wifi_set_mode(WIFI_MODE_STA);
+    esp_wifi_set_config(WIFI_IF_STA, &cfg.config);
+    esp_wifi_start();
+}
+
+void WiFiManager::startAP(WifiParameters& cfg) {
+    esp_netif_create_default_wifi_ap();
+
+    esp_wifi_set_mode(WIFI_MODE_AP);
+    esp_wifi_set_config(WIFI_IF_AP, &cfg.config);
+    esp_wifi_start();
 }
