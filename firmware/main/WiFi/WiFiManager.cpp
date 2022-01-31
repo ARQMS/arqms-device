@@ -2,7 +2,6 @@
 
 #include "esp_wifi.h"
 
-
 // Event Callback mapper
 static void eventHandler(void* context, esp_event_base_t base, int32_t id, void* data) {
     EventHandlerIfc* pHandler = static_cast<EventHandlerIfc*>(context);
@@ -12,6 +11,7 @@ static void eventHandler(void* context, esp_event_base_t base, int32_t id, void*
 WiFiManager::WiFiManager(DeviceStorage& storage, EventLoopIfc& eventLoop) :
     storage(storage),
     eventLoop(eventLoop),
+    localCtrlHandler(storage),
     wifiState(WiFiState::DISABLED),
     retryNum(0U),
     apClients(0U) {
@@ -71,6 +71,10 @@ uint32_t WiFiManager::countClients() {
 }
 
 void WiFiManager::startSTA(WifiParameters& cfg) {
+    if (localCtrlHandler.isRunning()) {
+        localCtrlHandler.stopService();
+    }
+
     esp_netif_create_default_wifi_sta();
 
     esp_wifi_set_mode(WIFI_MODE_STA);
@@ -84,4 +88,10 @@ void WiFiManager::startAP(WifiParameters& cfg) {
     esp_wifi_set_mode(WIFI_MODE_AP);
     esp_wifi_set_config(WIFI_IF_AP, &cfg.config);
     esp_wifi_start();
+
+    // Setup Local Control
+    // ESP Local_Ctrl framework is used for communication in Service mode.
+    if (!localCtrlHandler.isRunning()) {
+        localCtrlHandler.startService();
+    }
 }

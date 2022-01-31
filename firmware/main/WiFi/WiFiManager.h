@@ -2,6 +2,7 @@
 #define WIFI_MANAGER_H
 
 #include "Platform.h"
+#include "LocalCtrlHandler.h"
 #include "DeviceStorage/DeviceStorage.h"
 #include "Events/EventLoopIfc.h"
 #include "Events/EventHandlerIfc.h"
@@ -90,6 +91,7 @@ private:
     // Members
     DeviceStorage& storage;
     EventLoopIfc& eventLoop;
+    LocalCtrlHandler localCtrlHandler;
     WiFiState wifiState;
 
     uint32_t retryNum;
