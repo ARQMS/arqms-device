@@ -70,7 +70,10 @@ TimerId EventDispatcher::startOneShotTimer(uint32_t durationMs) {
 
     esp_timer_create_args_t timerArgs = {
         .callback = timerHandlerOneShote,
-        .arg = this
+        .arg = this,
+        .dispatch_method = ESP_TIMER_TASK,
+        .name = NULL,
+        .skip_unhandled_events = false
     };
     esp_timer_handle_t timerHandler;
     esp_timer_create(&timerArgs, &timerHandler);
