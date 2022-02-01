@@ -1,7 +1,7 @@
 #ifndef HMIMANAGER_H
 #define HMIMANAGER_H
 
-#include "Platform.h"
+#include "HumiPlatform.h"
 #include "Events/EventHandlerIfc.h"
 #include "Events/EventLoopIfc.h"
 

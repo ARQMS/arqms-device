@@ -1,7 +1,7 @@
 #ifndef SENSORMANAGER_H
 #define SENSORMANAGER_H
 
-#include "Platform.h"
+#include "HumiPlatform.h"
 #include "Events/EventLoopIfc.h"
 
 /**

@@ -1,7 +1,7 @@
 #ifndef EVENTDISPATCHER_H
 #define EVENTDISPATCHER_H
 
-#include "Platform.h"
+#include "HumiPlatform.h"
 #include "EventHandlerIfc.h"
 #include "EventLoopIfc.h"
 

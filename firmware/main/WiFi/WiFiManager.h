@@ -1,7 +1,7 @@
 #ifndef WIFI_MANAGER_H
 #define WIFI_MANAGER_H
 
-#include "Platform.h"
+#include "HumiPlatform.h"
 #include "LocalCtrlHandler.h"
 #include "DeviceStorage/DeviceStorage.h"
 #include "Events/EventLoopIfc.h"

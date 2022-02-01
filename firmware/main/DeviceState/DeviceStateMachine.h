@@ -1,7 +1,7 @@
 #ifndef DEVICE_STATE_MACHINE_H
 #define DEVICE_STATE_MACHINE_H
 
-#include "Platform.h"
+#include "HumiPlatform.h"
 #include "DeviceHandler.h"
 
 /**

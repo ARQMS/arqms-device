@@ -3,7 +3,7 @@
 
 #include "esp_local_ctrl.h"
 
-#include "Platform.h"
+#include "HumiPlatform.h"
 #include "DeviceStorage/DeviceStorage.h"
 
 /**

@@ -1,7 +1,7 @@
 #ifndef DEVICEHANDLER_H
 #define DEVICEHANDLER_H
 
-#include "Platform.h"
+#include "HumiPlatform.h"
 #include "WiFi/WiFiManager.h"
 #include "DeviceStorage/DeviceStorage.h"
 #include "Sensor/SensorManager.h"

@@ -1,7 +1,7 @@
 #ifndef DEVICE_SETTINGS_H
 #define DEVICE_SETTINGS_H
 
-#include "Platform.h"
+#include "HumiPlatform.h"
 #include "ConfigurationLayout.h"
 
 /**

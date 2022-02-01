@@ -1,7 +1,7 @@
 #ifndef CONFIGURATION_LAYOUT_H
 #define CONFIGURATION_LAYOUT_H
 
-#include "Platform.h"
+#include "HumiPlatform.h"
 #include "esp_wifi_types.h"
 
 /**
