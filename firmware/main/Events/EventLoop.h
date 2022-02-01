@@ -6,20 +6,20 @@
 #include "EventLoopIfc.h"
 
 /**
- * A EventDispatcher which uses the ESP-IDF event loop framework to notify HMI about changes.
+ * A EventLoop which uses the ESP-IDF event loop framework to notify managers and service about changes.
  */
-class EventDispatcher : public EventLoopIfc {
+class EventLoop : public EventLoopIfc {
 public:
 
     /**
      * Constructor
      */
-    explicit EventDispatcher(void);
+    explicit EventLoop(void);
 
     /**
      * Deconstructor
      */
-    ~EventDispatcher() { }
+    ~EventLoop() { }
 
     /**
      * Initializes the application loop
@@ -53,12 +53,12 @@ private:
     /**
      * Private copy constructor.
      */
-    EventDispatcher(const EventDispatcher& other);
+    EventLoop(const EventLoop& other);
 
     /**
      * Private assignment operator.
      */
-    EventDispatcher& operator=(const EventDispatcher& other);
+    EventLoop& operator=(const EventLoop& other);
 
     // members
     static esp_event_loop_handle_t s_appLoopHandle;

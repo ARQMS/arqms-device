@@ -52,7 +52,6 @@ void DeviceStateMachine::process() {
             // nothing to do 
             break;
         default:
-            ESP_LOGE("StateMachine", "State not implemented!");
             ESP_ERROR_CHECK(ESP_FAIL);
             break;
         }

@@ -4,20 +4,22 @@
 // Application
 #include "DeviceStorage/DeviceStorage.h"
 #include "WiFi/WiFiManager.h"
+#include "WiFi/MqttHandler.h"
 #include "Sensor/SensorManager.h"
 #include "Hmi/HmiManager.h"
 #include "DeviceState/DeviceStateMachine.h"
-#include "Events/EventDispatcher.h"
+#include "Events/EventLoop.h"
 #include "Events/Events.h"
 
 #define SM_STACK_SIZE configMINIMAL_STACK_SIZE
 #define HMI_STACK_SIZE configMINIMAL_STACK_SIZE
 
 static DeviceStorage storage;
-static EventDispatcher dispatcher;
+static EventLoop dispatcher;
 static HmiManager hmi(dispatcher);
 static SensorManager sensor(dispatcher);
 static WiFiManager wifi(storage, dispatcher);
+static MqttHandler mqtt(storage, dispatcher);
 
 static DeviceHandler stateMachineHandler(wifi, sensor, storage);
 static DeviceStateMachine stateMachine(stateMachineHandler);
@@ -26,6 +28,7 @@ static DeviceStateMachine stateMachine(stateMachineHandler);
 ESP_EVENT_DEFINE_BASE(HMI_EVENTS);
 ESP_EVENT_DEFINE_BASE(SENSOR_EVENTS);
 ESP_EVENT_DEFINE_BASE(TIMER_EVENTS);
+ESP_EVENT_DEFINE_BASE(DEVICE_EVENTS);
 
 extern "C" void statemachine_main(void* args) {
     DeviceStateMachine* pSm = static_cast<DeviceStateMachine*>(args);
@@ -55,6 +58,7 @@ extern "C" void app_main(void) {
     dispatcher.registerEventHandler(TIMER_EVENTS, TIMER_ELAPSED, hmi);
     dispatcher.registerEventHandler(HMI_EVENTS, ESP_EVENT_ANY_ID, hmi);
     dispatcher.registerEventHandler(SENSOR_EVENTS, DATA_ACQUIRED, hmi);
+    dispatcher.registerEventHandler(SENSOR_EVENTS, DATA_ACQUIRED, mqtt);
 
     // application tasks
     xTaskCreate(statemachine_main, "StateMachineTask", SM_STACK_SIZE, &stateMachine, uxTaskPriorityGet(NULL), NULL);
