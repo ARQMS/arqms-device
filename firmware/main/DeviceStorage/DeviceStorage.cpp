@@ -4,7 +4,9 @@
 #include "nvs_flash.h"
 #include "nvs.h"
 
+// Maximal 15 characters inkl zero-terminator
 #define STORAGE_NAMESPACE "HumiConfStore"
+#define DEVICE_CONFIG "DeviceConfig"
 
 DeviceStorage::DeviceStorage() :
     initialized(false) {
@@ -31,7 +33,6 @@ bool DeviceStorage::isInitialized() {
     return initialized;
 }
 
-
 DeviceParameters DeviceStorage::getDeviceParameters(void) {
     NvsLayoutV1 nvsValues;
 
@@ -43,7 +44,7 @@ DeviceParameters DeviceStorage::getDeviceParameters(void) {
     nvs_open(STORAGE_NAMESPACE, NVS_READONLY, pHandler);
 
     size_t size;
-    nvs_get_blob(*pHandler, "Config", &nvsValues, &size);
+    nvs_get_blob(*pHandler, DEVICE_CONFIG, &nvsValues, &size);
     nvs_close(*pHandler);
 
     return nvsValues.deviceParameters;
@@ -58,7 +59,8 @@ void DeviceStorage::setDeviceParameters(const DeviceParameters& param) {
     nvs_handle* pHandler = nullptr;
     nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, pHandler);
 
-    nvs_set_blob(*pHandler, "Config", &nvsValues, CURRENT_LAYOUT_SIZE_BYTES);
+    nvs_set_blob(*pHandler, DEVICE_CONFIG, &nvsValues, CURRENT_LAYOUT_SIZE_BYTES);
+    nvs_commit(*pHandler);
     nvs_close(*pHandler);
 }
 

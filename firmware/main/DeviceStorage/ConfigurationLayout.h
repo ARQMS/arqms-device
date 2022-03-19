@@ -4,6 +4,13 @@
 #include "HumiPlatform.h"
 #include "esp_wifi_types.h"
 
+// Note: At the moment only the following tyes are supported by IDF
+//  - uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t
+//  - zero-terminated string
+//  - binary blocks
+//
+// float or double not supported!
+
 /**
  * Device parameters characterize the behavior of the device and are programmed in production.
  */
