@@ -2,103 +2,22 @@
 FileName = Mainboard.GBR
 AutoAperture = True
 *************************************************************
-Generating : GND
-      File : Mainboard.G1
+Generating : Bottom Overlay
+      File : Mainboard.GBO
 
-    Adding Layer      : GND
-
-    Adding Layer      : Multi-Layer
+    Adding Layer      : Bottom Overlay
 
 
 Used DCodes :
-    D13
-    D98
-    D101
-    D102
-    D103
+    D16
+    D109
 *************************************************************
 
 *************************************************************
-Generating : PWD
-      File : Mainboard.G2
+Generating : Bottom Solder
+      File : Mainboard.GBS
 
-    Adding Layer      : PWD
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D102
-    D104
-*************************************************************
-
-*************************************************************
-Generating : Top
-      File : Mainboard.GTL
-
-    Adding Layer      : Top
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D11
-    D13
-    D15
-    D17
-    D57
-    D58
-    D59
-    D60
-    D61
-    D62
-    D63
-    D64
-    D65
-    D66
-    D67
-    D68
-    D69
-    D70
-    D71
-    D72
-    D73
-    D74
-    D75
-    D76
-    D77
-    D78
-    D79
-    D80
-    D81
-    D82
-    D83
-    D84
-    D85
-    D86
-    D87
-    D88
-    D89
-    D90
-    D91
-    D92
-    D93
-    D94
-    D95
-    D96
-    D97
-    D98
-    D99
-    D100
-    D101
-    D102
-    D103
-    D104
-*************************************************************
-
-*************************************************************
-Generating : Bottom
-      File : Mainboard.GBL
+    Adding Layer      : Bottom Solder
 
     Adding Layer      : Bottom
 
@@ -106,72 +25,24 @@ Generating : Bottom
 
 
 Used DCodes :
-    D11
-    D13
-    D15
-    D71
-    D90
-    D91
-    D96
-    D97
-    D98
-    D99
-    D100
-    D101
-    D102
-    D103
-    D104
-    D105
-    D106
+    D52
+    D53
+    D54
+    D55
+    D56
+    D107
+    D108
 *************************************************************
 
 *************************************************************
-Generating : Top Overlay
-      File : Mainboard.GTO
+Generating : Keep-Out Layer
+      File : Mainboard.GKO
 
-    Adding Layer      : Top Overlay
+    Adding Layer      : Keep-Out Layer
 
 
 Used DCodes :
-    D10
-    D11
-    D12
-    D13
-    D14
-    D15
-    D16
-    D17
-    D18
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 13
-      File : Mainboard.GM13
-
-    Adding Layer      : Mechanical 13
-
-
-Used DCodes :
-    D11
-    D12
-    D16
-    D18
-    D109
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 15
-      File : Mainboard.GM15
-
-    Adding Layer      : Mechanical 15
-
-
-Used DCodes :
-    D12
-    D16
-    D18
-    D110
-    D111
+    D92
 *************************************************************
 
 *************************************************************
@@ -227,10 +98,88 @@ Used DCodes :
 *************************************************************
 
 *************************************************************
-Generating : Bottom Solder
-      File : Mainboard.GBS
+Generating : Mechanical 15
+      File : Mainboard.GM15
 
-    Adding Layer      : Bottom Solder
+    Adding Layer      : Mechanical 15
+
+
+Used DCodes :
+    D10
+    D16
+    D18
+    D110
+    D111
+*************************************************************
+
+*************************************************************
+Generating : PWD
+      File : Mainboard.G2
+
+    Adding Layer      : PWD
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D102
+    D104
+*************************************************************
+
+*************************************************************
+Generating : GND
+      File : Mainboard.G1
+
+    Adding Layer      : GND
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D13
+    D97
+    D101
+    D102
+    D103
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 13
+      File : Mainboard.GM13
+
+    Adding Layer      : Mechanical 13
+
+
+Used DCodes :
+    D10
+    D12
+    D16
+    D18
+    D109
+*************************************************************
+
+*************************************************************
+Generating : Top Overlay
+      File : Mainboard.GTO
+
+    Adding Layer      : Top Overlay
+
+
+Used DCodes :
+    D10
+    D11
+    D12
+    D13
+    D14
+    D15
+    D16
+    D17
+    D18
+*************************************************************
+
+*************************************************************
+Generating : Bottom
+      File : Mainboard.GBL
 
     Adding Layer      : Bottom
 
@@ -238,35 +187,86 @@ Generating : Bottom Solder
 
 
 Used DCodes :
-    D52
-    D53
-    D54
-    D55
-    D56
-    D107
-    D108
-*************************************************************
-
-*************************************************************
-Generating : Bottom Overlay
-      File : Mainboard.GBO
-
-    Adding Layer      : Bottom Overlay
-
-
-Used DCodes :
-    D16
-    D109
-*************************************************************
-
-*************************************************************
-Generating : Keep-Out Layer
-      File : Mainboard.GKO
-
-    Adding Layer      : Keep-Out Layer
-
-
-Used DCodes :
+    D12
+    D13
+    D15
+    D71
     D90
+    D92
+    D96
+    D97
+    D98
+    D99
+    D100
+    D101
+    D102
+    D103
+    D104
+    D105
+    D106
+*************************************************************
+
+*************************************************************
+Generating : Top
+      File : Mainboard.GTL
+
+    Adding Layer      : Top
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D12
+    D13
+    D15
+    D17
+    D57
+    D58
+    D59
+    D60
+    D61
+    D62
+    D63
+    D64
+    D65
+    D66
+    D67
+    D68
+    D69
+    D70
+    D71
+    D72
+    D73
+    D74
+    D75
+    D76
+    D77
+    D78
+    D79
+    D80
+    D81
+    D82
+    D83
+    D84
+    D85
+    D86
+    D87
+    D88
+    D89
+    D90
+    D91
+    D92
+    D93
+    D94
+    D95
+    D96
+    D97
+    D98
+    D99
+    D100
+    D101
+    D102
+    D103
+    D104
 *************************************************************
 
