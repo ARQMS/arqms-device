@@ -5,6 +5,7 @@
 // Project includes
 #include <HumiPlatform.h>
 #include "Drivers/ApplicationHardwareConfig.h"
+#include "Drivers/AirIndicatorDriver.h"
 #include "Drivers/StartupController.h"
 
 /**
@@ -20,10 +21,13 @@ extern "C" void app_main(void) {
     StartupController::initializeSpi1();
     StartupController::initializeAdc1();
 
-    uint8_t ledState = 0;
-    while(true){
-        gpio_set_level(LED_AIR_POOR, ledState);
-        ledState = !ledState;
+    // TODO remove test code
+    AirIndicatorDriver airIndicator(LED_AIR_GOOD, LED_AIR_MOD, LED_AIR_POOR);
+    AirIndicatorDriver::Quality quality = AirIndicatorDriver::Quality::POOR;
+    while(true) {
+        quality = static_cast<AirIndicatorDriver::Quality>((quality + 1) % 3);
+        airIndicator.setQuality(quality);
+
         vTaskDelay(250 / portTICK_PERIOD_MS);
     }
 }
