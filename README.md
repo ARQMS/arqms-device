@@ -11,7 +11,7 @@ The project is documented in ![Github Wiki Page](https://github.com/ARQMS/arqms-
 
 ## IDE and SDK
 The ESP32-C3 is used as main CPU and WLAN module. Ensure you have installed the ESP-IDF Framework on your 
-development machine according to [docs](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/get-started/index.html#step-1-install-prerequisites)
+development machine according to [docs](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/get-started/index.html#step-1-install-prerequisites) or quick install instruction from [YoutTube](https://www.youtube.com/watch?v=byVPAfodTyY)
 
 As standard IDE Visual Studio Code is used, open the `firmware` Folder.
 
