@@ -1,0 +1,9 @@
+DRC Rules Export File for PCB: C:\Users\sandro.pedrett\AppData\Local\Temp\Releases\Snapshot\1\Mainboard.PcbDoc
+RuleKind=SolderMaskExpansion|RuleName=SolderMaskExpansion|Scope=Board|Minimum=4.00
+RuleKind=MinimumAnnularRing|RuleName=MinimumAnnularRing|Scope=Board|Minimum=3.00
+RuleKind=ShortCircuit|RuleName=ShortCircuit|Scope=Board|Allowed=0
+RuleKind=SolderMaskExpansion|RuleName=SolderMaskExpansion_Tented|Scope=Board|Minimum=4.00
+RuleKind=Width|RuleName=Width|Scope=Board|Minimum=3.94
+RuleKind=Clearance|RuleName=Clearance|Scope=Board|Minimum=7.87
+RuleKind=Clearance|RuleName=Clearance Top Layer|Scope=Board|Minimum=39.37
+RuleKind=Clearance|RuleName=Clearance Bottom Layer|Scope=Board|Minimum=8.00
