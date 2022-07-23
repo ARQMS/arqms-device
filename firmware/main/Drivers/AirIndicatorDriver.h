@@ -16,10 +16,10 @@ public:
      * Enum for air quality 
      */
     enum Quality {
-        POOR,
-        MOD,
-        GOOD,
-        UNKNOWN
+        UNKNOWN = 0,
+        GOOD    = 1,
+        MOD     = 2,
+        POOR    = 3,
     };
 
     /**
@@ -59,6 +59,10 @@ private:
     const gpio_num_t m_goodPin;
     const gpio_num_t m_modPin; 
     const gpio_num_t m_poorPin; 
+
+    // LED Helper state
+    static const uint8_t ON     = 0;
+    static const uint8_t OFF    = 1;
 };
 
 

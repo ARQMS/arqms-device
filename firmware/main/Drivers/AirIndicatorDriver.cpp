@@ -12,27 +12,27 @@ AirIndicatorDriver::~AirIndicatorDriver() {
 void AirIndicatorDriver::setQuality(const AirIndicatorDriver::Quality quality) {
     switch (quality) {
         case Quality::GOOD: 
-            gpio_set_level(m_goodPin, 1);
-            gpio_set_level(m_modPin, 0);
-            gpio_set_level(m_poorPin, 0);
+            gpio_set_level(m_goodPin, ON);
+            gpio_set_level(m_modPin, OFF);
+            gpio_set_level(m_poorPin, OFF);
             break;
 
         case Quality::MOD: 
-            gpio_set_level(m_goodPin, 1);
-            gpio_set_level(m_modPin, 1);
-            gpio_set_level(m_poorPin, 0);
+            gpio_set_level(m_goodPin, ON);
+            gpio_set_level(m_modPin, ON);
+            gpio_set_level(m_poorPin, OFF);
             break;
 
         case Quality::POOR: 
-            gpio_set_level(m_goodPin, 1);
-            gpio_set_level(m_modPin, 1);
-            gpio_set_level(m_poorPin, 1);
+            gpio_set_level(m_goodPin, ON);
+            gpio_set_level(m_modPin, ON);
+            gpio_set_level(m_poorPin, ON);
             break;
 
         default:
-            gpio_set_level(m_goodPin, 0);
-            gpio_set_level(m_modPin, 0);
-            gpio_set_level(m_poorPin, 0);
+            gpio_set_level(m_goodPin, OFF);
+            gpio_set_level(m_modPin, OFF);
+            gpio_set_level(m_poorPin, OFF);
             break;
     }
 }

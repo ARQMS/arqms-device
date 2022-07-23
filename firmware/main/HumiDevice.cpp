@@ -23,12 +23,12 @@ extern "C" void app_main(void) {
 
     // TODO remove test code
     AirIndicatorDriver airIndicator(LED_AIR_GOOD, LED_AIR_MOD, LED_AIR_POOR);
-    AirIndicatorDriver::Quality quality = AirIndicatorDriver::Quality::POOR;
+    AirIndicatorDriver::Quality quality = AirIndicatorDriver::Quality::UNKNOWN;
     while(true) {
-        quality = static_cast<AirIndicatorDriver::Quality>((quality + 1) % 3);
         airIndicator.setQuality(quality);
+        quality = static_cast<AirIndicatorDriver::Quality>((quality + 1) % 4);
 
-        vTaskDelay(250 / portTICK_PERIOD_MS);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
 
