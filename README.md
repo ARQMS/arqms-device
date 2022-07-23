@@ -25,4 +25,6 @@ As standard IDE Visual Studio Code is used, open the `firmware` Folder.
 - [x] Case - Bottom case has infinity small border for screw holder
 
 **Rev1**
-none
+- [] PCB - USB Port is too small after JLCPCB fabrication
+- [] PCB - If HW Switch is soldered, ESP does not start anymore. Workaround remove R23
+- [] PCB - Green LED is very bright, increase resistor
