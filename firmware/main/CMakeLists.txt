@@ -1,2 +1,6 @@
-idf_component_register(SRCS HumiDevice.cpp
-                       INCLUDE_DIRS ".")
+idf_component_register(
+     SRCS 
+          "HumiDevice.cpp"
+          "Drivers/StartupController.cpp"
+     INCLUDE_DIRS "."
+)
