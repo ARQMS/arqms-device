@@ -4,20 +4,28 @@
 // Project includes
 #include <HumiPlatform.h>
 
+#include "Rtos/EventSubscriberIfc.h"
+#include "Rtos/EventPublisherIfc.h"
+
 /**
- * Interface for FreeRTOS Task.
- * 
- * It wrappes framework FreeRTOS Task into type-safe task. Tasks are an unit which encapsulate
- * the state and behavior from other tasks. It interconnects to other tasks with queues.
- * 
- * @see https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/system/freertos.html#task-api
+ * Interface for Task.
  */
-class TaskBase {
+class TaskIfc : public EventSubscriberIfc {
 public:
     /**
      * Destructor
      */
-    virtual ~TaskBase() {}
+    virtual ~TaskIfc() {};
+
+    /**
+     * Initialize the task
+     */
+    virtual void initialize() = 0;
+
+    /**
+     * Starts the task in a loop. Task can not be restartet when it's over!
+     */
+    virtual void start() = 0;
 };
 
 
