@@ -11,10 +11,12 @@
 #include "Drivers/StartupController.h"
 #include "Control/ControlTask.h"
 #include "GuiUpdater/GuiUpdaterTask.h"
+#include "CloudLink/CloudLinkTask.h"
 
 // Create task definitions
 CREATE_TASK_DEF(Control, 0x800, 10) // 2kB Stack
 CREATE_TASK_DEF(GuiUpdater, 0x800, 10) // 2kB Stack
+CREATE_TASK_DEF(CloudLink, 0x800, 11) // 2kB Stack
 
 /**
  * The entry point for humi device. This is called after second bootloader has 
@@ -35,13 +37,17 @@ extern "C" void app_main(void) {
     // create tasks
     ControlTask& control = *createControlTask();
     GuiUpdaterTask& guiUpdater = *createGuiUpdaterTask();
+    CloudLinkTask& cloudLink = *createCloudLinkTask();
 
     // connect tasks
     control.GuiUpdater.connect(guiUpdater);
+    control.CloudLink.connect(cloudLink);
     control.Same.connect(control);
+    cloudLink.Control.connect(control);
 
     // start tasks
     startGuiUpdaterTask();
     startControlTask();
+    startCloudLinkTask();
 }
 

@@ -9,6 +9,8 @@ idf_component_register(
           
           "GuiUpdater/GuiUpdaterTask.cpp"
           "GuiUpdater/AirIndicatorDriver.cpp"
+
+          "CloudLink/CloudLinkTask.cpp"
      INCLUDE_DIRS "."
      REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform
 )

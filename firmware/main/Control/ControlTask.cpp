@@ -5,6 +5,7 @@
 
 ControlTask::ControlTask() :
     GuiUpdater(),
+    CloudLink(),
     Same(),
     m_currentQuality(0.0f) {
 }
@@ -40,6 +41,8 @@ void ControlTask::onHandleTestId() {
     AirQualityEvent event;
     event.setQuality(m_currentQuality);
     GuiUpdater.send(EventIdentifiers::QUALITY_EVENT, &event);
+
+    CloudLink.send(EventIdentifiers::TEST_EVENT, &event);
 
     // TODO remove test code
     vTaskDelay(100 / portTICK_PERIOD_MS);
