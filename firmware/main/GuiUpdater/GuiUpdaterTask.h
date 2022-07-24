@@ -1,31 +1,30 @@
-#ifndef CONTROL_TASK_H_ 
-#define CONTROL_TASK_H_
+#ifndef GUI_UPDATER_H_ 
+#define GUI_UPDATER_H_
 
 // Project includes
 #include <HumiPlatform.h>
 #include "Rtos/TaskBase.h"
-#include "Rtos/EventPublisherSingle.h"
 
+#include "AirIndicatorDriver.h"
 #include "Events/AirQualityEvent.h"
 
 /**
  * 
  */
-class ControlTask : public TaskBase<10, sizeof(int)> {
+class GuiUpdaterTask : public TaskBase<2, sizeof(AirQualityEvent)> {
 public:
-    EventPublisherSingle GuiUpdater;
-    EventPublisherSingle Same; // TODO remove test publisher
+    // no outputs
 
 public:
     /**
      * Constructor
      */
-    ControlTask();
+    GuiUpdaterTask();
 
     /**
      * Destructor
      */
-    virtual ~ControlTask();
+    virtual ~GuiUpdaterTask();
     
 protected:
     /**
@@ -44,22 +43,23 @@ protected:
     virtual void onExecute(EventId eventId, Deserializer* pEvent = NULL) override;
 
 private:
+
     // Helper methods
-    void onHandleTestId();
+    void onHandleAirQuality(const AirQualityEvent& quality);
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
      */
-    ControlTask(const ControlTask& other);
+    GuiUpdaterTask(const GuiUpdaterTask& other);
 
     /**
      * Provide the private assignment operator so the compiler does not generate the default one.
      */
-    ControlTask& operator=(const ControlTask& other);
+    GuiUpdaterTask& operator=(const GuiUpdaterTask& other);
 
     // Private Members
-    AirQuality m_currentQuality;
+    AirIndicatorDriver m_airIndicator;
 };
 
 
-#endif // CONTROL_TASK_H_
+#endif // GUI_UPDATER_H_

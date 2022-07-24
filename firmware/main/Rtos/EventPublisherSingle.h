@@ -7,31 +7,32 @@
 
 // project includes
 #include <HumiPlatform.h>
-#include "EventPublisherIfc.h"
-#include "EventSubscriberIfc.h"
+#include "Rtos/EventRuntime.h"
+#include "Rtos/EventPublisherIfc.h"
+#include "Rtos/TaskIfc.h"
 
 /**
  * A simple event publisher which can be connected to single target subscriber.
  */
-class EventSinglePublisher : public EventPublisherIfc {
+class EventPublisherSingle : public EventPublisherIfc {
 public:
     /**
      * Constructor
      */
-    EventSinglePublisher() {};
+    EventPublisherSingle() {};
 
     /**
      * Destructor
      */
-    virtual ~EventSinglePublisher() {};
+    virtual ~EventPublisherSingle() {};
 
     /**
      * Connects the given subscriber to this publisher
      * 
      * @param subscriber to send events when send() is called
      */
-    void connect(EventSubscriberIfc& subscriber) {
-        m_subId = subscriber.getId();
+    void connect(TaskIfc& subscriber) {
+        m_subId = subscriber.getSubscriberId();
     }
 
     /**
@@ -39,16 +40,11 @@ public:
      */
     virtual void send(EventId eventId, EventIfc* pEvent = NULL) override {
         if (m_subId <= INVALID_SUBSCRIBER_ID) {
-            // TODO error
+            ESP_LOGE("HumiDevice", "Subscriber is invalid. No events sent");
+            return;
         }
 
-        // TODO serialize data. Use Protobuf?
-        // data << eventId;
-        // pEvent?.serialize(eventId);
-
-        /*if (xQueueSend(m_subId, &data, 100) != pdPASS) {
-            // TODO not sent, log message
-        }*/
+        EventRuntime::send(m_subId, eventId, pEvent);
     }
 
 private:

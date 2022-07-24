@@ -9,21 +9,21 @@ AirIndicatorDriver::AirIndicatorDriver(const gpio_num_t goodPin, const gpio_num_
 AirIndicatorDriver::~AirIndicatorDriver() {
 }
 
-void AirIndicatorDriver::setQuality(const AirIndicatorDriver::Quality quality) {
+void AirIndicatorDriver::setQuality(const AirQuality quality) {
     switch (quality) {
-        case Quality::GOOD: 
+        case AirQuality::GOOD: 
             gpio_set_level(m_goodPin, ON);
             gpio_set_level(m_modPin, OFF);
             gpio_set_level(m_poorPin, OFF);
             break;
 
-        case Quality::MOD: 
+        case AirQuality::MOD: 
             gpio_set_level(m_goodPin, ON);
             gpio_set_level(m_modPin, ON);
             gpio_set_level(m_poorPin, OFF);
             break;
 
-        case Quality::POOR: 
+        case AirQuality::POOR: 
             gpio_set_level(m_goodPin, ON);
             gpio_set_level(m_modPin, ON);
             gpio_set_level(m_poorPin, ON);

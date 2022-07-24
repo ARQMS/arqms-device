@@ -6,22 +6,13 @@
 
 // Project includes
 #include <HumiPlatform.h>
+#include "Events/AirQualityEvent.h"
 
 /**
  * AirIndicatorDriver manages air indicator
  */
 class AirIndicatorDriver {
 public:
-    /**
-     * Enum for air quality 
-     */
-    enum Quality {
-        UNKNOWN = 0,
-        GOOD    = 1,
-        MOD     = 2,
-        POOR    = 3,
-    };
-
     /**
      * Construtor
      */
@@ -37,7 +28,7 @@ public:
      * 
      * @param quality is used for led indication
      */
-    void setQuality(const AirIndicatorDriver::Quality quality);
+    void setQuality(const AirQuality quality);
 
 private:
     /**

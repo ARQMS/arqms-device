@@ -1,21 +1,29 @@
+// FreeRTOS includes
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
 // Project includes
 #include <HumiPlatform.h>
-#include "Rtos/TaskFactory.h"
+#include "Rtos/EventRuntime.h"
 #include "Drivers/ApplicationHardwareConfig.h"
-#include "Drivers/AirIndicatorDriver.h"
+
 #include "Drivers/StartupController.h"
 #include "Control/ControlTask.h"
+#include "GuiUpdater/GuiUpdaterTask.h"
 
-
-CREATE_TASK_DEF(Control, 200)
+// Create task definitions
+CREATE_TASK_DEF(Control, 0x800, 10) // 2kB Stack
+CREATE_TASK_DEF(GuiUpdater, 0x800, 10) // 2kB Stack
 
 /**
  * The entry point for humi device. This is called after second bootloader has 
  * initialized all peripherals pins and c++/c domain.
  * 
  * It is configured as a FreeRTOS task.
+ * @see https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/system/freertos.html#freertos-applications
  */
 extern "C" void app_main(void) {
+    ESP_LOGI("HumiDevice", "Application initialization...");
 
     // initialize hardware
     StartupController::initializeCPU();
@@ -24,37 +32,15 @@ extern "C" void app_main(void) {
     StartupController::initializeAdc1();
 
     // create tasks
-    // MeasurementFilterTask measFilter();
-    // GuiUpdaterTask guiUpdater();
-    // PowerMgmtTask powerMgmt();
-    // CloudLinkTask cloudLink();
     ControlTask& control = *createControlTask();
+    GuiUpdaterTask& guiUpdater = *createGuiUpdaterTask();
 
-    // MeasurementSensorTask measSensor();
+    // connect tasks
+    control.GuiUpdater.connect(guiUpdater);
+    control.Same.connect(control);
 
-    // control.MeasSensor.connect(measSensor);
-
-    /**
-     * in MeasSensorTask:
-     * execute(EventId eventId, byte* data)
-     *      switch (eventId) {
-     *          case HumiDeviceEvents::Snapshot: Snapshot s(data); handleSnapshot(s); break; // used google protobuf
-     *          ...
-     *      }
-     * 
-     * handleSnapshot(Snapshot s)
-     *      MeasFilter.publish(data);
-     */
-
-    // TODO remove test code
-    AirIndicatorDriver airIndicator(LED_AIR_GOOD, LED_AIR_MOD, LED_AIR_POOR);
-    AirIndicatorDriver::Quality quality = AirIndicatorDriver::Quality::UNKNOWN;
-    while(true) {
-        airIndicator.setQuality(quality);
-        quality = static_cast<AirIndicatorDriver::Quality>((quality + 1) % 4);
-
-
-        vTaskDelay(500 / portTICK_PERIOD_MS);
-    }
+    // start tasks
+    startGuiUpdaterTask();
+    startControlTask();
 }
 
