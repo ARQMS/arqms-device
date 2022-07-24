@@ -11,7 +11,6 @@ GuiUpdaterTask::~GuiUpdaterTask() {
 }
 
 void GuiUpdaterTask::onInitialize()  {
-    m_airIndicator.setQuality(AirQuality::UNKNOWN);
 }
 
 void GuiUpdaterTask::onStart() {

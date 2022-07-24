@@ -1,7 +1,7 @@
 #include "AirQualityEvent.h"
 
 AirQualityEvent::AirQualityEvent() :
-    m_quality(AirQuality::UNKNOWN) {
+    m_quality(0.0f) {
 }
 
 AirQualityEvent::AirQualityEvent(Deserializer& deserializer) {
@@ -12,11 +12,9 @@ AirQualityEvent::~AirQualityEvent() {
 }
 
 void AirQualityEvent::deserialize(Deserializer& deserializer) {
-    uint32_t quality;
-    deserializer >> quality;
-    m_quality = static_cast<AirQuality>(quality);
+    deserializer >> m_quality;
 }
 
 void AirQualityEvent::serialize(Serializer& serializer) const {
-    serializer << static_cast<uint32_t>(m_quality);
+    serializer << m_quality;
 }

@@ -10,7 +10,9 @@
 #include "Events/AirQualityEvent.h"
 
 /**
+ * This unit updates all user interface components
  * 
+ * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
 class GuiUpdaterTask : public TaskBase<2, sizeof(AirQualityEvent)> {
 public:

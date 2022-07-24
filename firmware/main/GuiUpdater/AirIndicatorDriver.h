@@ -28,11 +28,31 @@ public:
     /**
      * Set the air quality
      * 
-     * @param quality is used for led indication
+     * @param quality is used for led indication.     
+     *          - 0 means bad quality
+     *          - 1 means best quality
      */
-    void setQuality(const AirQuality quality);
+    void setQuality(const float32_t quality);
 
 private:
+
+    // Enum for air quality 
+    enum AirQuality {
+        UNKNOWN = 0,
+        GOOD    = 1,
+        MOD     = 2,
+        POOR    = 3,
+    };
+
+    // Constants
+    const float32_t POOR_THRESHOLD   = 0.8f;
+    const float32_t MOD_THRESHOLD    = 0.5f;
+    const uint8_t ON                 = 0;
+    const uint8_t OFF                = 1;
+
+    // Helper method
+    AirQuality calculateAirQuality(const float32_t quality);
+
     /**
      * Private default constructor
      */
@@ -52,10 +72,6 @@ private:
     const gpio_num_t m_goodPin;
     const gpio_num_t m_modPin; 
     const gpio_num_t m_poorPin; 
-
-    // LED Helper state
-    static const uint8_t ON     = 0;
-    static const uint8_t OFF    = 1;
 };
 
 

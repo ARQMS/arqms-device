@@ -9,8 +9,10 @@ AirIndicatorDriver::AirIndicatorDriver(const gpio_num_t goodPin, const gpio_num_
 AirIndicatorDriver::~AirIndicatorDriver() {
 }
 
-void AirIndicatorDriver::setQuality(const AirQuality quality) {
-    switch (quality) {
+void AirIndicatorDriver::setQuality(const float32_t quality) {
+    AirQuality indicator = calculateAirQuality(quality);
+
+    switch (indicator) {
         case AirQuality::GOOD: 
             gpio_set_level(m_goodPin, ON);
             gpio_set_level(m_modPin, OFF);
@@ -35,4 +37,10 @@ void AirIndicatorDriver::setQuality(const AirQuality quality) {
             gpio_set_level(m_poorPin, OFF);
             break;
     }
+}
+
+AirIndicatorDriver::AirQuality AirIndicatorDriver::calculateAirQuality(const float32_t quality) {
+    if (quality >= POOR_THRESHOLD) return AirQuality::POOR;
+    else if (quality >= MOD_THRESHOLD) return AirQuality::MOD;
+    else return AirQuality::GOOD;
 }

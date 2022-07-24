@@ -6,11 +6,10 @@
 #include <HumiDevice.Rtos/TaskBase.h>
 #include <HumiDevice.Rtos/EventPublisherSingle.h>
 
-// Project includes
-#include "Events/AirQualityEvent.h"
-
 /**
+ * This item is responsible for central logic and status of the device
  * 
+ * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
 class ControlTask : public TaskBase<10, sizeof(int)> {
 public:
@@ -59,7 +58,7 @@ private:
     ControlTask& operator=(const ControlTask& other);
 
     // Private Members
-    AirQuality m_currentQuality;
+    float32_t m_currentQuality;
 };
 
 

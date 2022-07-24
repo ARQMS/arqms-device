@@ -1,11 +1,12 @@
 #include "ControlTask.h"
 
 #include "Events/EventIdentifiers.h"
+#include "Events/AirQualityEvent.h"
 
 ControlTask::ControlTask() :
     GuiUpdater(),
     Same(),
-    m_currentQuality(AirQuality::UNKNOWN) {
+    m_currentQuality(0.0f) {
 }
 
 ControlTask::~ControlTask() {
@@ -31,12 +32,16 @@ void ControlTask::onExecute(EventId eventId, Deserializer* pEvent) {
 }
 
 void ControlTask::onHandleTestId() {
-    m_currentQuality = static_cast<AirQuality>((m_currentQuality + 1) % 4);
+    m_currentQuality += .1f; // quality is getting better
+    if (m_currentQuality >= 1.0f) {
+        m_currentQuality = 0.0f; // reset
+    }
+
     AirQualityEvent event;
     event.setQuality(m_currentQuality);
     GuiUpdater.send(EventIdentifiers::QUALITY_EVENT, &event);
 
     // TODO remove test code
-    vTaskDelay(250 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
     Same.send(EventIdentifiers::TEST_EVENT); // call same handle again after 250ms
 }
