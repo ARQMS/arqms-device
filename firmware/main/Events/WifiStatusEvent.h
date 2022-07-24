@@ -1,5 +1,5 @@
-#ifndef AIR_QUALITY_EVENT_H_
-#define AIR_QUALITY_EVENT_H_
+#ifndef WIFI_STATUS_EVENT_H_
+#define WIFI_STATUS_EVENT_H_
 
 // Platform
 #include <HumiDevice.Platform/Platform.h>
@@ -24,7 +24,7 @@ enum class WifiStatus : uint8_t {
 };
 
 /**
- * An air quality event which holds all information about air quality
+ * A wifi status event which holds information about current wifi state
  */
 class WifiStatusEvent : public EventIfc {
 public:
@@ -50,11 +50,12 @@ public:
     virtual void serialize(Serializer& serializer) const override;
 
     // Getter & Setter
-    void setRssi(const int32_t value) { m_rssi = value; }
-    int32_t getRssi() const { return m_rssi; }
+    void setRssi(const int32_t value);
+    int32_t getRssi() const;
 
-    void setWifiStatus(const WifiStatus value) { m_wifiStatus = value; }
-    WifiStatus getWifiStatus() const { return m_wifiStatus; }
+    void setWifiStatus(const WifiStatus value);
+    WifiStatus getWifiStatus() const;
+    
 private:
     int32_t m_rssi; 
     WifiStatus m_wifiStatus;
@@ -62,4 +63,4 @@ private:
 
 
 
-#endif // AIR_QUALITY_EVENT_H_
+#endif // WIFI_STATUS_EVENT_H_

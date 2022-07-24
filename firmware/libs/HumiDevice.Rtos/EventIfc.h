@@ -13,7 +13,7 @@
 typedef uint8_t EventId;
 
 // no bigger messages are supported
-static const size_t MAX_MESSAGE_SIZE = 32 + sizeof(EventId);
+static const size_t MAX_MESSAGE_SIZE = 127 + sizeof(EventId);
 
 /**
  * An event is used to send data or signal to another task 

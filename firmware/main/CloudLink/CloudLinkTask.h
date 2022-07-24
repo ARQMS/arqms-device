@@ -6,12 +6,15 @@
 #include <HumiDevice.Rtos/TaskBase.h>
 #include <HumiDevice.Rtos/EventPublisherSingle.h>
 
+// Project includes
+#include "Events/WifiSettingsEvent.h"
+
 /**
  * This item is responsible for connection to cloud
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class CloudLinkTask : public TaskBase<10, sizeof(int)> {
+class CloudLinkTask : public TaskBase<5, sizeof(WifiSettingsEvent)> {
 public:
     EventPublisherSingle Control;
 
@@ -43,6 +46,8 @@ protected:
     virtual void onExecute(EventId eventId, Deserializer* pEvent = NULL) override;
 
 private:
+    // Helper methods
+    void onHandleWifiSettings(const WifiSettingsEvent& settings);
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.

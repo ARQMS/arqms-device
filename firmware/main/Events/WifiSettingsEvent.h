@@ -1,5 +1,5 @@
-#ifndef AIR_QUALITY_EVENT_H_
-#define AIR_QUALITY_EVENT_H_
+#ifndef WIFI_SETTINGS_EVENT_H_
+#define WIFI_SETTINGS_EVENT_H_
 
 // Platform
 #include <HumiDevice.Platform/Platform.h>
@@ -15,7 +15,7 @@ enum class WifiMode : uint8_t {
 };
 
 /**
- * An air quality event which holds all information about air quality
+ * A wifi settings event which holds configuration for wifi
  */
 class WifiSettingsEvent : public EventIfc {
 public:
@@ -46,32 +46,14 @@ public:
     virtual void serialize(Serializer& serializer) const override;
 
     // Getter & Setter
-    void setMode(const WifiMode mode) { m_mode = mode; }
-    WifiMode getMode() const { return m_mode; }
+    void setMode(const WifiMode mode);
+    WifiMode getMode() const;
 
-    void setSSID(const char8_t ssid[MAX_SSID_LENGTH]) {       
-        if (ssid != NULL) {
-            mempcpy(&m_ssid[0], &ssid[0], MAX_SSID_LENGTH * sizeof(char8_t));
-        } 
-    }
+    void setSSID(const char8_t ssid[MAX_SSID_LENGTH]);
+    void getSSID(char8_t ssid[MAX_SSID_LENGTH]) const;
 
-    void getSSID(char8_t ssid[MAX_SSID_LENGTH]) const { 
-        if (ssid != NULL) {
-            mempcpy(&ssid[0], &m_ssid[0], MAX_SSID_LENGTH * sizeof(char8_t));
-        }
-    }
-
-    void setPWD(const char8_t password[MAX_PWD_LENGTH]) {       
-        if (password != NULL) {
-            mempcpy(&m_pwd[0], &password[0], MAX_PWD_LENGTH * sizeof(char8_t));
-        } 
-    }
-    
-    void getPWD(char8_t password[MAX_PWD_LENGTH]) const { 
-        if (password != NULL) {
-            mempcpy(&password[0], &m_pwd[0], MAX_PWD_LENGTH * sizeof(char8_t));
-        }
-    }
+    void setPWD(const char8_t password[MAX_PWD_LENGTH]);
+    void getPWD(char8_t password[MAX_PWD_LENGTH]) const;
 
 private:
     WifiMode m_mode;
@@ -81,4 +63,4 @@ private:
 
 
 
-#endif // AIR_QUALITY_EVENT_H_
+#endif // WIFI_SETTINGS_EVENT_H_

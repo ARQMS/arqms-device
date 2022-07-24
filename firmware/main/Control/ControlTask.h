@@ -6,12 +6,15 @@
 #include <HumiDevice.Rtos/TaskBase.h>
 #include <HumiDevice.Rtos/EventPublisherSingle.h>
 
+// Project includes
+#include "Events/WifiStatusEvent.h"
+
 /**
  * This item is responsible for central logic and status of the device
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class ControlTask : public TaskBase<10, sizeof(int)> {
+class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
 public:
     EventPublisherSingle GuiUpdater;
     EventPublisherSingle CloudLink;
@@ -47,6 +50,7 @@ protected:
 private:
     // Helper methods
     void onHandleTestId();
+    void onHandleWifiStatus(const WifiStatusEvent& status);
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.

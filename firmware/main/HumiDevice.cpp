@@ -14,9 +14,9 @@
 #include "CloudLink/CloudLinkTask.h"
 
 // Create task definitions
-CREATE_TASK_DEF(Control, 0x800, 10) // 2kB Stack
+CREATE_TASK_DEF(Control, 0x8000, 10) // 4kB Stack
 CREATE_TASK_DEF(GuiUpdater, 0x800, 10) // 2kB Stack
-CREATE_TASK_DEF(CloudLink, 0x800, 11) // 2kB Stack
+CREATE_TASK_DEF(CloudLink, 0x8000, 11) // 4kB Stack
 
 /**
  * The entry point for humi device. This is called after second bootloader has 
