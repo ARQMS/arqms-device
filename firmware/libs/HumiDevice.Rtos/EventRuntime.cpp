@@ -15,7 +15,7 @@ extern "C" void taskProcess(void* parameter) {
     
     const TaskId taskHandle = pTask->getTaskId();
     const SubscriberId queueHandle = pTask->getSubscriberId();
-    uint8_t dataStream[MAX_MESSAGE_SIZE];
+    static uint8_t dataStream[MAX_MESSAGE_SIZE];
 
     ESP_LOGI("HumiDevice", "Task %p initialized...", taskHandle);
 
@@ -31,7 +31,7 @@ extern "C" void taskProcess(void* parameter) {
 }
 
 void EventRuntime::send(const SubscriberId handle, const EventId id, const EventIfc* const pData) {
-    uint8_t dataStream[MAX_MESSAGE_SIZE];
+    static uint8_t dataStream[MAX_MESSAGE_SIZE];
 
     Serializer serializer(dataStream, MAX_MESSAGE_SIZE);
     serializer << id;
