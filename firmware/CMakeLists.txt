@@ -4,5 +4,8 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.8)
 
+# https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/build-system.html#optional-project-variables
+set(EXTRA_COMPONENT_DIRS "libs")
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(HumiDevice)

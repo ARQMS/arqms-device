@@ -1,7 +1,14 @@
 idf_component_register(
      SRCS 
+          "Events/AirQualityEvent.cpp"
+
           "HumiDevice.cpp"
           "Drivers/StartupController.cpp"
-          "Drivers/AirIndicatorDriver.cpp"
+
+          "Control/ControlTask.cpp"
+          
+          "GuiUpdater/GuiUpdaterTask.cpp"
+          "GuiUpdater/AirIndicatorDriver.cpp"
      INCLUDE_DIRS "."
+     REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform
 )

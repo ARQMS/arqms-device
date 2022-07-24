@@ -1,8 +1,8 @@
 #ifndef STARTUP_CONTROLLER_H_ 
 #define STARTUP_CONTROLLER_H_
 
-// Project includes
-#include <HumiPlatform.h>
+// Platform
+#include <HumiDevice.Platform/Platform.h>
 
 /**
  * StartupController to initialize ESP32-C3 HumiDevice hardware. 
