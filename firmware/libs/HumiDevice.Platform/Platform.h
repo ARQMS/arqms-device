@@ -8,6 +8,7 @@
 typedef double float64_t;
 typedef float float32_t;
 typedef bool bool_t;
+typedef uint8_t char8_t;
 
 #include <esp_log.h>
 

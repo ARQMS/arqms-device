@@ -1,6 +1,8 @@
 idf_component_register(
      SRCS 
           "Events/AirQualityEvent.cpp"
+          "Events/WifiStatusEvent.cpp"
+          "Events/WifiSettingsEvent.cpp"
 
           "HumiDevice.cpp"
           "Drivers/StartupController.cpp"
