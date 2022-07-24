@@ -2,11 +2,12 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-// Project includes
-#include <HumiPlatform.h>
-#include "Rtos/EventRuntime.h"
-#include "Drivers/ApplicationHardwareConfig.h"
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+#include <HumiDevice.Rtos/EventRuntime.h>
 
+// Project includes
+#include "Drivers/ApplicationHardwareConfig.h"
 #include "Drivers/StartupController.h"
 #include "Control/ControlTask.h"
 #include "GuiUpdater/GuiUpdaterTask.h"

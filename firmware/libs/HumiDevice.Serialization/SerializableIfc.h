@@ -1,8 +1,8 @@
 #ifndef SERIALIZABLEIFC_H
 #define SERIALIZABLEIFC_H
 
-// Project includes
-#include <HumiPlatform.h>
+// Platform
+#include <HumiDevice.Platform/Platform.h>
 
 // forward declaration
 class Serializer;

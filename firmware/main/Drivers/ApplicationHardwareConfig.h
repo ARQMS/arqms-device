@@ -1,11 +1,11 @@
 #ifndef APPLICATION_HARDWARE_CONFIG_H_ 
 #define APPLICATION_HARDWARE_CONFIG_H_
 
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+
 // IDF includes
 #include "driver/gpio.h"
-
-// Project includes
-#include <HumiPlatform.h>
 
 // Air indicator GPIO
 static const gpio_num_t LED_AIR_POOR    = GPIO_NUM_21;

@@ -1,11 +1,13 @@
 #ifndef AIR_INDICATOR_DRIVER_H_ 
 #define AIR_INDICATOR_DRIVER_H_
 
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+
 // IDF includes
 #include "driver/gpio.h"
 
 // Project includes
-#include <HumiPlatform.h>
 #include "Events/AirQualityEvent.h"
 
 /**

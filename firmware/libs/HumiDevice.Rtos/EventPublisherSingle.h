@@ -1,15 +1,17 @@
 #ifndef EVENT_SINGLE_PUBLISHER_H_
 #define EVENT_SINGLE_PUBLISHER_H_
 
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+
 // include FreeRTOS
-#include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
 
 // project includes
-#include <HumiPlatform.h>
-#include "Rtos/EventRuntime.h"
-#include "Rtos/EventPublisherIfc.h"
-#include "Rtos/TaskIfc.h"
+#include "EventRuntime.h"
+#include "EventPublisherIfc.h"
+#include "TaskIfc.h"
 
 /**
  * A simple event publisher which can be connected to single target subscriber.

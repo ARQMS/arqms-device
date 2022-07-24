@@ -1,9 +1,11 @@
 #ifndef DESERIALIZER_H
 #define DESERIALIZER_H
 
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+
 // Project includes
-#include <HumiPlatform.h>
-#include "Rtos/Serialization/SerializableIfc.h"
+#include "SerializableIfc.h"
 
 /**
  * Deserializes various data types from the given byte buffer.

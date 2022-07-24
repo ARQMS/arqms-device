@@ -2,15 +2,15 @@
 #define TASKIFC_H_
 
 // FreeRTOS includes
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/message_buffer.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/message_buffer.h>
 
 // Project includes
-#include <HumiPlatform.h>
+#include <HumiDevice.Platform/Platform.h>
 
-#include "Rtos/EventSubscriberIfc.h"
-#include "Rtos/EventIfc.h"
+#include "EventSubscriberIfc.h"
+#include "EventIfc.h"
 
 // A unique task identifier used to control task from FreeRTOS
 typedef TaskHandle_t TaskId;

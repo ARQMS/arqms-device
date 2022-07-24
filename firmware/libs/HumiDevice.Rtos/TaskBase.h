@@ -1,14 +1,16 @@
 #ifndef TASK_BASE_H_
 #define TASK_BASE_H_
 
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+
 // FreeRTOS
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/message_buffer.h>
 
 // Project includes
-#include <HumiPlatform.h>
-#include "Rtos/TaskIfc.h"
+#include "TaskIfc.h"
 
 /**
  * Wrapper for FreeRTOS Task.

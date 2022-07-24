@@ -1,9 +1,9 @@
 #ifndef EVENT_IDENTIFIERS_H_
 #define EVENT_IDENTIFIERS_H_
 
-// Project includes
-#include <HumiPlatform.h>
-#include "Rtos/EventIfc.h"
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+#include <HumiDevice.Rtos/EventIfc.h>
 
 /**
  * A list of all available event identifiers 

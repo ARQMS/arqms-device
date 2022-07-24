@@ -1,8 +1,10 @@
 #ifndef EVENT_PUBLISHER_IFC_
 #define EVENT_PUBLISHER_IFC_
 
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+
 // Project includes
-#include <HumiPlatform.h>
 #include "EventIfc.h"
 
 /**

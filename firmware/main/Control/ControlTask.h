@@ -1,11 +1,12 @@
 #ifndef CONTROL_TASK_H_ 
 #define CONTROL_TASK_H_
 
-// Project includes
-#include <HumiPlatform.h>
-#include "Rtos/TaskBase.h"
-#include "Rtos/EventPublisherSingle.h"
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+#include <HumiDevice.Rtos/TaskBase.h>
+#include <HumiDevice.Rtos/EventPublisherSingle.h>
 
+// Project includes
 #include "Events/AirQualityEvent.h"
 
 /**

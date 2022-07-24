@@ -1,11 +1,11 @@
 #ifndef EVENTIFC_H_
 #define EVENTIFC_H_
 
-// Project includes
-#include <HumiPlatform.h>
-#include "Rtos/Serialization/SerializableIfc.h"
-#include "Rtos/Serialization/Deserializer.h"
-#include "Rtos/Serialization/Serializer.h"
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+#include <HumiDevice.Serialization/SerializableIfc.h>
+#include <HumiDevice.Serialization/Deserializer.h>
+#include <HumiDevice.Serialization/Serializer.h>
 
 /**
  * A unique event id to deserialize event 

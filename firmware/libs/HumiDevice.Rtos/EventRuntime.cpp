@@ -1,13 +1,8 @@
-// FreeRTOS includes
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/message_buffer.h"
+#include "EventRuntime.h"
 
-// Project includes
-#include <HumiPlatform.h>
-#include "Rtos/EventRuntime.h"
-#include "Rtos/Serialization/Deserializer.h"
-#include "Rtos/Serialization/Serializer.h"
+// Platform
+#include <HumiDevice.Serialization/Deserializer.h>
+#include <HumiDevice.Serialization/Serializer.h>
 
 extern "C" void taskProcess(void* parameter) {
     TaskIfc* pTask = static_cast<TaskIfc*>(parameter);

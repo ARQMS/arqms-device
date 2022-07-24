@@ -1,8 +1,10 @@
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
 
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+
 // project includes
-#include <HumiPlatform.h>
 #include "SerializableIfc.h"
 
 /**

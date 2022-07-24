@@ -1,10 +1,12 @@
 #ifndef EVENT_SUBSCRIBER_IFC
 #define EVENT_SUBSCRIBER_IFC
 
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+#include <HumiDevice.Serialization/Deserializer.h>
+
 // Project includes
-#include <HumiPlatform.h>
-#include "Rtos/EventIfc.h"
-#include "Rtos/Serialization/Deserializer.h"
+#include "EventIfc.h"
 
 /**
  * An event subscriber which can receive any events

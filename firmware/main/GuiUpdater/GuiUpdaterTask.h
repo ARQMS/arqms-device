@@ -1,10 +1,11 @@
 #ifndef GUI_UPDATER_H_ 
 #define GUI_UPDATER_H_
 
-// Project includes
-#include <HumiPlatform.h>
-#include "Rtos/TaskBase.h"
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+#include <HumiDevice.Rtos/TaskBase.h>
 
+// Project includes
 #include "AirIndicatorDriver.h"
 #include "Events/AirQualityEvent.h"
 

@@ -1,10 +1,10 @@
 #ifndef AIR_QUALITY_EVENT_H_
 #define AIR_QUALITY_EVENT_H_
 
-// Project includes
-#include <HumiPlatform.h>
-#include "Rtos/EventIfc.h"
-#include "Rtos/Serialization/Deserializer.h"
+// Platform
+#include <HumiDevice.Platform/Platform.h>
+#include <HumiDevice.Rtos/EventIfc.h>
+#include <HumiDevice.Serialization/Deserializer.h>
 
 /**
  * Enum for air quality 
