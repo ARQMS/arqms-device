@@ -1,7 +1,7 @@
 #include "WifiSettingsEvent.h"
 
 WifiSettingsEvent::WifiSettingsEvent() :
-    m_mode(WifiMode::STL) {
+    m_mode(WifiMode::STA) {
     memset(&m_ssid[0], 0, MAX_SSID_LENGTH * sizeof(char8_t));
     memset(&m_pwd[0], 0, MAX_PWD_LENGTH * sizeof(char8_t));
 }

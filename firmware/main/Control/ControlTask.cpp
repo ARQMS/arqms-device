@@ -15,11 +15,14 @@ ControlTask::~ControlTask() {
 }
 
 void ControlTask::onInitialize()  {
-    
 }
 
+// TODO replace with proper main state machine (https://github.com/ARQMS/arqms-device/wiki/Firmware#main-statemachine)
 void ControlTask::onStart() {
-    // TODO remove test code
+    // TODO 
+    // var wifiConfig = persistancy.readWifiConfig();
+
+    // no wifi configuration available, start AP
     WifiSettingsEvent wifiSettings;
     wifiSettings.setMode(WifiMode::AP);
     CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);

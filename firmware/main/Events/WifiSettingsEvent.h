@@ -10,7 +10,7 @@
  */
 enum class WifiMode : uint8_t {
     NONE,
-    STL,
+    STA,
     AP
 };
 

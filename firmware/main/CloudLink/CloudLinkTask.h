@@ -8,6 +8,7 @@
 
 // Project includes
 #include "Events/WifiSettingsEvent.h"
+#include "WifiStateMachine.h"
 
 /**
  * This item is responsible for connection to cloud
@@ -60,6 +61,7 @@ private:
     CloudLinkTask& operator=(const CloudLinkTask& other);
 
     // Private Members
+    WifiStateMachine m_wifiStateMachine;
 };
 
 
