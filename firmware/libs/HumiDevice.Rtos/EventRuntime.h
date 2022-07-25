@@ -26,8 +26,8 @@ extern "C" void taskProcess(void* parameter);
  */
 #define CREATE_TASK_DEF(name, stackSize, priority) \
     static name## Task name; \
-    StaticTask_t x ##name## TaskBuffer; \
-    StackType_t x ##name## TaskStack[stackSize]; \
+    static StaticTask_t x ##name## TaskBuffer; \
+    static StackType_t x ##name## TaskStack[stackSize]; \
     name## Task* create ##name## Task() {\
         TaskId taskId = xTaskCreateStatic( \
             taskProcess,  \
