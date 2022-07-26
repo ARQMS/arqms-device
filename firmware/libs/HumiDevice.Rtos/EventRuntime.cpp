@@ -4,6 +4,20 @@
 #include <HumiDevice.Serialization/Deserializer.h>
 #include <HumiDevice.Serialization/Serializer.h>
 
+#include "TimerEvent.h"
+
+// internal timer structure
+struct EventTimerInfo {
+    StaticTimer_t internal;
+    TimerHandle_t handle;
+    SubscriberId taskHandle;
+    TimerId id;
+};
+
+// global variables
+static TimerId g_timerCounter = 0;
+static EventTimerInfo g_timerBuffer[MAX_TIMER];
+
 extern "C" void taskProcess(void* parameter) {
     TaskIfc* pTask = static_cast<TaskIfc*>(parameter);
     if (pTask == NULL) return;
@@ -28,6 +42,15 @@ extern "C" void taskProcess(void* parameter) {
         size_t receivedBytes = xMessageBufferReceive(queueHandle, (void*)dataStream, MAX_MESSAGE_SIZE, 1000 / portTICK_PERIOD_MS);
         EventRuntime::process(*pTask, dataStream, receivedBytes);
     } while (!pTask->isShutdownRequested());
+}
+
+extern "C" void taskTimer(TimerHandle_t parameter) {
+    TimerId& timerId = *(TimerId*) pvTimerGetTimerID(parameter);
+
+    ESP_LOGV("HumiDevice", "TimerId %i fired in %p", timerId, g_timerBuffer[timerId].taskHandle);
+
+    TimerEvent data(timerId);
+    EventRuntime::send(g_timerBuffer[timerId].taskHandle, TimerEventId, &data);
 }
 
 void EventRuntime::send(const SubscriberId handle, const EventId id, const EventIfc* const pData) {
@@ -57,4 +80,26 @@ void EventRuntime::process(TaskIfc& task, const void* pData, const size_t dataLe
     ESP_LOGI("HumiDevice", "Received ID %i in %p", id, task.getSubscriberId());
 
     task.execute(id, &deserializer);
+}
+
+TimerId EventRuntime::startTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic) {
+    if (g_timerCounter - 1 >= MAX_TIMER) {
+        ESP_LOGE("HumiDevice", "EventRuntime out of Timer. Increase MAX_TIMER define!");
+        return g_timerCounter + 1; // return an invalid timerId
+    }
+
+    const UBaseType_t autoReload = isPeriodic ? pdTRUE : pdFALSE;
+
+    // save id in seperate register to avoid race-conditions
+    g_timerBuffer[g_timerCounter].id = g_timerCounter;
+    g_timerBuffer[g_timerCounter].taskHandle = subId;
+    g_timerBuffer[g_timerCounter].handle = xTimerCreateStatic("Timer", period / portTICK_PERIOD_MS, autoReload, &g_timerBuffer[g_timerCounter].id, taskTimer, &g_timerBuffer[g_timerCounter].internal);
+
+    // start timer immediatly
+    xTimerStart(g_timerBuffer[g_timerCounter].handle, 0);
+
+    // next timer, not thread-safe yet!
+    g_timerCounter++;
+
+    return g_timerBuffer[g_timerCounter].id;
 }

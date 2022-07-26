@@ -8,9 +8,12 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/message_buffer.h>
+#include <freertos/timers.h>
 
 // Project includes
 #include "TaskIfc.h"
+#include "TimerServiceIfc.h"
+#include "EventRuntime.h"
 
 /**
  * Wrapper for FreeRTOS Task.
@@ -24,7 +27,7 @@
  * @tparam ITEM_SIZE The biggest event which can be received from this task. Attention: Set as small as possible to save memory
  */
 template<int QUEUE_LENGTH, int ITEM_SIZE>
-class TaskBase : public TaskIfc  {
+class TaskBase : public TaskIfc, public TimerServiceIfc {
 public:
     /**
      * Constructor 
@@ -87,6 +90,20 @@ public:
      */
     virtual void execute(EventId eventId, Deserializer* pEvent = NULL) override {
         onExecute(eventId, pEvent);
+    }
+
+    /**
+     * @see TimerServiceIfc::startPeriodicTimer()
+     */
+    TimerId startPeriodicTimer(const uint32_t period) {
+        return EventRuntime::startTimer(m_xQueueHandle, period, true);
+    }
+
+    /**
+     * @see TimerServiceIfc::startOneShotTimer()
+     */
+    TimerId startOneShotTimer(const uint32_t delay) {
+        return EventRuntime::startTimer(m_xQueueHandle, delay, false);
     }
 
 protected:

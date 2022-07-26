@@ -13,8 +13,8 @@
 #include "GuiUpdater/GuiUpdaterTask.h"
 
 // Create task definitions
-CREATE_TASK_DEF(Control, 0x800, 10) // 2kB Stack
-CREATE_TASK_DEF(GuiUpdater, 0x800, 10) // 2kB Stack
+CREATE_TASK_DEF(Control, 0x8000, 10) // 2kB Stack
+CREATE_TASK_DEF(GuiUpdater, 0x8000, 10) // 2kB Stack
 
 /**
  * The entry point for humi device. This is called after second bootloader has 
@@ -38,7 +38,6 @@ extern "C" void app_main(void) {
 
     // connect tasks
     control.GuiUpdater.connect(guiUpdater);
-    control.Same.connect(control);
 
     // start tasks
     startGuiUpdaterTask();
