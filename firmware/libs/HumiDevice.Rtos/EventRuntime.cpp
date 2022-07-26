@@ -17,11 +17,11 @@ extern "C" void taskProcess(void* parameter) {
     const SubscriberId queueHandle = pTask->getSubscriberId();
     static uint8_t dataStream[MAX_MESSAGE_SIZE];
 
-    ESP_LOGI("HumiDevice", "Task %p initialized...", taskHandle);
+    ESP_LOGV("HumiDevice", "Task %p initialized...", taskHandle);
 
     pTask->start();
 
-    ESP_LOGI("HumiDevice", "Task %p started...", taskHandle);
+    ESP_LOGV("HumiDevice", "Task %p started...", taskHandle);
 
     do {
         // Block thread until any event is received. weak at least every second to check shutdown request
@@ -39,7 +39,7 @@ void EventRuntime::send(const SubscriberId handle, const EventId id, const Event
         pData->serialize(serializer);
     }
 
-    ESP_LOGI("HumiDevice", "Sending ID %i to %p", id, handle);
+    ESP_LOGV("HumiDevice", "Sending ID %i to %p", id, handle);
 
     if (xMessageBufferSend(handle, (void*)dataStream, serializer.getBufferPos(), 0) == 0) {
         ESP_LOGE("HumiDevice", "Queue full. No events sent");
@@ -54,7 +54,7 @@ void EventRuntime::process(TaskIfc& task, const void* pData, const size_t dataLe
 
     deserializer >> id;
 
-    ESP_LOGI("HumiDevice", "Received ID %i in %p", id, task.getSubscriberId());
+    ESP_LOGV("HumiDevice", "Received ID %i in %p", id, task.getSubscriberId());
 
     task.execute(id, &deserializer);
 }
