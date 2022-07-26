@@ -4,6 +4,8 @@
 #include <HumiDevice.Serialization/Deserializer.h>
 #include <HumiDevice.Serialization/Serializer.h>
 
+TimerId EventRuntime::s_timerCounter = 0;
+
 extern "C" void taskProcess(void* parameter) {
     TaskIfc* pTask = static_cast<TaskIfc*>(parameter);
     if (pTask == NULL) return;
@@ -28,6 +30,11 @@ extern "C" void taskProcess(void* parameter) {
         size_t receivedBytes = xMessageBufferReceive(queueHandle, (void*)dataStream, MAX_MESSAGE_SIZE, 1000 / portTICK_PERIOD_MS);
         EventRuntime::process(*pTask, dataStream, receivedBytes);
     } while (!pTask->isShutdownRequested());
+}
+
+extern "C" void taskTimer(TimerHandle_t parameter) {
+    SubscriberId* pSubId = (SubscriberId*)parameter;
+    EventRuntime::send(*pSubId, TimerEventId);
 }
 
 void EventRuntime::send(const SubscriberId handle, const EventId id, const EventIfc* const pData) {
@@ -57,4 +64,19 @@ void EventRuntime::process(TaskIfc& task, const void* pData, const size_t dataLe
     ESP_LOGI("HumiDevice", "Received ID %i in %p", id, task.getSubscriberId());
 
     task.execute(id, &deserializer);
+}
+
+TimerId EventRuntime::startTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic) {
+    if (s_timerCounter >= MAX_TIMER) {
+        ESP_LOGE("HumiDevice", "EventRuntime out of Timer. Increase MAX_TIMER define!");
+        return s_timerCounter + 1; // return an invalid timerId
+    }
+
+    const UBaseType_t autoReload = isPeriodic ? pdTRUE : pdFALSE;
+    s_xTimerId[s_timerCounter] = xTimerCreateStatic("Timer", period / portTICK_PERIOD_MS, autoReload, (void*)subId, taskTimer, &s_xTimerStruct[s_timerCounter]);
+
+    // start timer immediatly
+    xTimerStart(s_xTimerId[s_timerCounter], 0);
+
+    return s_timerCounter++;
 }

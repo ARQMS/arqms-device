@@ -8,14 +8,21 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/message_buffer.h>
+#include <freertos/timers.h>
 
 // Project includes
 #include "TaskIfc.h"
+#include "TimerServiceIfc.h"
 
 /**
  * Task process method, it's called in seperated context for each task
  */
 extern "C" void taskProcess(void* parameter);
+
+/**
+ * Timer process method, it's called whenever a timer is fired
+ */
+extern "C" void taskTimer(TimerHandle_t parameter);
 
 /**
  * defines FreeRTOS structure and task object and register 
@@ -67,9 +74,25 @@ public:
      * @param dataLength The total length of pData
      */
     static void process(TaskIfc& task, const void* pData, const size_t dataLength);
+
+    /**
+     * starts a timer with given properties. ATTENTION, a timer created (even it's a oneshot is never released, so be careful!)
+     * 
+     * @param subId the target task which receives events
+     * @param period the period in ms
+     * @param isPeriodic true if timer is periodic, otherwise it's a one-shot-timer
+     * 
+     * @return TimerId the timer id
+     */
+    static TimerId startTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic);
+
 private:
     EventRuntime();
     ~EventRuntime();
+
+    static StaticTimer_t s_xTimerStruct[MAX_TIMER];
+    static TimerHandle_t s_xTimerId[MAX_TIMER];
+    static TimerId s_timerCounter;
 };
 
 
