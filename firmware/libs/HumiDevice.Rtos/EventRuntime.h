@@ -89,10 +89,6 @@ public:
 private:
     EventRuntime();
     ~EventRuntime();
-
-    static StaticTimer_t s_xTimerStruct[MAX_TIMER];
-    static TimerHandle_t s_xTimerId[MAX_TIMER];
-    static TimerId s_timerCounter;
 };
 
 

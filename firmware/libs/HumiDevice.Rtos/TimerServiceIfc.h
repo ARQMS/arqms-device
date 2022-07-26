@@ -48,7 +48,6 @@ public:
      * @return TimerId a unique handle id
      */
     TimerId startOneShotTimer(const uint32_t delay);
-
 };
 
 #endif // TIMER_SERVICE_IFC_H_
