@@ -8,6 +8,7 @@
 
 // Project includes
 #include "Events/WifiSettingsEvent.h"
+#include "Events/WifiStatusEvent.h"
 #include "WifiStateMachine.h"
 #include "WifiStateMachineIfc.h"
 
@@ -70,6 +71,7 @@ protected:
 private:
     // Helper methods
     void onHandleWifiSettings(const WifiSettingsEvent& settings);
+    void sendWifiStatus(const WifiStatus status, const int32_t rssi = 0);
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.

@@ -1,8 +1,8 @@
 #include "ControlTask.h"
 
 #include "Events/EventIdentifiers.h"
-#include "Events/AirQualityEvent.h"
 #include "Events/WifiSettingsEvent.h"
+#include "Events/AirQualityEvent.h"
 
 ControlTask::ControlTask() :
     GuiUpdater(),
@@ -62,7 +62,19 @@ void ControlTask::onHandleTestId() {
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
-    // TODO remove test code
-    // Start blinking
-    Same.send(EventIdentifiers::TEST_EVENT);    
+    if (status.getWifiStatus() == WifiStatus::CLIENT_SEARCHING) {
+        // TODO remove test code
+        // Start blinking
+        Same.send(EventIdentifiers::TEST_EVENT);    
+    }
+    else if (status.getWifiStatus() == WifiStatus::CLIENT_CONNECTED) {
+        // TODO
+    }
+    else if (status.getWifiStatus() == WifiStatus::CLIENT_DISCONNECTED) {
+        // TODO perform shutdown, seems IDF does not support shutdown, 
+        // so we must connect GPIO 1 (PCU_STATE2) as output and connect to Latch Power or 
+        // battery charger
+        esp_restart();
+    }
+    
 }

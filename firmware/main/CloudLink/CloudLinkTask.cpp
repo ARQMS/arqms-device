@@ -30,19 +30,28 @@ void CloudLinkTask::onExecute(EventId eventId, Deserializer* pEvent) {
 
 void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
     if (settings.getMode() == WifiMode::AP) {
+        sendWifiStatus(WifiStatus::CLIENT_SEARCHING);
+
         m_wifiStateMachine.onServiceMode();
+
+        // TODO start timout 1min, when reached before client is connected -> shutdown
+    }
+    else if (settings.getMode() == WifiMode::STA) {
+        // TODO
+    }
+    else {
+        m_wifiStateMachine.reset();
+        
+        sendWifiStatus(WifiStatus::DISABLED);
     }
 }
 
-
 void CloudLinkTask::onClientConnected() {
-    WifiStatusEvent status;
-    status.setWifiStatus(WifiStatus::CLIENT_SEARCHING);
-    Control.send(EventIdentifiers::WIFI_STATUS_EVENT, &status);
+    sendWifiStatus(WifiStatus::CLIENT_CONNECTED);
 }
 
 void CloudLinkTask::onClientDisconnected() {
-
+    sendWifiStatus(WifiStatus::CLIENT_DISCONNECTED);
 }
 
 void CloudLinkTask::onServiceModeIdle() {
@@ -51,4 +60,12 @@ void CloudLinkTask::onServiceModeIdle() {
 
 void CloudLinkTask::onNormalModeIdle() {
 
+}
+
+void CloudLinkTask::sendWifiStatus(const WifiStatus status, const int32_t rssi) {
+    WifiStatusEvent event;
+    event.setWifiStatus(status);
+    event.setRssi(rssi);
+
+    Control.send(EventIdentifiers::WIFI_STATUS_EVENT, &event);
 }

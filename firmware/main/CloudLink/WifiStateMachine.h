@@ -33,6 +33,11 @@ public:
     virtual ~WifiStateMachine();
 
     /**
+     * Resets the wifi phy
+     */
+    void reset();
+
+    /**
      * Start service mode
      */
     void onServiceMode();

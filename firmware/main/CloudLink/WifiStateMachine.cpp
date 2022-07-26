@@ -44,6 +44,22 @@ WifiStateMachine::WifiStateMachine(WifiStateMachineIfc& sender) :
 WifiStateMachine::~WifiStateMachine() {
 }
 
+void WifiStateMachine::reset() {
+    m_failure = false;
+    m_normalMode = false;
+    m_serviceMode = false;
+
+    m_currentState = State::OFF;
+    m_nextState = State::OFF;
+
+    ESP_LOGI("HumiDevice", "Reset wifi phy");
+
+    esp_netif_deinit();
+    esp_wifi_deinit();
+
+    runStateMachine();
+}
+
 void WifiStateMachine::onServiceMode() {
     m_serviceMode = true;
     runStateMachine();
@@ -70,7 +86,10 @@ void WifiStateMachine::runStateMachine(void) {
             case State::SERVICE:
                 break;
 
-            case State::FAILURE: // TODO TBD
+            case State::FAILURE: 
+                reset();
+                break;
+
             default:
                 ESP_LOGE("HumiDevice", "unexpected WifiStateMachine::State");
                 break;
