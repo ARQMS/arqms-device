@@ -7,7 +7,6 @@
 ControlTask::ControlTask() :
     GuiUpdater(),
     CloudLink(),
-    Same(),
     m_currentQuality(0.0f) {
 }
 
@@ -30,8 +29,9 @@ void ControlTask::onStart() {
 
 void ControlTask::onExecute(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
-        case EventIdentifiers::TEST_EVENT: {
-            onHandleTestId();
+        case EventIdentifiers::TIMER_EVENT: {
+            TimerEvent event(*pEvent);
+            onHandleTestId(event);
         }
         break;
 
@@ -45,8 +45,11 @@ void ControlTask::onExecute(EventId eventId, Deserializer* pEvent) {
     }
 }
 
-// TODO remove test code
-void ControlTask::onHandleTestId() {
+void ControlTask::onHandleTestId(const TimerEvent& timer) {
+    ESP_LOGI("HumiDevice", "EventId %i <--> %i", m_testTimer, timer.getId());
+    
+    if (timer.getId() != m_testTimer) return;
+
     m_currentQuality += .1f; // quality is getting better
     if (m_currentQuality >= 1.0f) {
         m_currentQuality = 0.0f; // reset
@@ -55,17 +58,12 @@ void ControlTask::onHandleTestId() {
     AirQualityEvent event;
     event.setQuality(m_currentQuality);
     GuiUpdater.send(EventIdentifiers::QUALITY_EVENT, &event);
-
-    CloudLink.send(EventIdentifiers::TEST_EVENT, &event);
-    vTaskDelay(150 / portTICK_PERIOD_MS);
-    Same.send(EventIdentifiers::TEST_EVENT); // call same handle again after 250ms
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
     if (status.getWifiStatus() == WifiStatus::CLIENT_SEARCHING) {
         // TODO remove test code
         // Start blinking
-        Same.send(EventIdentifiers::TEST_EVENT);    
     }
     else if (status.getWifiStatus() == WifiStatus::CLIENT_CONNECTED) {
         // TODO

@@ -42,7 +42,6 @@ extern "C" void app_main(void) {
     // connect tasks
     control.GuiUpdater.connect(guiUpdater);
     control.CloudLink.connect(cloudLink);
-    control.Same.connect(control);
     cloudLink.Control.connect(control);
 
     // start tasks
