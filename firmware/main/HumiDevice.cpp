@@ -40,9 +40,10 @@ extern "C" void app_main(void) {
     CloudLinkTask& cloudLink = *createCloudLinkTask();
 
     // connect tasks
-    control.GuiUpdater.connect(guiUpdater);
-    control.CloudLink.connect(cloudLink);
-    cloudLink.Control.connect(control);
+    control.GuiSettings.connect(guiUpdater);
+    control.WifiSettings.connect(cloudLink);
+    cloudLink.StatusEvent.connect(control);
+    cloudLink.StatusEvent.connect(guiUpdater);
 
     // start tasks
     startGuiUpdaterTask();

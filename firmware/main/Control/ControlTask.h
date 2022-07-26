@@ -17,8 +17,8 @@
  */
 class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
 public:
-    EventPublisherSingle GuiUpdater;
-    EventPublisherSingle CloudLink;
+    EventPublisherSingle GuiSettings;
+    EventPublisherSingle WifiSettings;
 
 public:
     /**
@@ -50,7 +50,6 @@ protected:
 
 private:
     // Helper methods
-    void onHandleTestId();
     void onHandleWifiStatus(const WifiStatusEvent& status);
 
     /**
@@ -62,10 +61,6 @@ private:
      * Provide the private assignment operator so the compiler does not generate the default one.
      */
     ControlTask& operator=(const ControlTask& other);
-
-    // Private Members
-    float32_t m_currentQuality;
-    TimerId m_testTimer;
 };
 
 

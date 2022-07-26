@@ -17,6 +17,7 @@ public:
      */
     enum class State {
         OFF,
+        SERVICE_WAITING,
         SERVICE,
         NORMAL,
         FAILURE
@@ -40,7 +41,32 @@ public:
     /**
      * Start service mode
      */
-    void onServiceMode();
+    void onStartServiceMode();
+
+    /**
+     * Client connected in service mode
+     */
+    void onClientConnected();
+
+    /**
+     * Client disconnected in service mode
+     */
+    void onClientDisconnected();
+
+    /**
+     * Connection started, but not ready to use. See onWifiConnected
+     */
+    void onWifiConnecting();
+
+    /**
+     * Connected to a external wifi access point
+     */
+    void onWifiConnected();
+
+    /**
+     * Connection list
+     */
+    void onWifiDisconnected();
 
     /**
      * Checks if given state is the current state of STM
@@ -84,7 +110,9 @@ private:
     State m_currentState;
     State m_nextState;
 
-    bool m_serviceMode;
+    bool m_clientConnected;
+    bool m_clientDisonnected;
+    bool m_serviceWaiting;
     bool m_normalMode;
     bool m_failure;
 };

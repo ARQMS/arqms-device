@@ -95,7 +95,7 @@ public:
             onHandleTimer(timerEvent.getId());
         }
         else {
-            onHandleTimer(eventId, pEvent);
+            onHandleEvent(eventId, pEvent);
         }
     }
 

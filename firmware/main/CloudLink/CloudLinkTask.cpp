@@ -4,7 +4,7 @@
 #include "Events/WifiStatusEvent.h"
 
 CloudLinkTask::CloudLinkTask() :
-    Control(),
+    StatusEvent(),
     m_wifiStateMachine(*this) {
 }
 
@@ -28,13 +28,19 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     }
 }
 
+void CloudLinkTask::onHandleTimer(TimerId timerId) {
+    if (m_timeoutTimer == timerId) {
+        onHandleTimeout();
+    }
+}
+
 void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
     if (settings.getMode() == WifiMode::AP) {
         sendWifiStatus(WifiStatus::CLIENT_SEARCHING);
 
-        m_wifiStateMachine.onServiceMode();
+        m_wifiStateMachine.onStartServiceMode();
 
-        // TODO start timout 1min, when reached before client is connected -> shutdown
+        m_timeoutTimer = startOneShotTimer(TIMEOUT_SERVICE_MODE);
     }
     else if (settings.getMode() == WifiMode::STA) {
         // TODO
@@ -46,20 +52,10 @@ void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
     }
 }
 
-void CloudLinkTask::onClientConnected() {
-    sendWifiStatus(WifiStatus::CLIENT_CONNECTED);
-}
-
-void CloudLinkTask::onClientDisconnected() {
-    sendWifiStatus(WifiStatus::CLIENT_DISCONNECTED);
-}
-
-void CloudLinkTask::onServiceModeIdle() {
-
-}
-
-void CloudLinkTask::onNormalModeIdle() {
-
+void CloudLinkTask::onHandleTimeout() {
+    if (m_wifiStateMachine.isCurrentState(WifiStateMachine::State::SERVICE_WAITING)) {
+        sendWifiStatus(WifiStatus::CLIENT_TIMEOUT);
+    }
 }
 
 void CloudLinkTask::sendWifiStatus(const WifiStatus status, const int32_t rssi) {
@@ -67,5 +63,5 @@ void CloudLinkTask::sendWifiStatus(const WifiStatus status, const int32_t rssi) 
     event.setWifiStatus(status);
     event.setRssi(rssi);
 
-    Control.send(EventIdentifiers::WIFI_STATUS_EVENT, &event);
+    StatusEvent.send(EventIdentifiers::WIFI_STATUS_EVENT, &event);
 }

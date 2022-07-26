@@ -2,12 +2,10 @@
 
 #include "Events/EventIdentifiers.h"
 #include "Events/WifiSettingsEvent.h"
-#include "Events/AirQualityEvent.h"
 
 ControlTask::ControlTask() :
-    GuiUpdater(),
-    CloudLink(),
-    m_currentQuality(0.0f) {
+    GuiSettings(),
+    WifiSettings() {
 }
 
 ControlTask::~ControlTask() {
@@ -27,7 +25,7 @@ void ControlTask::onStart() {
     // TODO delete demo code
     WifiSettingsEvent wifiSettings;
     wifiSettings.setMode(WifiMode::AP);
-    CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
+    WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
 }
 
 void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
@@ -43,20 +41,7 @@ void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
 }
 
 void ControlTask::onHandleTimer(const TimerId timerId) {
-    if (m_testTimer == timerId) {
-        onHandleTestId();
-    }
-}
-
-void ControlTask::onHandleTestId() {
-    m_currentQuality += .1f; // quality is getting better
-    if (m_currentQuality >= 1.0f) {
-        m_currentQuality = 0.0f; // reset
-    }
-
-    AirQualityEvent event;
-    event.setQuality(m_currentQuality);
-    GuiUpdater.send(EventIdentifiers::QUALITY_EVENT, &event);
+    // nothing to do
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
@@ -66,7 +51,7 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
     else if (status.getWifiStatus() == WifiStatus::CONNECTED) {
         // m_deviceStateMachine.onIdle();
     }
-    else if (status.getWifiStatus() == WifiStatus::CLIENT_DISCONNECTED) {
+    else if (status.getWifiStatus() == WifiStatus::CLIENT_DISCONNECTED || status.getWifiStatus() == WifiStatus::CLIENT_TIMEOUT) {
         // TODO perform shutdown, seems IDF does not support shutdown, 
         // so we must connect GPIO 1 (PCU_STATE2) as output and connect to Latch Power or 
         // battery charger

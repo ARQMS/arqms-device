@@ -8,11 +8,13 @@
 // Project includes
 #include "AirIndicatorDriver.h"
 #include "Events/AirQualityEvent.h"
+#include "Events/WifiStatusEvent.h"
 
 /**
  * This unit updates all user interface components
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
+ * @see https://github.com/ARQMS/arqms-device/wiki/Mechanics#hmi-interface
  */
 class GuiUpdaterTask : public TaskBase<2, sizeof(AirQualityEvent)> {
 public:
@@ -44,11 +46,16 @@ protected:
      * @see TaskBase::onExecute()
      */
     virtual void onHandleEvent(EventId eventId, Deserializer* pEvent = NULL) override;
+    virtual void onHandleTimer(const TimerId timerId) override;
 
 private:
+    // refresh rate of ui
+    static const uint32_t REFRESH_RATE = (1 / 10.f) * 1000; // 100ms
 
     // Helper methods
     void onHandleAirQuality(const AirQualityEvent& quality);
+    void onHandleWifiStatus(const WifiStatusEvent& wifiStatus);
+    void onHandleRefresh();
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
@@ -62,6 +69,11 @@ private:
 
     // Private Members
     AirIndicatorDriver m_airIndicator;
+    TimerId m_refreshTimer;
+
+    // TODO remove demo
+    float32_t m_currentQuality;
+    float32_t m_animationSpeed;
 };
 
 

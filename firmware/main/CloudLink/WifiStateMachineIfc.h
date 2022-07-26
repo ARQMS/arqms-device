@@ -4,6 +4,9 @@
 // Platform include
 #include <HumiDevice.Platform/Platform.h>
 
+// Project include
+#include "Events/WifiStatusEvent.h"
+
 /**
  * Represents the state machine callback interface
  */
@@ -18,22 +21,7 @@ public:
     /**
      * 
      */
-    virtual void onClientConnected() = 0;
-
-    /**
-     * 
-     */
-    virtual void onClientDisconnected() = 0;
-
-    /**
-     * 
-     */
-    virtual void onServiceModeIdle() = 0;
-
-    /**
-     * 
-     */
-    virtual void onNormalModeIdle() = 0;
+    virtual void sendWifiStatus(const WifiStatus status, const int32_t rssi = 0) = 0;
 };
 
 

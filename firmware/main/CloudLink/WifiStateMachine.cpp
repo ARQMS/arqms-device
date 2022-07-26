@@ -4,31 +4,29 @@
 #include "esp_wifi.h"
 #include "sdkconfig.h"
 
+
 #define HUMIDEVICE_ESP_WIFI_SSID      CONFIG_ESP_WIFI_SSID
 #define HUMIDEVICE_ESP_WIFI_PASS      CONFIG_ESP_WIFI_PASSWORD
 #define HUMIDEVICE_ESP_WIFI_CHANNEL   CONFIG_ESP_WIFI_CHANNEL
 #define HUMIDEVICE_MAX_STA_CONN       1
 
 extern "C" void onWifiEventHandler(void* param, esp_event_base_t eventBase, int32_t eventId, void* eventData) {
-    WifiStateMachineIfc* pSender = (WifiStateMachineIfc*)(param);
+    WifiStateMachine* pSender = (WifiStateMachine*)(param);
 
-    if (eventId == WIFI_EVENT_AP_STACONNECTED) { 
+    if (eventId == WIFI_EVENT_AP_STACONNECTED) {
         pSender->onClientConnected();
     }
     else if (eventId == WIFI_EVENT_AP_STADISCONNECTED) {
         pSender->onClientDisconnected();
     } 
-    else if (eventId == WIFI_EVENT_AP_START) {
-        pSender->onServiceModeIdle();
-    }
     else if (eventId == WIFI_EVENT_STA_START) {
-        pSender->onNormalModeIdle();
+        pSender->onWifiConnecting();
     }
     else if (eventId == WIFI_EVENT_STA_CONNECTED) {
-        // TODO wifi connected
+        pSender->onWifiConnected();
     }
     else if (eventId == WIFI_EVENT_STA_DISCONNECTED) {
-        // TODO wifi disconnected
+        pSender->onWifiDisconnected();
     }
 }
 
@@ -36,7 +34,9 @@ WifiStateMachine::WifiStateMachine(WifiStateMachineIfc& sender) :
     m_sender(sender),
     m_currentState(State::OFF),
     m_nextState(State::OFF),
-    m_serviceMode(false),
+    m_clientConnected(false),
+    m_clientDisonnected(false),
+    m_serviceWaiting(false),
     m_normalMode(false),
     m_failure(false) {
 }
@@ -46,8 +46,11 @@ WifiStateMachine::~WifiStateMachine() {
 
 void WifiStateMachine::reset() {
     m_failure = false;
+    
     m_normalMode = false;
-    m_serviceMode = false;
+    m_clientConnected = false;
+    m_clientDisonnected = false;
+    m_serviceWaiting = false;
 
     m_currentState = State::OFF;
     m_nextState = State::OFF;
@@ -60,9 +63,42 @@ void WifiStateMachine::reset() {
     runStateMachine();
 }
 
-void WifiStateMachine::onServiceMode() {
-    m_serviceMode = true;
+void WifiStateMachine::onStartServiceMode() {
+    m_serviceWaiting = true;
     runStateMachine();
+}
+
+void WifiStateMachine::onClientConnected() {
+    m_clientConnected = true;
+    runStateMachine();
+
+    m_sender.sendWifiStatus(WifiStatus::CLIENT_CONNECTED);
+}
+
+void WifiStateMachine::onClientDisconnected() {
+    m_clientDisonnected = true;
+    runStateMachine();
+
+    m_sender.sendWifiStatus(WifiStatus::CLIENT_DISCONNECTED);
+}
+
+void WifiStateMachine::onWifiConnecting() {
+    runStateMachine();
+    m_sender.sendWifiStatus(WifiStatus::CONNECTING);
+}
+
+void WifiStateMachine::onWifiConnected() {
+    runStateMachine();
+
+    wifi_ap_record_t ap;
+    esp_wifi_sta_get_ap_info(&ap);
+    m_sender.sendWifiStatus(WifiStatus::CONNECTED, ap.rssi);
+}
+
+void WifiStateMachine::onWifiDisconnected() {
+    runStateMachine();
+
+    m_sender.sendWifiStatus(WifiStatus::DISCONNECTED, -100);
 }
 
 bool WifiStateMachine::isCurrentState(const State state) const {
@@ -76,14 +112,19 @@ void WifiStateMachine::runStateMachine(void) {
         stateChanged = false;
         switch (m_currentState) {
             case State::OFF:
-                handleEvent(&m_serviceMode, State::SERVICE);
+                handleEvent(&m_serviceWaiting, State::SERVICE_WAITING);
                 handleEvent(&m_normalMode, State::NORMAL);
+                break;
+
+            case State::SERVICE_WAITING:
+                handleEvent(&m_clientConnected, State::SERVICE);
                 break;
 
             case State::NORMAL:
                 break;
 
             case State::SERVICE:
+                handleEvent(&m_clientDisonnected, State::OFF);
                 break;
 
             case State::FAILURE: 
@@ -157,7 +198,7 @@ void WifiStateMachine::startWifiAsAp() {
     esp_netif_create_default_wifi_ap();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     m_failure |= esp_wifi_init(&cfg) != ESP_OK;
-    m_failure |= esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &onWifiEventHandler, (void*)&m_sender, NULL) != ESP_OK;
+    m_failure |= esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &onWifiEventHandler, (void*)this, NULL) != ESP_OK;
     
     wifi_config_t wifiConfig = {};
     wifiConfig.ap.channel = HUMIDEVICE_ESP_WIFI_CHANNEL;
