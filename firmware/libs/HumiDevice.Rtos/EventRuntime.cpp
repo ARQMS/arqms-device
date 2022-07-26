@@ -14,6 +14,7 @@ struct EventTimerInfo {
     TimerId id;
 };
 
+// global variables
 static TimerId g_timerCounter = 0;
 static EventTimerInfo g_timerBuffer[MAX_TIMER];
 
@@ -44,7 +45,6 @@ extern "C" void taskProcess(void* parameter) {
 }
 
 extern "C" void taskTimer(TimerHandle_t parameter) {
-
     TimerId& timerId = *(TimerId*) pvTimerGetTimerID(parameter);
 
     ESP_LOGV("HumiDevice", "TimerId %i fired in %p", timerId, g_timerBuffer[timerId].taskHandle);

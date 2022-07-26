@@ -8,7 +8,8 @@
 #include <HumiDevice.Serialization/Deserializer.h>
 
 /**
- * An air quality event which holds all information about air quality
+ * A RTOS SW timer event which contains the given identifier to compare
+ * against epxected TimerId
  */
 class TimerEvent : public EventIfc {
 public:
@@ -33,7 +34,7 @@ public:
      */
     virtual void serialize(Serializer& serializer) const override;
 
-    // Getter & Setter
+    // Getter
     float32_t getId() const { return m_id; }
 
 private:

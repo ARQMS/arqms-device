@@ -8,7 +8,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/message_buffer.h>
-#include <freertos/timers.h>
 
 // Project includes
 #include "TaskIfc.h"
