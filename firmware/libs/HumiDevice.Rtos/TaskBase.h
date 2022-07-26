@@ -13,6 +13,7 @@
 // Project includes
 #include "TaskIfc.h"
 #include "TimerServiceIfc.h"
+#include "TimerEvent.h"
 #include "EventRuntime.h"
 
 /**
@@ -89,7 +90,13 @@ public:
      * @see EventSubscriberIfc::execute()
      */
     virtual void execute(EventId eventId, Deserializer* pEvent = NULL) override {
-        onExecute(eventId, pEvent);
+        if (eventId == TimerEventId) {
+            TimerEvent timerEvent(*pEvent);
+            onHandleTimer(timerEvent.getId());
+        }
+        else {
+            onHandleTimer(eventId, pEvent);
+        }
     }
 
     /**
@@ -118,9 +125,22 @@ protected:
     virtual void onStart() = 0;
 
     /**
+     * Handle event with and without data
+     * 
      * @see EventSubscriberIfc::onExecute()
+     * @see onHandleTimer
      */
-    virtual void onExecute(EventId eventId, Deserializer* pEvent = NULL) = 0;
+    virtual void onHandleEvent(EventId eventId, Deserializer* pEvent = NULL) = 0;
+
+    /**
+     * Handle all timers
+     * 
+     * @see EventSubscriberIfc::onExecute()
+     * @see onHandleEvent
+     */
+    virtual void onHandleTimer(const TimerId timerId) {
+        // nothing to do
+    }
 
 private:
     // Members

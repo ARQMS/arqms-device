@@ -45,11 +45,12 @@ protected:
     /**
      * @see TaskBase::onExecute()
      */
-    virtual void onExecute(EventId eventId, Deserializer* pEvent = NULL) override;
+    virtual void onHandleEvent(EventId eventId, Deserializer* pEvent = NULL) override;
+    virtual void onHandleTimer(const TimerId timerId) override;
 
 private:
     // Helper methods
-    void onHandleTestId(const TimerEvent& timer);
+    void onHandleTestId();
     void onHandleWifiStatus(const WifiStatusEvent& status);
 
     /**

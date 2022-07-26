@@ -17,7 +17,7 @@ void CloudLinkTask::onInitialize()  {
 void CloudLinkTask::onStart() {
 }
 
-void CloudLinkTask::onExecute(EventId eventId, Deserializer* pEvent) {
+void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
         case EventIdentifiers::WIFI_SETTINGS_EVENT: {
             WifiSettingsEvent msg(*pEvent);

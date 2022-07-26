@@ -17,7 +17,7 @@ void GuiUpdaterTask::onStart() {
     // nothing to do
 }
 
-void GuiUpdaterTask::onExecute(EventId eventId, Deserializer* pEvent) {
+void GuiUpdaterTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
         case EventIdentifiers::QUALITY_EVENT: {
             AirQualityEvent event(*pEvent);

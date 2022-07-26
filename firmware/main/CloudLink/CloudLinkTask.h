@@ -66,7 +66,7 @@ protected:
     /**
      * @see TaskBase::onExecute()
      */
-    virtual void onExecute(EventId eventId, Deserializer* pEvent = NULL) override;
+    virtual void onHandleEvent(EventId eventId, Deserializer* pEvent = NULL) override;
 
 private:
     // Helper methods

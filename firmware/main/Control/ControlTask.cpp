@@ -16,25 +16,22 @@ ControlTask::~ControlTask() {
 void ControlTask::onInitialize()  {
 }
 
-// TODO replace with proper main state machine (https://github.com/ARQMS/arqms-device/wiki/Firmware#main-statemachine)
 void ControlTask::onStart() {
-    // TODO 
+    // TODO replace with proper main state machine (https://github.com/ARQMS/arqms-device/wiki/Firmware#main-statemachine)
     // var wifiConfig = persistancy.readWifiConfig();
+    // if (wifiConfig != null)
+    //      CloudLink.send(WIFI_SETTINGS_EVENT, &wifiSettings)
+    // else
+    //      m_deviceStateMachine.onServiceMode()
 
-    // no wifi configuration available, start AP
+    // TODO delete demo code
     WifiSettingsEvent wifiSettings;
     wifiSettings.setMode(WifiMode::AP);
     CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
 }
 
-void ControlTask::onExecute(EventId eventId, Deserializer* pEvent) {
+void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
-        case EventIdentifiers::TIMER_EVENT: {
-            TimerEvent event(*pEvent);
-            onHandleTestId(event);
-        }
-        break;
-
         case EventIdentifiers::WIFI_STATUS_EVENT: {
             WifiStatusEvent msg(*pEvent);
             onHandleWifiStatus(msg);
@@ -45,11 +42,13 @@ void ControlTask::onExecute(EventId eventId, Deserializer* pEvent) {
     }
 }
 
-void ControlTask::onHandleTestId(const TimerEvent& timer) {
-    ESP_LOGI("HumiDevice", "EventId %i <--> %i", m_testTimer, timer.getId());
-    
-    if (timer.getId() != m_testTimer) return;
+void ControlTask::onHandleTimer(const TimerId timerId) {
+    if (m_testTimer == timerId) {
+        onHandleTestId();
+    }
+}
 
+void ControlTask::onHandleTestId() {
     m_currentQuality += .1f; // quality is getting better
     if (m_currentQuality >= 1.0f) {
         m_currentQuality = 0.0f; // reset
@@ -61,12 +60,11 @@ void ControlTask::onHandleTestId(const TimerEvent& timer) {
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
-    if (status.getWifiStatus() == WifiStatus::CLIENT_SEARCHING) {
-        // TODO remove test code
-        // Start blinking
+    if (status.getWifiStatus() == WifiStatus::CONNECTING) {
+        // m_deviceStateMachine.onConnecting();
     }
-    else if (status.getWifiStatus() == WifiStatus::CLIENT_CONNECTED) {
-        // TODO
+    else if (status.getWifiStatus() == WifiStatus::CONNECTED) {
+        // m_deviceStateMachine.onIdle();
     }
     else if (status.getWifiStatus() == WifiStatus::CLIENT_DISCONNECTED) {
         // TODO perform shutdown, seems IDF does not support shutdown, 

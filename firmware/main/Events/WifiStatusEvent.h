@@ -13,6 +13,7 @@ enum class WifiStatus : uint8_t {
     DISCONNECTED,
     CONNECTED,
     LOST,
+    CONNECTING,
 
     // AP mode
     CLIENT_SEARCHING,
