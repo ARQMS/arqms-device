@@ -5,6 +5,7 @@
 #include <HumiDevice.Platform/Platform.h>
 #include <HumiDevice.Rtos/TaskBase.h>
 #include <HumiDevice.Rtos/EventPublisherSingle.h>
+#include <HumiDevice.Rtos/TimerEvent.h>
 
 /**
  * This item is responsible for central logic and status of the device
@@ -14,7 +15,6 @@
 class ControlTask : public TaskBase<10, sizeof(int)> {
 public:
     EventPublisherSingle GuiUpdater;
-    EventPublisherSingle Same; // TODO remove test publisher
 
 public:
     /**
@@ -45,7 +45,7 @@ protected:
 
 private:
     // Helper methods
-    void onHandleTestId();
+    void onHandleTestId(const TimerEvent& timer);
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
@@ -59,6 +59,7 @@ private:
 
     // Private Members
     float32_t m_currentQuality;
+    TimerId m_testTimer;
 };
 
 
