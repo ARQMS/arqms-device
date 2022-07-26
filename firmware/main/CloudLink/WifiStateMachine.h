@@ -4,6 +4,9 @@
 // Platform include
 #include <HumiDevice.Platform/Platform.h>
 
+// Project include
+#include "WifiStateMachineIfc.h"
+
 /**
  * Represents the state machine for wifi controller
  */
@@ -22,13 +25,16 @@ public:
     /**
      * Constructor
      */
-    explicit WifiStateMachine();
+    explicit WifiStateMachine(WifiStateMachineIfc& sender);
 
     /**
      * Destructor
      */
     virtual ~WifiStateMachine();
 
+    /**
+     * Start service mode
+     */
     void onServiceMode();
 
     /**
@@ -62,12 +68,17 @@ private:
     void onLeaveState(const State state);
     // transitions
     void handleEvent(bool* const pFlag, const State nextState);
+    // helper
+    void startWifiAsAp();
+
+
+    // Member variables
+    WifiStateMachineIfc& m_sender;
 
     // state
     State m_currentState;
     State m_nextState;
 
-    bool m_initialized;
     bool m_serviceMode;
     bool m_normalMode;
     bool m_failure;

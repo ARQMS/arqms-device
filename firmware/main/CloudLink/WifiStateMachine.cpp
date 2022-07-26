@@ -10,25 +10,32 @@
 #define HUMIDEVICE_MAX_STA_CONN       1
 
 extern "C" void onWifiEventHandler(void* param, esp_event_base_t eventBase, int32_t eventId, void* eventData) {
-    WifiStateMachine* pStateMachine = (WifiStateMachine*)(param);
+    WifiStateMachineIfc* pSender = (WifiStateMachineIfc*)(param);
 
-    if (eventId == WIFI_EVENT_AP_STACONNECTED) {
-        // client connected
-        wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) eventData;
-        ESP_LOGI("HumidDevice", "station "MACSTR" join, AID=%d", MAC2STR(event->mac), event->aid);
-
+    if (eventId == WIFI_EVENT_AP_STACONNECTED) { 
+        pSender->onClientConnected();
     }
     else if (eventId == WIFI_EVENT_AP_STADISCONNECTED) {
-        // client disconnected
-        wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) eventData;
-        ESP_LOGI("HumidDevice", "station "MACSTR" leave, AID=%d", MAC2STR(event->mac), event->aid);
+        pSender->onClientDisconnected();
+    } 
+    else if (eventId == WIFI_EVENT_AP_START) {
+        pSender->onServiceModeIdle();
+    }
+    else if (eventId == WIFI_EVENT_STA_START) {
+        pSender->onNormalModeIdle();
+    }
+    else if (eventId == WIFI_EVENT_STA_CONNECTED) {
+        // TODO wifi connected
+    }
+    else if (eventId == WIFI_EVENT_STA_DISCONNECTED) {
+        // TODO wifi disconnected
     }
 }
 
-WifiStateMachine::WifiStateMachine() :
+WifiStateMachine::WifiStateMachine(WifiStateMachineIfc& sender) :
+    m_sender(sender),
     m_currentState(State::OFF),
     m_nextState(State::OFF),
-    m_initialized(false),
     m_serviceMode(false),
     m_normalMode(false),
     m_failure(false) {
@@ -58,12 +65,9 @@ void WifiStateMachine::runStateMachine(void) {
                 break;
 
             case State::NORMAL:
-                handleEvent(&m_failure, State::FAILURE);
                 break;
 
             case State::SERVICE:
-                handleEvent(&m_failure, State::FAILURE);
-
                 break;
 
             case State::FAILURE: // TODO TBD
@@ -71,6 +75,9 @@ void WifiStateMachine::runStateMachine(void) {
                 ESP_LOGE("HumiDevice", "unexpected WifiStateMachine::State");
                 break;
         }
+
+        // any state can throw a failure
+        handleEvent(&m_failure, State::FAILURE);
 
         if (m_currentState != m_nextState) {
             onLeaveState(m_currentState);
@@ -87,20 +94,9 @@ void WifiStateMachine::runStateMachine(void) {
 
 void WifiStateMachine::onEnterState(const State state) { 
     switch (m_currentState) {
-        case State::SERVICE: {
-            esp_netif_create_default_wifi_ap();
-            wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-            m_failure |= esp_wifi_init(&cfg) != ESP_OK;
-            m_failure |= esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &onWifiEventHandler, (void*)this, NULL) != ESP_OK;
-           //
-           //wifi_config_t wifiConfig;
-           //wifiConfig.ap.ssid = HUMIDEVICE_ESP_WIFI_SSID;
-
-           //m_failure |= esp_wifi_set_mode(WIFI_MODE_AP) != ESP_OK;
-           //m_failure |= esp_wifi_set_config(WIFI_IF_AP, &wifiConfig) != ESP_OK;
-           //m_failure |= esp_wifi_start() != ESP_OK;
-        }
-        break;
+        case State::SERVICE:          
+            startWifiAsAp();
+            break;
 
         default: 
             // nothnig to do
@@ -138,3 +134,21 @@ void WifiStateMachine::handleEvent(bool* const pFlag, const State nextState) {
     *pFlag = false;
 }
 
+void WifiStateMachine::startWifiAsAp() {
+    esp_netif_create_default_wifi_ap();
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    m_failure |= esp_wifi_init(&cfg) != ESP_OK;
+    m_failure |= esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &onWifiEventHandler, (void*)&m_sender, NULL) != ESP_OK;
+    
+    wifi_config_t wifiConfig = {};
+    wifiConfig.ap.channel = HUMIDEVICE_ESP_WIFI_CHANNEL;
+    wifiConfig.ap.ssid_len = sizeof(HUMIDEVICE_ESP_WIFI_SSID);
+    wifiConfig.ap.max_connection = 1;
+    wifiConfig.ap.authmode = WIFI_AUTH_WPA2_PSK;
+    memcpy(&wifiConfig.ap.ssid, HUMIDEVICE_ESP_WIFI_SSID, sizeof(HUMIDEVICE_ESP_WIFI_SSID));
+    memcpy(&wifiConfig.ap.password, HUMIDEVICE_ESP_WIFI_PASS, sizeof(HUMIDEVICE_ESP_WIFI_PASS));
+
+    m_failure |= esp_wifi_set_mode(WIFI_MODE_AP) != ESP_OK;
+    m_failure |= esp_wifi_set_config(WIFI_IF_AP, &wifiConfig) != ESP_OK;
+    m_failure |= esp_wifi_start() != ESP_OK;
+}

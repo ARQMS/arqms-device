@@ -5,7 +5,7 @@
 
 CloudLinkTask::CloudLinkTask() :
     Control(),
-    m_wifiStateMachine() {
+    m_wifiStateMachine(*this) {
 }
 
 CloudLinkTask::~CloudLinkTask() {
@@ -31,10 +31,24 @@ void CloudLinkTask::onExecute(EventId eventId, Deserializer* pEvent) {
 void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
     if (settings.getMode() == WifiMode::AP) {
         m_wifiStateMachine.onServiceMode();
-
-        // WifiStatusEvent status;
-        // status.setWifiStatus(WifiStatus::CLIENT_SEARCHING);
-        // Control.send(EventIdentifiers::WIFI_STATUS_EVENT, &status);
     }
 }
 
+
+void CloudLinkTask::onClientConnected() {
+    WifiStatusEvent status;
+    status.setWifiStatus(WifiStatus::CLIENT_SEARCHING);
+    Control.send(EventIdentifiers::WIFI_STATUS_EVENT, &status);
+}
+
+void CloudLinkTask::onClientDisconnected() {
+
+}
+
+void CloudLinkTask::onServiceModeIdle() {
+
+}
+
+void CloudLinkTask::onNormalModeIdle() {
+
+}

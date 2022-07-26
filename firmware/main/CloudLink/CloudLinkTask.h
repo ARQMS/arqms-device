@@ -9,13 +9,14 @@
 // Project includes
 #include "Events/WifiSettingsEvent.h"
 #include "WifiStateMachine.h"
+#include "WifiStateMachineIfc.h"
 
 /**
  * This item is responsible for connection to cloud
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class CloudLinkTask : public TaskBase<5, sizeof(WifiSettingsEvent)> {
+class CloudLinkTask : public TaskBase<5, sizeof(WifiSettingsEvent)>, WifiStateMachineIfc {
 public:
     EventPublisherSingle Control;
 
@@ -30,6 +31,26 @@ public:
      */
     virtual ~CloudLinkTask();
     
+    /**
+     * @see WifiStateMachineIfc::onClientConnected
+     */
+    virtual void onClientConnected() override;
+
+    /**
+     * @see WifiStateMachineIfc::onClientDisconnected
+     */
+    virtual void onClientDisconnected() override;
+
+    /**
+     * @see WifiStateMachineIfc::onServiceModeIdle
+     */
+    virtual void onServiceModeIdle() override;
+
+    /**
+     * @see WifiStateMachineIfc::onNormalModeIdle
+     */
+    virtual void onNormalModeIdle() override;
+
 protected:
     /**
      * @see TaskBase::onInitialize()
