@@ -6,6 +6,7 @@ idf_component_register(
 
           "HumiDevice.cpp"
           "Drivers/StartupController.cpp"
+          "Drivers/SK6805Driver.cpp"
 
           "Control/ControlTask.cpp"
           
