@@ -97,7 +97,7 @@ void SK6805Driver::initialize() {
 
 void SK6805Driver::refresh() {
     static uint8_t DISABLED_BUFFER [3] = {0, 0 , 0};
-    static_assert(sizeof(m_info.buffer) == sizeof(DISABLED_BUFFER));
+    static_assert(sizeof(m_info.colorBuffer) == sizeof(DISABLED_BUFFER));
 
     uint32_t currentTick = xTaskGetTickCount();
     m_info.tickCounter -= pdTICKS_TO_MS((currentTick - m_lastRefreshTick));
@@ -107,9 +107,9 @@ void SK6805Driver::refresh() {
         m_info.tickCounter = m_info.period;
     }
 
-    uint8_t* pData = m_info.isOn ? m_info.buffer : DISABLED_BUFFER;
+    uint8_t* pData = m_info.isOn ? m_info.colorBuffer : DISABLED_BUFFER;
     
-    rmt_write_sample(m_info.rmtChannel, pData, sizeof(m_info.buffer), true);
+    rmt_write_sample(m_info.rmtChannel, pData, sizeof(m_info.colorBuffer), true);
     rmt_wait_tx_done(m_info.rmtChannel, 40 / portTICK_PERIOD_MS);
 }
 
@@ -122,13 +122,13 @@ void SK6805Driver::clear() {
 
 void SK6805Driver::setColor(RGB color, const uint32_t period) {
     // according to Datasheet chapter 15
-    m_info.buffer[0] = color.green;
-    m_info.buffer[1] = color.red;
-    m_info.buffer[2] = color.blue;
+    m_info.colorBuffer[0] = color.green;
+    m_info.colorBuffer[1] = color.red;
+    m_info.colorBuffer[2] = color.blue;
 
-    setPeriod(period);
+    updatePeriod(period);
 }
 
-void SK6805Driver::setPeriod(const uint32_t period) {
+void SK6805Driver::updatePeriod(const uint32_t period) {
     m_info.period = period;
 }

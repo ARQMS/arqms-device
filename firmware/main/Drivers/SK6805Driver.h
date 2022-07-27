@@ -98,23 +98,24 @@ public:
     /**
      * Set the color of pixel
      * 
-     * @param color 
+     * @param color the color 
+     * @param period the blinking period in ms. The accuracy is based on refresh rate!
      */
     void setColor(RGB color, const uint32_t period = 0);
 
     /**
-     * Turns off all led 
+     * Sets the period of blinking. Without color change
+     * 
+     * @param period the blinking period in ms. The accuracy is based on refresh rate!
+     */
+    void updatePeriod(const uint32_t period);
+
+    /**
+     * Turns off led 
      */
     void clear();
 
-    /**
-     * Set the period of pixel blinking
-     * 
-     * @param period in ms
-     */
-    void setPeriod(const uint32_t period);
-    
-    // Ticks configuration. Available aftr initialize() is called
+    // Ticks configuration. Available after initialize() is called
     static uint32_t T0hTicks;
     static uint32_t T1hTicks;
     static uint32_t T0lTicks;
@@ -133,16 +134,18 @@ private:
          * led is always on/off
          */
         uint32_t period;
-        int32_t tickCounter;
+
 
         /**
          * Indicates the current state, on or off
          */
         bool isOn;
 
-        rmt_channel_t rmtChannel;
-        uint8_t buffer[3];
-        gpio_num_t gpioPin;
+        // internal helper structure
+        int32_t tickCounter;        //< ticks left until period is over
+        uint8_t colorBuffer[3];     //< represents the color buffer
+        rmt_channel_t rmtChannel;   //< the rmt channel
+        gpio_num_t gpioPin;         //< the associated gpio hardware pin
     };
 
     LedInfo m_info;
