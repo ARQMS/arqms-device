@@ -57,7 +57,7 @@ protected:
 
 private:
     // constant
-    static const uint32_t TIMEOUT_SERVICE_MODE = 1000 * 60; // 1min
+    static const uint32_t TIMEOUT_SERVICE_MODE = 60 * 1000; // 1min
 
     // Helper methods
     void onHandleWifiSettings(const WifiSettingsEvent& settings);

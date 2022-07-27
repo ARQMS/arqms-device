@@ -47,14 +47,14 @@ void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
     }
     else {
         m_wifiStateMachine.reset();
-        
-        sendWifiStatus(WifiStatus::DISABLED);
     }
 }
 
 void CloudLinkTask::onHandleTimeout() {
     if (m_wifiStateMachine.isCurrentState(WifiStateMachine::State::SERVICE_WAITING)) {
         sendWifiStatus(WifiStatus::CLIENT_TIMEOUT);
+
+        m_wifiStateMachine.reset();
     }
 }
 

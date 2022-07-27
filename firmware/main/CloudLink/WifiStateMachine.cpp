@@ -19,6 +19,9 @@ extern "C" void onWifiEventHandler(void* param, esp_event_base_t eventBase, int3
     else if (eventId == WIFI_EVENT_AP_STADISCONNECTED) {
         pSender->onClientDisconnected();
     } 
+    else if (eventId == WIFI_EVENT_AP_START) {
+        pSender->onClientSearching();
+    }
     else if (eventId == WIFI_EVENT_STA_START) {
         pSender->onWifiConnecting();
     }
@@ -61,6 +64,8 @@ void WifiStateMachine::reset() {
     esp_wifi_deinit();
 
     runStateMachine();
+
+    m_sender.sendWifiStatus(WifiStatus::DISABLED);
 }
 
 void WifiStateMachine::onStartServiceMode() {
@@ -82,6 +87,10 @@ void WifiStateMachine::onClientDisconnected() {
     m_sender.sendWifiStatus(WifiStatus::CLIENT_DISCONNECTED);
 }
 
+void WifiStateMachine::onClientSearching() {
+    m_sender.sendWifiStatus(WifiStatus::CLIENT_SEARCHING);
+}
+
 void WifiStateMachine::onWifiConnecting() {
     runStateMachine();
     m_sender.sendWifiStatus(WifiStatus::CONNECTING);
@@ -97,7 +106,7 @@ void WifiStateMachine::onWifiConnected() {
 
 void WifiStateMachine::onWifiDisconnected() {
     runStateMachine();
-
+    // -100dB is bad rssi
     m_sender.sendWifiStatus(WifiStatus::DISCONNECTED, -100);
 }
 
@@ -154,7 +163,7 @@ void WifiStateMachine::runStateMachine(void) {
 
 void WifiStateMachine::onEnterState(const State state) { 
     switch (m_currentState) {
-        case State::SERVICE:          
+        case State::SERVICE_WAITING:          
             startWifiAsAp();
             break;
 

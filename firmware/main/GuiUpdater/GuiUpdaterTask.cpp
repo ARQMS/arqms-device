@@ -56,6 +56,7 @@ void GuiUpdaterTask::onHandleWifiStatus(const WifiStatusEvent& wifiStatus) {
     else if (wifiStatus.getWifiStatus() == WifiStatus::CLIENT_CONNECTED) {
         // m_wlanIndicator.startBlink(0, blue); // constant blue
         m_animationSpeed = 0.0f;
+        m_currentQuality = .5f;
     } 
     else if (wifiStatus.getWifiStatus() == WifiStatus::CONNECTED) {
         // m_wlanIndicator.startBlink(0, blue); // constant blue
@@ -64,13 +65,20 @@ void GuiUpdaterTask::onHandleWifiStatus(const WifiStatusEvent& wifiStatus) {
     // else if (wifiStatus.getWifiStatus() == WifiStatus::SENDING) {
     //     // m_wlanIndicator.startBlink(50, yellow); // blink yellow
     // } 
+    else {
+        m_animationSpeed = 0.0f;
+        m_currentQuality = 1.0f;
+    }
 }
 
+// TODO remove demo code
 void GuiUpdaterTask::onHandleRefresh() {
     // animation
-    m_currentQuality += m_animationSpeed;
-    if (m_currentQuality >= 1.0f) {
-        m_currentQuality = 0.0f; // reset
+    if (m_animationSpeed > 0.0f) {
+        m_currentQuality += m_animationSpeed;
+        if (m_currentQuality >= 1.0f) {
+            m_currentQuality = 0.0f; // reset
+        }
     }
 
     m_airIndicator.setQuality(m_currentQuality);

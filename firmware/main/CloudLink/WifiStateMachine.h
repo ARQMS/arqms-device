@@ -54,6 +54,11 @@ public:
     void onClientDisconnected();
 
     /**
+     * Wait for client
+     */
+    void onClientSearching();
+
+    /**
      * Connection started, but not ready to use. See onWifiConnected
      */
     void onWifiConnecting();
