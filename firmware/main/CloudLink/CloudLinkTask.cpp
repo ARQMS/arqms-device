@@ -5,13 +5,15 @@
 
 CloudLinkTask::CloudLinkTask() :
     StatusEvent(),
-    m_wifiStateMachine(*this) {
+    m_wifiStateMachine(*this),
+    m_pTimeoutTimer(NULL) {
 }
 
 CloudLinkTask::~CloudLinkTask() {
 }
 
 void CloudLinkTask::onInitialize()  {
+    m_pTimeoutTimer = createOneShotTimer(TIMEOUT_SERVICE_MODE);
 }
 
 void CloudLinkTask::onStart() {
@@ -29,18 +31,16 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
 }
 
 void CloudLinkTask::onHandleTimer(TimerId timerId) {
-    if (m_timeoutTimer == timerId) {
+    if (m_pTimeoutTimer->id == timerId) {
         onHandleTimeout();
     }
 }
 
 void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
     if (settings.getMode() == WifiMode::AP) {
-        sendWifiStatus(WifiStatus::CLIENT_SEARCHING);
-
         m_wifiStateMachine.onStartServiceMode();
 
-        m_timeoutTimer = startOneShotTimer(TIMEOUT_SERVICE_MODE);
+        m_pTimeoutTimer->start();
     }
     else if (settings.getMode() == WifiMode::STA) {
         // TODO

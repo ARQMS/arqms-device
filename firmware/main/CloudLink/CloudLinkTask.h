@@ -75,7 +75,7 @@ private:
 
     // Private Members
     WifiStateMachine m_wifiStateMachine;
-    TimerId m_timeoutTimer;
+    Timer* m_pTimeoutTimer;
 };
 
 

@@ -12,9 +12,9 @@
 
 // Project includes
 #include "TaskIfc.h"
-#include "TimerServiceIfc.h"
 #include "TimerEvent.h"
 #include "EventRuntime.h"
+#include "TimerServiceIfc.h"
 
 /**
  * Wrapper for FreeRTOS Task.
@@ -97,20 +97,6 @@ public:
         else {
             onHandleEvent(eventId, pEvent);
         }
-    }
-
-    /**
-     * @see TimerServiceIfc::startPeriodicTimer()
-     */
-    TimerId startPeriodicTimer(const uint32_t period) {
-        return EventRuntime::startTimer(m_xQueueHandle, period, true);
-    }
-
-    /**
-     * @see TimerServiceIfc::startOneShotTimer()
-     */
-    TimerId startOneShotTimer(const uint32_t delay) {
-        return EventRuntime::startTimer(m_xQueueHandle, delay, false);
     }
 
 protected:

@@ -11,7 +11,10 @@
 
 // Project includes
 #include "TaskIfc.h"
-#include "TimerServiceIfc.h"
+#include "Timer.h"
+
+// defines the maximal timer count in application
+#define MAX_TIMER configTIMER_QUEUE_LENGTH
 
 /**
  * Task process method, it's called in seperated context for each task
@@ -75,7 +78,7 @@ public:
     static void process(TaskIfc& task, const void* pData, const size_t dataLength);
 
     /**
-     * starts a timer with given properties. ATTENTION, a timer created (even it's a oneshot is never released, so be careful!)
+     * creates a timer with given properties. ATTENTION, a timer created (even it's a oneshot is never released, so be careful!)
      * 
      * @param subId the target task which receives events
      * @param period the period in ms
@@ -83,7 +86,7 @@ public:
      * 
      * @return TimerId the timer id
      */
-    static TimerId startTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic);
+    static Timer* createTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic);
 
 private:
     EventRuntime();

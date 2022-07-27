@@ -5,6 +5,7 @@
 
 GuiUpdaterTask::GuiUpdaterTask() :
     m_airIndicator(LED_AIR_GOOD, LED_AIR_MOD, LED_AIR_POOR),
+    m_pRefreshTimer(NULL),
     m_currentQuality(0.0f),
     m_animationSpeed(0.1f) {
 }
@@ -16,7 +17,7 @@ void GuiUpdaterTask::onInitialize()  {
 }
 
 void GuiUpdaterTask::onStart() {
-    m_refreshTimer = startPeriodicTimer(REFRESH_RATE);
+    m_pRefreshTimer = startPeriodicTimer(REFRESH_RATE);
 }
 
 void GuiUpdaterTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
@@ -37,7 +38,7 @@ void GuiUpdaterTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
 }
 
 void GuiUpdaterTask::onHandleTimer(const TimerId timerId) {
-    if (m_refreshTimer == timerId) {
+    if (m_pRefreshTimer->id == timerId) {
         onHandleRefresh();
     }
 }

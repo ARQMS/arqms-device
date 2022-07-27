@@ -4,7 +4,7 @@
 // Platform
 #include <HumiDevice.Platform/Platform.h>
 #include <HumiDevice.Rtos/EventIfc.h>
-#include <HumiDevice.Rtos/TimerServiceIfc.h>
+#include <HumiDevice.Rtos/Timer.h>
 
 /**
  * A list of all available event identifiers 

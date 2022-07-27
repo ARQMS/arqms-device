@@ -69,7 +69,7 @@ private:
 
     // Private Members
     AirIndicatorDriver m_airIndicator;
-    TimerId m_refreshTimer;
+    Timer* m_pRefreshTimer;
 
     // TODO remove demo
     float32_t m_currentQuality;

@@ -9,19 +9,9 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
 
-/**
- * A unique TimerHandler to control freertos timer. Reuse messagebuffer handler to
- * directly forwared event to correct task
- */
-typedef uint8_t TimerId;
+// Project includes
+#include "Timer.h"
 
-/**
- * Unique timer id
- */
-static const EventId TimerEventId = 1;
-
-// defines the maximal timer count in application
-#define MAX_TIMER 5
 
 /**
  * A timer service to create and handle software timers
@@ -39,7 +29,9 @@ public:
      * @param period of the created timer
      * @return TimerId a unique handle id
      */
-    TimerId startPeriodicTimer(const uint32_t period);
+    Timer* createPeriodicTimer(const uint32_t period) {
+        return EventRuntime::createTimer(getSubscriberId(), period, true);
+    }
 
     /**
      * Starts a one shot timer
@@ -47,7 +39,38 @@ public:
      * @param delay of the created timer
      * @return TimerId a unique handle id
      */
-    TimerId startOneShotTimer(const uint32_t delay);
+    Timer* createOneShotTimer(const uint32_t delay){
+        return EventRuntime::createTimer(getSubscriberId(), delay, false);
+    }
+
+    /**
+     * Gets the subscribtion identifier
+     */
+    virtual SubscriberId getSubscriberId() const = 0;
+
+protected:
+
+    /**
+     * @see TimerServiceIfc::startPeriodicTimer()
+     */
+    Timer* startPeriodicTimer(const uint32_t period) {
+        Timer* pTimer = createPeriodicTimer(period);
+        if (pTimer != NULL) {
+            pTimer->start();
+        }
+        return pTimer;
+    }
+
+    /**
+     * @see TimerServiceIfc::startOneShotTimer()
+     */
+    Timer* startOneShotTimer(const uint32_t delay) {
+        Timer* pTimer = createOneShotTimer(delay);
+        if (pTimer != NULL) {
+            pTimer->start();
+        }
+        return pTimer;
+    }
 };
 
 #endif // TIMER_SERVICE_IFC_H_

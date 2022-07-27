@@ -3,8 +3,9 @@
 
 // Platform
 #include <HumiDevice.Platform/Platform.h>
+#include <HumiDevice.Rtos/EventRuntime.h>
 #include <HumiDevice.Rtos/EventIfc.h>
-#include <HumiDevice.Rtos/TimerServiceIfc.h>
+#include <HumiDevice.Rtos/Timer.h>
 #include <HumiDevice.Serialization/Deserializer.h>
 
 /**
@@ -35,7 +36,7 @@ public:
     virtual void serialize(Serializer& serializer) const override;
 
     // Getter
-    float32_t getId() const { return m_id; }
+    TimerId getId() const { return m_id; }
 
 private:
     TimerId m_id; 
