@@ -47,30 +47,6 @@ public:
      * Gets the subscribtion identifier
      */
     virtual SubscriberId getSubscriberId() const = 0;
-
-protected:
-
-    /**
-     * @see TimerServiceIfc::startPeriodicTimer()
-     */
-    Timer* startPeriodicTimer(const uint32_t period) {
-        Timer* pTimer = createPeriodicTimer(period);
-        if (pTimer != NULL) {
-            pTimer->start();
-        }
-        return pTimer;
-    }
-
-    /**
-     * @see TimerServiceIfc::startOneShotTimer()
-     */
-    Timer* startOneShotTimer(const uint32_t delay) {
-        Timer* pTimer = createOneShotTimer(delay);
-        if (pTimer != NULL) {
-            pTimer->start();
-        }
-        return pTimer;
-    }
 };
 
 #endif // TIMER_SERVICE_IFC_H_
