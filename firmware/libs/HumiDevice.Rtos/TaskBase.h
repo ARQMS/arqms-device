@@ -12,8 +12,9 @@
 
 // Project includes
 #include "TaskIfc.h"
-#include "TimerServiceIfc.h"
+#include "TimerEvent.h"
 #include "EventRuntime.h"
+#include "TimerServiceIfc.h"
 
 /**
  * Wrapper for FreeRTOS Task.
@@ -89,21 +90,13 @@ public:
      * @see EventSubscriberIfc::execute()
      */
     virtual void execute(EventId eventId, Deserializer* pEvent = NULL) override {
-        onExecute(eventId, pEvent);
-    }
-
-    /**
-     * @see TimerServiceIfc::startPeriodicTimer()
-     */
-    TimerId startPeriodicTimer(const uint32_t period) {
-        return EventRuntime::startTimer(m_xQueueHandle, period, true);
-    }
-
-    /**
-     * @see TimerServiceIfc::startOneShotTimer()
-     */
-    TimerId startOneShotTimer(const uint32_t delay) {
-        return EventRuntime::startTimer(m_xQueueHandle, delay, false);
+        if (eventId == TimerEventId) {
+            TimerEvent timerEvent(*pEvent);
+            onHandleTimer(timerEvent.getId());
+        }
+        else {
+            onHandleEvent(eventId, pEvent);
+        }
     }
 
 protected:
@@ -118,9 +111,22 @@ protected:
     virtual void onStart() = 0;
 
     /**
+     * Handle event with and without data
+     * 
      * @see EventSubscriberIfc::onExecute()
+     * @see onHandleTimer
      */
-    virtual void onExecute(EventId eventId, Deserializer* pEvent = NULL) = 0;
+    virtual void onHandleEvent(EventId eventId, Deserializer* pEvent = NULL) = 0;
+
+    /**
+     * Handle all timers
+     * 
+     * @see EventSubscriberIfc::onExecute()
+     * @see onHandleEvent
+     */
+    virtual void onHandleTimer(const TimerId timerId) {
+        // nothing to do
+    }
 
 private:
     // Members

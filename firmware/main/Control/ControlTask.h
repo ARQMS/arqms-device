@@ -7,14 +7,18 @@
 #include <HumiDevice.Rtos/EventPublisherSingle.h>
 #include <HumiDevice.Rtos/TimerEvent.h>
 
+// Project includes
+#include "Events/WifiStatusEvent.h"
+
 /**
  * This item is responsible for central logic and status of the device
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class ControlTask : public TaskBase<10, sizeof(int)> {
+class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
 public:
-    EventPublisherSingle GuiUpdater;
+    EventPublisherSingle GuiSettings;
+    EventPublisherSingle WifiSettings;
 
 public:
     /**
@@ -41,11 +45,12 @@ protected:
     /**
      * @see TaskBase::onExecute()
      */
-    virtual void onExecute(EventId eventId, Deserializer* pEvent = NULL) override;
+    virtual void onHandleEvent(EventId eventId, Deserializer* pEvent = NULL) override;
+    virtual void onHandleTimer(const TimerId timerId) override;
 
 private:
     // Helper methods
-    void onHandleTestId(const TimerEvent& timer);
+    void onHandleWifiStatus(const WifiStatusEvent& status);
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
@@ -56,10 +61,6 @@ private:
      * Provide the private assignment operator so the compiler does not generate the default one.
      */
     ControlTask& operator=(const ControlTask& other);
-
-    // Private Members
-    float32_t m_currentQuality;
-    TimerId m_testTimer;
 };
 
 

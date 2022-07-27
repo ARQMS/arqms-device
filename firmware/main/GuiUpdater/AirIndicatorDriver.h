@@ -45,10 +45,10 @@ private:
     };
 
     // Constants
-    const float32_t POOR_THRESHOLD   = 0.8f;
-    const float32_t MOD_THRESHOLD    = 0.5f;
-    const uint8_t ON                 = 0;
-    const uint8_t OFF                = 1;
+    const static float32_t POOR_THRESHOLD;
+    const static float32_t MOD_THRESHOLD;
+    const static uint8_t ON;
+    const static uint8_t OFF;
 
     // Helper method
     AirQuality calculateAirQuality(const float32_t quality);

@@ -1,48 +1,61 @@
 #include "ControlTask.h"
 
 #include "Events/EventIdentifiers.h"
-#include "Events/AirQualityEvent.h"
+#include "Events/WifiSettingsEvent.h"
 
 ControlTask::ControlTask() :
-    GuiUpdater(),
-    m_currentQuality(0.0f) {
+    GuiSettings(),
+    WifiSettings() {
 }
 
 ControlTask::~ControlTask() {
 }
 
 void ControlTask::onInitialize()  {
-    
 }
 
 void ControlTask::onStart() {
-    m_testTimer = startPeriodicTimer(100);
+    // TODO replace with proper main state machine (https://github.com/ARQMS/arqms-device/wiki/Firmware#main-statemachine)
+    // var wifiConfig = persistancy.readWifiConfig();
+    // if (wifiConfig != null)
+    //      CloudLink.send(WIFI_SETTINGS_EVENT, &wifiSettings)
+    // else
+    //      m_deviceStateMachine.onServiceMode()
+
+    // TODO delete demo code
+    WifiSettingsEvent wifiSettings;
+    wifiSettings.setMode(WifiMode::AP);
+    WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
 }
 
-void ControlTask::onExecute(EventId eventId, Deserializer* pEvent) {
+void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
-        case EventIdentifiers::TIMER_EVENT: {
-            TimerEvent event(*pEvent);
-            onHandleTestId(event);
+        case EventIdentifiers::WIFI_STATUS_EVENT: {
+            WifiStatusEvent msg(*pEvent);
+            onHandleWifiStatus(msg);
         }
         break;
-
     default:
         break;
     }
 }
 
-void ControlTask::onHandleTestId(const TimerEvent& timer) {
-    ESP_LOGI("HumiDevice", "EventId %i <--> %i", m_testTimer, timer.getId());
-    
-    if (timer.getId() != m_testTimer) return;
+void ControlTask::onHandleTimer(const TimerId timerId) {
+    // nothing to do
+}
 
-    m_currentQuality += .1f; // quality is getting better
-    if (m_currentQuality >= 1.0f) {
-        m_currentQuality = 0.0f; // reset
+void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
+    if (status.getWifiStatus() == WifiStatus::CONNECTING) {
+        // m_deviceStateMachine.onConnecting();
     }
-
-    AirQualityEvent event;
-    event.setQuality(m_currentQuality);
-    GuiUpdater.send(EventIdentifiers::QUALITY_EVENT, &event);
+    else if (status.getWifiStatus() == WifiStatus::CONNECTED) {
+        // m_deviceStateMachine.onIdle();
+    }
+    else if (status.getWifiStatus() == WifiStatus::CLIENT_DISCONNECTED || status.getWifiStatus() == WifiStatus::CLIENT_TIMEOUT) {
+        // TODO perform shutdown, seems IDF does not support shutdown, 
+        // so we must connect GPIO 1 (PCU_STATE2) as output and connect to Latch Power or 
+        // battery charger
+        esp_restart();
+    }
+    
 }

@@ -1,0 +1,22 @@
+menu "HumiDevice Configuration"
+
+    config ESP_WIFI_SSID
+        string "WiFi SSID"
+        default "HumiDevice-Service"
+        help
+            SSID (network name) for the HumiDevice to connect to.
+
+    config ESP_WIFI_PASSWORD
+        string "WiFi Password"
+        default "password"
+        help
+            WiFi password (WPA or WPA2) for the HumiDevice to use.
+
+    config ESP_WIFI_CHANNEL
+        int "WiFi Channel"
+        range 1 13
+        default 1
+        help
+            WiFi channel (network channel) for the HumiDevice to use.
+
+endmenu

@@ -1,5 +1,11 @@
 #include "AirIndicatorDriver.h"
 
+// Const initialization
+const float32_t AirIndicatorDriver::POOR_THRESHOLD  = 0.8f;
+const float32_t AirIndicatorDriver::MOD_THRESHOLD   = 0.5f;
+const uint8_t AirIndicatorDriver::ON                = 0;
+const uint8_t AirIndicatorDriver::OFF               = 1;
+
 AirIndicatorDriver::AirIndicatorDriver(const gpio_num_t goodPin, const gpio_num_t modPin, const gpio_num_t poorPin) :
     m_goodPin(goodPin),
     m_modPin(modPin),

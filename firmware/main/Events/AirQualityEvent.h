@@ -3,9 +3,7 @@
 
 // Platform
 #include <HumiDevice.Platform/Platform.h>
-#include <HumiDevice.Platform/Math.h>
 #include <HumiDevice.Rtos/EventIfc.h>
-#include <HumiDevice.Serialization/Deserializer.h>
 
 /**
  * An air quality event which holds all information about air quality
@@ -34,8 +32,8 @@ public:
     virtual void serialize(Serializer& serializer) const override;
 
     // Getter & Setter
-    void setQuality(const float32_t quality) { m_quality = Math::truncateToRange(quality, 0.0f, 1.0f); }
-    float32_t getQuality() const { return m_quality; }
+    void setQuality(const float32_t quality);
+    float32_t getQuality() const;
 
 private:
     // range 0..1

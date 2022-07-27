@@ -6,17 +6,9 @@
 
 #include "TimerEvent.h"
 
-// internal timer structure
-struct EventTimerInfo {
-    StaticTimer_t internal;
-    TimerHandle_t handle;
-    SubscriberId taskHandle;
-    TimerId id;
-};
-
 // global variables
 static TimerId g_timerCounter = 0;
-static EventTimerInfo g_timerBuffer[MAX_TIMER];
+static Timer g_timerBuffer[MAX_TIMER];
 
 extern "C" void taskProcess(void* parameter) {
     TaskIfc* pTask = static_cast<TaskIfc*>(parameter);
@@ -29,13 +21,13 @@ extern "C" void taskProcess(void* parameter) {
     
     const TaskId taskHandle = pTask->getTaskId();
     const SubscriberId queueHandle = pTask->getSubscriberId();
-    uint8_t dataStream[MAX_MESSAGE_SIZE];
+    static uint8_t dataStream[MAX_MESSAGE_SIZE];
 
-    ESP_LOGI("HumiDevice", "Task %p initialized...", taskHandle);
+    ESP_LOGV("HumiDevice", "Task %p initialized...", taskHandle);
 
     pTask->start();
 
-    ESP_LOGI("HumiDevice", "Task %p started...", taskHandle);
+    ESP_LOGV("HumiDevice", "Task %p started...", taskHandle);
 
     do {
         // Block thread until any event is received. weak at least every second to check shutdown request
@@ -54,7 +46,7 @@ extern "C" void taskTimer(TimerHandle_t parameter) {
 }
 
 void EventRuntime::send(const SubscriberId handle, const EventId id, const EventIfc* const pData) {
-    uint8_t dataStream[MAX_MESSAGE_SIZE];
+    static uint8_t dataStream[MAX_MESSAGE_SIZE];
 
     Serializer serializer(dataStream, MAX_MESSAGE_SIZE);
     serializer << id;
@@ -62,7 +54,7 @@ void EventRuntime::send(const SubscriberId handle, const EventId id, const Event
         pData->serialize(serializer);
     }
 
-    ESP_LOGI("HumiDevice", "Sending ID %i to %p", id, handle);
+    ESP_LOGV("HumiDevice", "Sending ID %i to %p", id, handle);
 
     if (xMessageBufferSend(handle, (void*)dataStream, serializer.getBufferPos(), 0) == 0) {
         ESP_LOGE("HumiDevice", "Queue full. No events sent");
@@ -77,29 +69,25 @@ void EventRuntime::process(TaskIfc& task, const void* pData, const size_t dataLe
 
     deserializer >> id;
 
-    ESP_LOGI("HumiDevice", "Received ID %i in %p", id, task.getSubscriberId());
+    ESP_LOGV("HumiDevice", "Received ID %i in %p", id, task.getSubscriberId());
 
     task.execute(id, &deserializer);
 }
 
-TimerId EventRuntime::startTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic) {
+Timer* EventRuntime::createTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic) {
     if (g_timerCounter - 1 >= MAX_TIMER) {
         ESP_LOGE("HumiDevice", "EventRuntime out of Timer. Increase MAX_TIMER define!");
-        return g_timerCounter + 1; // return an invalid timerId
+        return NULL;
     }
 
+    // next timer, not thread-safe yet!
+    const TimerId timerId = g_timerCounter++;
     const UBaseType_t autoReload = isPeriodic ? pdTRUE : pdFALSE;
 
     // save id in seperate register to avoid race-conditions
-    g_timerBuffer[g_timerCounter].id = g_timerCounter;
-    g_timerBuffer[g_timerCounter].taskHandle = subId;
-    g_timerBuffer[g_timerCounter].handle = xTimerCreateStatic("Timer", period / portTICK_PERIOD_MS, autoReload, &g_timerBuffer[g_timerCounter].id, taskTimer, &g_timerBuffer[g_timerCounter].internal);
+    g_timerBuffer[timerId].id = timerId;
+    g_timerBuffer[timerId].taskHandle = subId;
+    g_timerBuffer[timerId].handle = xTimerCreateStatic("Timer", period / portTICK_PERIOD_MS, autoReload, &g_timerBuffer[timerId].id, taskTimer, &g_timerBuffer[timerId].internal);
 
-    // start timer immediatly
-    xTimerStart(g_timerBuffer[g_timerCounter].handle, 0);
-
-    // next timer, not thread-safe yet!
-    g_timerCounter++;
-
-    return g_timerBuffer[g_timerCounter].id;
+    return &g_timerBuffer[timerId];
 }

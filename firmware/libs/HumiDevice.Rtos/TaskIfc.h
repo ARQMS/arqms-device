@@ -21,9 +21,6 @@ typedef MessageBufferHandle_t SubscriberId;
 // Represent a invalid subscriber id. All Subscriber identifiers greater than this are valid
 static const SubscriberId INVALID_SUBSCRIBER_ID = NULL;
 
-// no bigger messages are supported
-static const size_t MAX_MESSAGE_SIZE = 32 + sizeof(EventId);
-
 /**
  * Interface for Task.
  */

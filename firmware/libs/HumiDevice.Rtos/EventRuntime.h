@@ -11,7 +11,10 @@
 
 // Project includes
 #include "TaskIfc.h"
-#include "TimerServiceIfc.h"
+#include "Timer.h"
+
+// defines the maximal timer count in application
+#define MAX_TIMER configTIMER_QUEUE_LENGTH
 
 /**
  * Task process method, it's called in seperated context for each task
@@ -32,8 +35,8 @@ extern "C" void taskTimer(TimerHandle_t parameter);
  */
 #define CREATE_TASK_DEF(name, stackSize, priority) \
     static name## Task name; \
-    StaticTask_t x ##name## TaskBuffer; \
-    StackType_t x ##name## TaskStack[stackSize]; \
+    static StaticTask_t x ##name## TaskBuffer; \
+    static StackType_t x ##name## TaskStack[stackSize]; \
     name## Task* create ##name## Task() {\
         TaskId taskId = xTaskCreateStatic( \
             taskProcess,  \
@@ -75,7 +78,7 @@ public:
     static void process(TaskIfc& task, const void* pData, const size_t dataLength);
 
     /**
-     * starts a timer with given properties. ATTENTION, a timer created (even it's a oneshot is never released, so be careful!)
+     * creates a timer with given properties. ATTENTION, a timer created (even it's a oneshot is never released, so be careful!)
      * 
      * @param subId the target task which receives events
      * @param period the period in ms
@@ -83,7 +86,7 @@ public:
      * 
      * @return TimerId the timer id
      */
-    static TimerId startTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic);
+    static Timer* createTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic);
 
 private:
     EventRuntime();
