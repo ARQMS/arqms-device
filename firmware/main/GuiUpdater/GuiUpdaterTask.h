@@ -10,6 +10,8 @@
 #include "Events/AirQualityEvent.h"
 #include "Events/WifiStatusEvent.h"
 
+#include "Drivers/SK6805Driver.h"
+
 /**
  * This unit updates all user interface components
  * 
@@ -50,7 +52,7 @@ protected:
 
 private:
     // refresh rate of ui
-    static const uint32_t REFRESH_RATE = (1 / 10.f) * 1000; // 100ms
+    static const uint32_t REFRESH_RATE = (1 / 20.f) * 1000; // 50ms
 
     // Helper methods
     void onHandleAirQuality(const AirQualityEvent& quality);
@@ -69,11 +71,9 @@ private:
 
     // Private Members
     AirIndicatorDriver m_airIndicator;
-    Timer* m_pRefreshTimer;
+    SK6805Driver m_wlanIndicator;
 
-    // TODO remove demo
-    float32_t m_currentQuality;
-    float32_t m_animationSpeed;
+    Timer* m_pRefreshTimer;
 };
 
 

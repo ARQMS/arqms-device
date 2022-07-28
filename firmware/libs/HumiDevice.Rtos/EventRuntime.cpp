@@ -57,7 +57,7 @@ void EventRuntime::send(const SubscriberId handle, const EventId id, const Event
     ESP_LOGV("HumiDevice", "Sending ID %i to %p", id, handle);
 
     if (xMessageBufferSend(handle, (void*)dataStream, serializer.getBufferPos(), 0) == 0) {
-        ESP_LOGE("HumiDevice", "Queue full. No events sent");
+        ESP_LOGE("HumiDevice", "Queue full. No eventid %i to %p sent", id, handle);
     }
 }
 
