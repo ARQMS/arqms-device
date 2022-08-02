@@ -141,8 +141,8 @@ CONFIG_PARTITION_TABLE_MD5=y
 #
 # HumiDevice Configuration
 #
-CONFIG_ESP_WIFI_SSID="HumiDevice-Service"
-CONFIG_ESP_WIFI_PASSWORD="password"
+CONFIG_ESP_WIFI_SSID="AR-0001"
+CONFIG_ESP_WIFI_PASSWORD="AirRoom!2022"
 CONFIG_ESP_WIFI_CHANNEL=1
 # end of HumiDevice Configuration
 
