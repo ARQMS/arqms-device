@@ -4,6 +4,9 @@
 // Platform include
 #include <HumiDevice.Platform/Platform.h>
 
+// IDF includes
+#include "esp_wifi.h"
+
 // Project include
 #include "WifiStateMachineIfc.h"
 #include "LocalCtrlHandlerIfc.h"
@@ -108,6 +111,7 @@ private:
     // helper
     void startWifiAsAp();
     void checkEspError(const esp_err_t status);
+    static void onWifiEventHandler(void* param, esp_event_base_t eventBase, int32_t eventId, void* eventData);
 
 
     // Member variables

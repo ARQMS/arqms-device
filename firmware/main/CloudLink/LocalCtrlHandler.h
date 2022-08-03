@@ -19,7 +19,7 @@ public:
     /**
      * Constructor
      */
-    explicit LocalCtrlHandler(ConfigProviderIfc& provider);
+    explicit LocalCtrlHandler();
 
     /**
      * Deconstructor
@@ -41,6 +41,14 @@ public:
      */
     virtual bool isRunning() const override;
 
+    /**
+     * @brief Set the Storage Driver object
+     * 
+     * @param pDriver 
+     */
+    static void setStorageDriver(ConfigProviderIfc* const pDriver) {
+        s_pNvsStorageDriver = pDriver;
+    }
 private:
     /**
      * Private copy constructor.
@@ -71,6 +79,7 @@ private:
             PROP_TYPE_CHAR_STRING,
         };
 
+        constexpr PropertyType(const uint32_t val) : value(static_cast<Value>(val)) {}
         constexpr PropertyType(Value val) : value(val) {}
         PropertyType() = default;
 
@@ -166,8 +175,10 @@ private:
      */
     static esp_err_t setPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], const esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx);
 
+    // static members
+    static ConfigProviderIfc* s_pNvsStorageDriver;
+
     // Members
-    ConfigProviderIfc& m_provider;
     bool m_isServiceEnabled;
 };
 

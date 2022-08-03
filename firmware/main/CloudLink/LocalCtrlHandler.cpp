@@ -3,16 +3,13 @@
 #include <mdns.h>
 #include <esp_https_server.h>
 
-#define ESP_CTRL_NUMBER_OF_PROPERTIES       3
-#define ESP_CTRL_SERVICE_NAME               "service_mode"
+#define ESP_CTRL_NUMBER_OF_PROPERTIES       6
+// mDNS does not work at the moment, so we use IP
+#define ESP_CTRL_SERVICE_NAME               "192.168.4.1"
 
-#define ESP_CTRL_PROP_DEVICE_SN             "Device_SerialNumber"
-#define ESP_CTRL_PROP_WIFI_SSID             "Wifi_SSID"
-#define ESP_CTRL_PROP_WIFI_PASSPHRASE       "Wifi_Passphrase"
+ConfigProviderIfc* LocalCtrlHandler::s_pNvsStorageDriver = NULL;
 
-
-LocalCtrlHandler::LocalCtrlHandler(ConfigProviderIfc& provider) :
-    m_provider(provider),
+LocalCtrlHandler::LocalCtrlHandler() :
     m_isServiceEnabled(false) {
 }
 
@@ -44,25 +41,29 @@ esp_err_t LocalCtrlHandler::startService(void) {
         .handlers = {
             .get_prop_values = &LocalCtrlHandler::getPropertyValues,
             .set_prop_values = &LocalCtrlHandler::setPropertyValues,
-            .usr_ctx         = &m_provider,
+            .usr_ctx         = s_pNvsStorageDriver,
             .usr_ctx_free_fn = NULL
         },
         // Maximum number of properties that may be set
         .max_properties      = ESP_CTRL_NUMBER_OF_PROPERTIES
     };
 
-    mdns_init();
-    mdns_hostname_set(ESP_CTRL_SERVICE_NAME);
+    // setup DNS - hostname
+   mdns_init();
+   mdns_hostname_set(ESP_CTRL_SERVICE_NAME);
 
     // start service
     const esp_err_t err = esp_local_ctrl_start(&config);
     m_isServiceEnabled = err == ERR_OK;
 
-    // register properties
-    registerProperty(ESP_CTRL_PROP_DEVICE_SN, PropertyType::PROP_TYPE_UINT32, true);
+    // register properties. Attention: Do not reorder registration, it is used as index in app
+    registerProperty(ESP_CTRL_PROP_DEVICE_SN, PropertyType::PROP_TYPE_CHAR_STRING, true);
+    registerProperty(ESP_CTRL_PROP_DEVICE_ROOM, PropertyType::PROP_TYPE_CHAR_STRING);
+    registerProperty(ESP_CTRL_PROP_DEVICE_INTERVAL, PropertyType::PROP_TYPE_UINT32);
+    registerProperty(ESP_CTRL_PROP_DEVICE_BROKER_URI, PropertyType::PROP_TYPE_CHAR_STRING);
     registerProperty(ESP_CTRL_PROP_WIFI_SSID, PropertyType::PROP_TYPE_CHAR_STRING);
     registerProperty(ESP_CTRL_PROP_WIFI_PASSPHRASE, PropertyType::PROP_TYPE_CHAR_STRING);
-
+    
     return err;
 }
 
@@ -93,37 +94,33 @@ void LocalCtrlHandler::registerProperty(const char* name, const PropertyType typ
 }
 
 esp_err_t LocalCtrlHandler::getPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx) {
-    for (uint32_t i = 0; i < props_count; i++) {
-        ESP_LOGI("HumiDevice", "Get Property %s", props[i].name);
+    ConfigProviderIfc* pProvider = static_cast<ConfigProviderIfc*>(usr_ctx);
 
-        if (strncmp(props[i].name, ESP_CTRL_PROP_DEVICE_SN, sizeof(ESP_CTRL_PROP_DEVICE_SN))) {
-            // TODO
-        } 
-        else if ((strncmp(props[i].name, ESP_CTRL_PROP_WIFI_SSID, sizeof(ESP_CTRL_PROP_WIFI_SSID)))) {
-            // TODO
-        } 
-        else if ((strncmp(props[i].name, ESP_CTRL_PROP_WIFI_PASSPHRASE, sizeof(ESP_CTRL_PROP_WIFI_PASSPHRASE)))) {
-            // TODO
-        } 
-        else {
-            // property name not supported
-            return ESP_ERR_INVALID_STATE;
-        }
+    for (uint32_t i = 0; i < props_count; i++) {
+        // set default
+        prop_values[i].size = (static_cast<PropertyType>(props[i].type)).getSize();
+        prop_values[i].data = NULL;
+
+        esp_err_t err = pProvider->readConfiguration(props[i].name, &prop_values[i].data, &(prop_values[i].size));
+        if (err != ESP_OK) return err;
     }
 
     return ESP_OK;
 }
 
 esp_err_t LocalCtrlHandler::setPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], const esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx) {
+    ConfigProviderIfc* pProvider = static_cast<ConfigProviderIfc*>(usr_ctx);
+
     for (uint32_t i = 0; i < props_count; i++) {
         if (props[i].flags & PropertyFlags::PROP_FLAG_READONLY) {
             return ESP_ERR_INVALID_ARG;
         }   
 
-        ESP_LOGI("HumiDevice", "Set Property %s", props[i].name);
-
         const PropertyType type = static_cast<PropertyType::Value>(props[i].type);
-        
+        const size_t dataSize = type.getSize() == 0 ? prop_values[i].size : type.getSize();
+
+        esp_err_t err = pProvider->writeConfiguration(props[i].name, prop_values[i].data, dataSize);
+        if (err != ESP_OK) return err;
     }
 
     return ESP_OK;

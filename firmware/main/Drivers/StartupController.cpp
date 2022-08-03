@@ -1,8 +1,16 @@
 #include "StartupController.h"
-#include "Drivers/ApplicationHardwareConfig.h"
 
-void StartupController::initializeCPU() {
-    // nothing to do
+#include "Drivers/ApplicationHardwareConfig.h"
+#include "Control/ControlTask.h"
+#include "CloudLink/LocalCtrlHandler.h"
+
+NvsStorageDriver StartupController::s_nvsDriver;
+
+void StartupController::initialize() {
+    ESP_LOGI("Startup", "%p", &StartupController::s_nvsDriver);
+
+    ControlTask::setStorageDriver(&StartupController::s_nvsDriver);
+    LocalCtrlHandler::setStorageDriver(&StartupController::s_nvsDriver);
 }
 
 void StartupController::initializeGpio() {

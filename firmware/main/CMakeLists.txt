@@ -9,6 +9,7 @@ idf_component_register(
           "Drivers/SK6805Driver.cpp"
 
           "Control/ControlTask.cpp"
+          "Control/Persistency/NvsStorageDriver.cpp"
           
           "GuiUpdater/GuiUpdaterTask.cpp"
           "GuiUpdater/AirIndicatorDriver.cpp"
