@@ -33,8 +33,9 @@ extern "C" void onWifiEventHandler(void* param, esp_event_base_t eventBase, int3
     }
 }
 
-WifiStateMachine::WifiStateMachine(WifiStateMachineIfc& sender) :
+WifiStateMachine::WifiStateMachine(WifiStateMachineIfc& sender, LocalCtrlHandlerIfc& ctrlHandler) :
     m_sender(sender),
+    m_ctrlHandler(ctrlHandler),
     m_currentState(State::OFF),
     m_nextState(State::OFF),
     m_clientConnected(false),
@@ -47,25 +48,21 @@ WifiStateMachine::WifiStateMachine(WifiStateMachineIfc& sender) :
 WifiStateMachine::~WifiStateMachine() {
 }
 
-void WifiStateMachine::reset() {
+void WifiStateMachine::reset() {   
     m_failure = false;
-    
+
     m_normalMode = false;
     m_clientConnected = false;
     m_clientDisonnected = false;
     m_serviceWaiting = false;
 
-    m_currentState = State::OFF;
     m_nextState = State::OFF;
+    m_currentState = State::OFF;
 
     ESP_LOGI("HumiDevice", "Reset wifi phy");
 
     esp_netif_deinit();
     esp_wifi_deinit();
-
-    runStateMachine();
-
-    m_sender.sendWifiStatus(WifiStatus::DISABLED);
 }
 
 void WifiStateMachine::onStartServiceMode() {
@@ -88,6 +85,7 @@ void WifiStateMachine::onClientDisconnected() {
 }
 
 void WifiStateMachine::onClientSearching() {
+    runStateMachine();
     m_sender.sendWifiStatus(WifiStatus::CLIENT_SEARCHING);
 }
 
@@ -137,7 +135,7 @@ void WifiStateMachine::runStateMachine(void) {
                 break;
 
             case State::FAILURE: 
-                reset();
+                // nothing to do
                 break;
 
             default:
@@ -167,6 +165,10 @@ void WifiStateMachine::onEnterState(const State state) {
             startWifiAsAp();
             break;
 
+        case State::FAILURE:
+            reset();
+            break;
+
         default: 
             // nothnig to do
             break;
@@ -179,11 +181,19 @@ void WifiStateMachine::onRunState(const State state) const {
 
 void WifiStateMachine::onLeaveState(const State state) { 
     switch (m_currentState) {
-        case State::OFF: {
-            m_failure |= esp_netif_init() != ESP_OK;
-            m_failure |= esp_event_loop_create_default() != ESP_OK;
-        }
-        break;
+        case State::OFF: 
+            checkEspError(esp_netif_init());
+            checkEspError(esp_event_loop_create_default());
+            break;
+
+        case State::SERVICE_WAITING: 
+            checkEspError(m_ctrlHandler.startService());
+            break;
+
+        case State::SERVICE:
+            checkEspError(m_ctrlHandler.stopService());
+            break;
+
         default: 
             // nothnig to do
             break;
@@ -206,8 +216,8 @@ void WifiStateMachine::handleEvent(bool* const pFlag, const State nextState) {
 void WifiStateMachine::startWifiAsAp() {
     esp_netif_create_default_wifi_ap();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    m_failure |= esp_wifi_init(&cfg) != ESP_OK;
-    m_failure |= esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &onWifiEventHandler, (void*)this, NULL) != ESP_OK;
+    checkEspError(esp_wifi_init(&cfg));
+    checkEspError(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &onWifiEventHandler, (void*)this, NULL));
     
     wifi_config_t wifiConfig = {};
     wifiConfig.ap.channel = HUMIDEVICE_ESP_WIFI_CHANNEL;
@@ -217,7 +227,17 @@ void WifiStateMachine::startWifiAsAp() {
     memcpy(&wifiConfig.ap.ssid, HUMIDEVICE_ESP_WIFI_SSID, sizeof(HUMIDEVICE_ESP_WIFI_SSID));
     memcpy(&wifiConfig.ap.password, HUMIDEVICE_ESP_WIFI_PASS, sizeof(HUMIDEVICE_ESP_WIFI_PASS));
 
-    m_failure |= esp_wifi_set_mode(WIFI_MODE_AP) != ESP_OK;
-    m_failure |= esp_wifi_set_config(WIFI_IF_AP, &wifiConfig) != ESP_OK;
-    m_failure |= esp_wifi_start() != ESP_OK;
+    checkEspError(esp_wifi_set_mode(WIFI_MODE_AP));
+    checkEspError(esp_wifi_set_config(WIFI_IF_AP, &wifiConfig));
+    checkEspError(esp_wifi_start());
+}
+
+void WifiStateMachine::checkEspError(const esp_err_t status) {
+    if (status != ESP_OK) {
+        ESP_LOGE("HumiDevice", "WifiStateMachine has unknown failure. Reset PHY");
+
+        m_sender.sendWifiStatus(WifiStatus::UNKNOWN_ERROR);
+
+        m_failure = true;
+    }
 }

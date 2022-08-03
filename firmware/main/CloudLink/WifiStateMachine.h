@@ -6,6 +6,7 @@
 
 // Project include
 #include "WifiStateMachineIfc.h"
+#include "LocalCtrlHandlerIfc.h"
 
 /**
  * Represents the state machine for wifi controller
@@ -26,7 +27,7 @@ public:
     /**
      * Constructor
      */
-    explicit WifiStateMachine(WifiStateMachineIfc& sender);
+    explicit WifiStateMachine(WifiStateMachineIfc& sender, LocalCtrlHandlerIfc& ctrlHandler);
 
     /**
      * Destructor
@@ -106,10 +107,12 @@ private:
     void handleEvent(bool* const pFlag, const State nextState);
     // helper
     void startWifiAsAp();
+    void checkEspError(const esp_err_t status);
 
 
     // Member variables
     WifiStateMachineIfc& m_sender;
+    LocalCtrlHandlerIfc& m_ctrlHandler;
 
     // state
     State m_currentState;

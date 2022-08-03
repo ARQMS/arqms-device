@@ -12,13 +12,15 @@
 #include "Events/WifiStatusEvent.h"
 #include "WifiStateMachine.h"
 #include "WifiStateMachineIfc.h"
+#include "LocalCtrlHandler.h"
+#include "ConfigProviderIfc.h"
 
 /**
  * This item is responsible for connection to cloud
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class CloudLinkTask : public TaskBase<5, sizeof(WifiSettingsEvent)>, WifiStateMachineIfc {
+class CloudLinkTask : public TaskBase<5, sizeof(WifiSettingsEvent)>, WifiStateMachineIfc, ConfigProviderIfc {
 public:
     EventPublisherMultiple<2> StatusEvent;
 
@@ -74,6 +76,7 @@ private:
     CloudLinkTask& operator=(const CloudLinkTask& other);
 
     // Private Members
+    LocalCtrlHandler m_ctrlHandler;
     WifiStateMachine m_wifiStateMachine;
     Timer* m_pTimeoutTimer;
 };

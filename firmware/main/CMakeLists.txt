@@ -15,6 +15,8 @@ idf_component_register(
 
           "CloudLink/CloudLinkTask.cpp"
           "CloudLink/WifiStateMachine.cpp"
+          "CloudLink/LocalCtrlHandler.cpp"
      INCLUDE_DIRS "."
-     REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform
+     REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform esp_local_ctrl mdns
+     EMBED_TXTFILES "../certs/cacert.pem" "../certs/prvtkey.pem"
 )
