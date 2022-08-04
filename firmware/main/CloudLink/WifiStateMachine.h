@@ -4,8 +4,12 @@
 // Platform include
 #include <HumiDevice.Platform/Platform.h>
 
+// IDF includes
+#include "esp_wifi.h"
+
 // Project include
 #include "WifiStateMachineIfc.h"
+#include "LocalCtrlHandlerIfc.h"
 
 /**
  * Represents the state machine for wifi controller
@@ -26,7 +30,7 @@ public:
     /**
      * Constructor
      */
-    explicit WifiStateMachine(WifiStateMachineIfc& sender);
+    explicit WifiStateMachine(WifiStateMachineIfc& sender, LocalCtrlHandlerIfc& ctrlHandler);
 
     /**
      * Destructor
@@ -106,10 +110,13 @@ private:
     void handleEvent(bool* const pFlag, const State nextState);
     // helper
     void startWifiAsAp();
+    void checkEspError(const esp_err_t status);
+    static void onWifiEventHandler(void* param, esp_event_base_t eventBase, int32_t eventId, void* eventData);
 
 
     // Member variables
     WifiStateMachineIfc& m_sender;
+    LocalCtrlHandlerIfc& m_ctrlHandler;
 
     // state
     State m_currentState;

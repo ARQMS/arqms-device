@@ -5,7 +5,8 @@
 
 CloudLinkTask::CloudLinkTask() :
     StatusEvent(),
-    m_wifiStateMachine(*this),
+    m_ctrlHandler(),
+    m_wifiStateMachine(*this, m_ctrlHandler),
     m_pTimeoutTimer(NULL) {
 }
 

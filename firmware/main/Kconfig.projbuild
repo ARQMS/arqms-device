@@ -2,7 +2,7 @@ menu "HumiDevice Configuration"
 
     config ESP_WIFI_SSID
         string "WiFi SSID"
-        default "HumiDevice-Service"
+        default "AR-xxxx"
         help
             SSID (network name) for the HumiDevice to connect to.
 

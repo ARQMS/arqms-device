@@ -18,7 +18,7 @@
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  * @see https://github.com/ARQMS/arqms-device/wiki/Mechanics#hmi-interface
  */
-class GuiUpdaterTask : public TaskBase<2, sizeof(AirQualityEvent)> {
+class GuiUpdaterTask : public TaskBase<10, sizeof(AirQualityEvent)> {
 public:
     // no outputs
 

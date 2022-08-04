@@ -12,6 +12,7 @@
 #include "Events/WifiStatusEvent.h"
 #include "WifiStateMachine.h"
 #include "WifiStateMachineIfc.h"
+#include "LocalCtrlHandler.h"
 
 /**
  * This item is responsible for connection to cloud
@@ -74,6 +75,7 @@ private:
     CloudLinkTask& operator=(const CloudLinkTask& other);
 
     // Private Members
+    LocalCtrlHandler m_ctrlHandler;
     WifiStateMachine m_wifiStateMachine;
     Timer* m_pTimeoutTimer;
 };

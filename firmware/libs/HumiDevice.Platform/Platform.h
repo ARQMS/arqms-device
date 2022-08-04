@@ -11,5 +11,6 @@ typedef bool bool_t;
 typedef uint8_t char8_t;
 
 #include <esp_log.h>
+#include <esp_err.h>
 
 #endif // PLATFORM_H

@@ -2,6 +2,8 @@
 
 #include "Events/EventIdentifiers.h"
 #include "Events/WifiSettingsEvent.h"
+    
+StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
 
 ControlTask::ControlTask() :
     GuiSettings(),
@@ -12,6 +14,7 @@ ControlTask::~ControlTask() {
 }
 
 void ControlTask::onInitialize()  {
+    assert(s_pNvsStorageDriver != NULL);
 }
 
 void ControlTask::onStart() {

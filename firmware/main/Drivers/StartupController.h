@@ -4,6 +4,9 @@
 // Platform
 #include <HumiDevice.Platform/Platform.h>
 
+// Project includes
+#include "Control/Persistency/NvsStorageDriver.h"
+
 /**
  * StartupController to initialize ESP32-C3 HumiDevice hardware. 
  */
@@ -12,7 +15,7 @@ public:
     /**
      * initialize cpu
      */
-    static void initializeCPU();
+    static void initialize();
 
     /**
      * initialize cpu
@@ -50,6 +53,9 @@ private:
      * Provide the private assignment operator so the compiler does not generate the default one.
      */
     StartupController& operator=(const StartupController& other);
+
+    // static members
+    static NvsStorageDriver s_nvsDriver;
 };
 
 

@@ -9,6 +9,7 @@
 
 // Project includes
 #include "Events/WifiStatusEvent.h"
+#include "Control/Persistency/StorageDriverIfc.h"
 
 /**
  * This item is responsible for central logic and status of the device
@@ -31,6 +32,14 @@ public:
      */
     virtual ~ControlTask();
     
+    /**
+     * @brief Set the Storage Driver object
+     * 
+     * @param pDriver 
+     */
+    static void setStorageDriver(StorageDriverIfc* const pDriver) {
+        s_pNvsStorageDriver = pDriver;
+    }
 protected:
     /**
      * @see TaskBase::onInitialize()
@@ -61,6 +70,9 @@ private:
      * Provide the private assignment operator so the compiler does not generate the default one.
      */
     ControlTask& operator=(const ControlTask& other);
+
+    // Members
+    static StorageDriverIfc* s_pNvsStorageDriver;
 };
 
 

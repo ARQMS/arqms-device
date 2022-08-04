@@ -29,7 +29,7 @@ extern "C" void app_main(void) {
     ESP_LOGI("HumiDevice", "Application initialization...");
 
     // initialize hardware
-    StartupController::initializeCPU();
+    StartupController::initialize();
     StartupController::initializeGpio();
     StartupController::initializeSpi1();
     StartupController::initializeAdc1();
