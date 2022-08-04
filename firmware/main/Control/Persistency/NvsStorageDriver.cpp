@@ -8,6 +8,9 @@ static const char wifi_ssid[]    = "SSID";
 static const char wiif_pwd[]     = "PWD";
 static const int  interval       = 15;
 
+// checks given char* with expected property name with optional NULL-Termination
+#define CHECK_PROP(name, expected) strncmp(name, expected, sizeof(expected) - 1) == 0
+
 NvsStorageDriver::NvsStorageDriver() {
 
 }
@@ -19,26 +22,26 @@ NvsStorageDriver::~NvsStorageDriver() {
 esp_err_t NvsStorageDriver::readConfiguration(const char* name, void** data, size_t* size) {
     // TODO read from NVS
 
-    if (strncmp(name, ESP_CTRL_PROP_DEVICE_SN, sizeof(ESP_CTRL_PROP_DEVICE_SN) - 1) == 0) {
+    if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
         *data = (void*)sn;
         *size = sizeof(sn);
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_DEVICE_ROOM, sizeof(ESP_CTRL_PROP_DEVICE_ROOM) - 1) == 0) {
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_ROOM)) {
         *data = (void*)room;
         *size = sizeof(room);
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_DEVICE_INTERVAL, sizeof(ESP_CTRL_PROP_DEVICE_INTERVAL) - 1) == 0) {
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_INTERVAL)) {
         *data = (void*)&interval;
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_DEVICE_BROKER_URI, sizeof(ESP_CTRL_PROP_DEVICE_BROKER_URI) - 1) == 0) {
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_BROKER_URI)) {
         *data = (void*)broker;
         *size = sizeof(broker);
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_WIFI_SSID, sizeof(ESP_CTRL_PROP_WIFI_SSID) - 1) == 0) {
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_SSID)) {
         *data = (void*)wifi_ssid;
         *size = sizeof(wifi_ssid);
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_WIFI_PASSPHRASE, sizeof(ESP_CTRL_PROP_WIFI_PASSPHRASE) - 1) == 0) {
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_PASSPHRASE)) {
         *data = (void*)wiif_pwd;
         *size = sizeof(wiif_pwd);
     } 
@@ -50,26 +53,27 @@ esp_err_t NvsStorageDriver::readConfiguration(const char* name, void** data, siz
     return ESP_OK;
 }
 
-esp_err_t NvsStorageDriver::writeConfiguration(const char* name, void* data, size_t size) {
+esp_err_t NvsStorageDriver::writeConfiguration(const char* name, const void* const* data, const size_t size) {
     // TODO write from NVS
 
-    if (strncmp(name, ESP_CTRL_PROP_DEVICE_SN, sizeof(ESP_CTRL_PROP_DEVICE_SN) - 1) == 0) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
+    if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_DEVICE_ROOM, sizeof(ESP_CTRL_PROP_DEVICE_ROOM) - 1) == 0) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_ROOM)) {
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_DEVICE_INTERVAL, sizeof(ESP_CTRL_PROP_DEVICE_INTERVAL) - 1) == 0) {
-        ESP_LOGI("HumiDevice", "Write %s:%i", name, data);
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_INTERVAL)) {
+        const uint32_t interval = *(const uint32_t*)*data;
+        ESP_LOGI("HumiDevice", "Write %s:%i", name, interval);
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_DEVICE_BROKER_URI, sizeof(ESP_CTRL_PROP_DEVICE_BROKER_URI) - 1) == 0) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_BROKER_URI)) {
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_WIFI_SSID, sizeof(ESP_CTRL_PROP_WIFI_SSID) - 1) == 0) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_SSID)) {
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
     } 
-    else if (strncmp(name, ESP_CTRL_PROP_WIFI_PASSPHRASE, sizeof(ESP_CTRL_PROP_WIFI_PASSPHRASE) - 1) == 0) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_PASSPHRASE)) {
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
     } 
     else {
         ESP_LOGW("HumiDevice", "Configuration '%s' is not supported by NVS Storage", name);

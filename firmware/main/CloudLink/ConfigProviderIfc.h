@@ -39,7 +39,7 @@ public:
      * @param size the size
      * @return esp_err_t 
      */
-    virtual esp_err_t writeConfiguration(const char* name, void* data, size_t size) = 0;
+    virtual esp_err_t writeConfiguration(const char* name, const void* const* data, const size_t size) = 0;
 };
 
 #endif // CONFIGPROVIDER_IFC_H_

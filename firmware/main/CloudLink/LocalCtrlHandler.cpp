@@ -119,7 +119,12 @@ esp_err_t LocalCtrlHandler::setPropertyValues(size_t props_count, const esp_loca
         const PropertyType type = static_cast<PropertyType::Value>(props[i].type);
         const size_t dataSize = type.getSize() == 0 ? prop_values[i].size : type.getSize();
 
-        esp_err_t err = pProvider->writeConfiguration(props[i].name, prop_values[i].data, dataSize);
+        if (dataSize == 0) {
+            ESP_LOGW("HumiDevice", "DataSize is %i. Received Cmd but nut data available", dataSize);
+            return ESP_ERR_INVALID_ARG;
+        }
+
+        esp_err_t err = pProvider->writeConfiguration(props[i].name, &prop_values[i].data, dataSize);
         if (err != ESP_OK) return err;
     }
 
