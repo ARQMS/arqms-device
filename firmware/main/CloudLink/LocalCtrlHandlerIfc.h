@@ -26,13 +26,6 @@ public:
      * Stops the ctrl service
      */
     virtual esp_err_t stopService() = 0;
-
-    /**
-     * Indicates when local ctrl service is running
-     *
-     * @return bool true when service is already running, otherwise false.
-     */
-    virtual bool isRunning() const = 0;
 };
 
 #endif // LOCALCTRLHANDLER_IFC_H

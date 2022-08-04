@@ -9,8 +9,7 @@
 
 ConfigProviderIfc* LocalCtrlHandler::s_pNvsStorageDriver = NULL;
 
-LocalCtrlHandler::LocalCtrlHandler() :
-    m_isServiceEnabled(false) {
+LocalCtrlHandler::LocalCtrlHandler() {
 }
 
 esp_err_t LocalCtrlHandler::startService(void) {
@@ -54,9 +53,8 @@ esp_err_t LocalCtrlHandler::startService(void) {
 
     // start service
     const esp_err_t err = esp_local_ctrl_start(&config);
-    m_isServiceEnabled = err == ERR_OK;
 
-    // register properties. Attention: Do not reorder registration, it is used as index in app
+    // register properties after service is started
     registerProperty(ESP_CTRL_PROP_DEVICE_SN, PropertyType::PROP_TYPE_CHAR_STRING, true);
     registerProperty(ESP_CTRL_PROP_DEVICE_ROOM, PropertyType::PROP_TYPE_CHAR_STRING);
     registerProperty(ESP_CTRL_PROP_DEVICE_INTERVAL, PropertyType::PROP_TYPE_UINT32);
@@ -68,14 +66,7 @@ esp_err_t LocalCtrlHandler::startService(void) {
 }
 
 esp_err_t LocalCtrlHandler::stopService() {
-    const esp_err_t err = esp_local_ctrl_stop();
-    m_isServiceEnabled = !(err == ERR_OK);
-
-    return err;
-}
-
-bool LocalCtrlHandler::isRunning() const {
-    return m_isServiceEnabled;
+    return esp_local_ctrl_stop();
 }
 
 void LocalCtrlHandler::registerProperty(const char* name, const PropertyType type, const bool isReadOnly) {
@@ -124,7 +115,7 @@ esp_err_t LocalCtrlHandler::setPropertyValues(size_t props_count, const esp_loca
             return ESP_ERR_INVALID_ARG;
         }
 
-        esp_err_t err = pProvider->writeConfiguration(props[i].name, &prop_values[i].data, dataSize);
+        esp_err_t err = pProvider->writeConfiguration(props[i].name, prop_values[i].data, dataSize);
         if (err != ESP_OK) return err;
     }
 

@@ -1,6 +1,6 @@
 #include "NvsStorageDriver.h"
 
-// TODO remove demo. Use struct and fixed length strings!
+// TODO remove demo. Use struct or NVS with fixed length strings to avvoid dynamic memory!
 static const char sn[]           = "AR-0001";
 static const char room[]         = "OfficeRoom1";
 static const char broker[]       = "https://192.168.0.16";
@@ -53,27 +53,27 @@ esp_err_t NvsStorageDriver::readConfiguration(const char* name, void** data, siz
     return ESP_OK;
 }
 
-esp_err_t NvsStorageDriver::writeConfiguration(const char* name, const void* const* data, const size_t size) {
-    // TODO write from NVS
+esp_err_t NvsStorageDriver::writeConfiguration(const char* name, const void* data, const size_t size) {
+    // TODO write to NVS
 
     if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_ROOM)) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_INTERVAL)) {
-        const uint32_t interval = *(const uint32_t*)*data;
+        const uint32_t interval = *(const uint32_t*)data;
         ESP_LOGI("HumiDevice", "Write %s:%i", name, interval);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_BROKER_URI)) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_SSID)) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_PASSPHRASE)) {
-        ESP_LOGI("HumiDevice", "Write %s:%s", name, *data);
+        ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
     } 
     else {
         ESP_LOGW("HumiDevice", "Configuration '%s' is not supported by NVS Storage", name);
