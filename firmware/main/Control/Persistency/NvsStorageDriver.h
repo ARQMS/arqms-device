@@ -41,7 +41,9 @@ public:
     virtual esp_err_t writeConfiguration(const char8_t* name, const void* data, const size_t size) override;
 
     /**
-     * @see StorageDriverIfc::readWifiConfig
+     * @see  StorageDriverIfc::readWifiConfig
+     * 
+     * @param pWifiParam 
      */
     virtual void readWifiConfig(WifiSettingsEvent* pWifiParam) override;
 
@@ -49,6 +51,9 @@ public:
      * @see StorageDriverIfc::readDeviceConfig
      */
     virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) override;
+    
+private:
+    const static char8_t* nvsNamespace = "DeviceConfig";
 };
 
 

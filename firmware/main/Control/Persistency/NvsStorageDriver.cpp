@@ -3,6 +3,9 @@
 #include <HumiDevice.Serialization/Deserializer.h>
 #include <HumiDevice.Serialization/Serializer.h>
 
+#include "nvs.h"
+#include "nvs_flash.h"
+
 // TODO remove demo. Use struct or NVS with fixed length strings to avvoid dynamic memory!
 WifiSettingsEvent g_wifiSettings;
 DeviceSettingsEvent g_deviceSettings;
@@ -22,7 +25,7 @@ NvsStorageDriver::NvsStorageDriver() {
 }
 
 NvsStorageDriver::~NvsStorageDriver() {
-    
+    nvs_deinit_partition(nvsNamespace);    
 }
 
 esp_err_t NvsStorageDriver::initialize() {
@@ -33,7 +36,12 @@ esp_err_t NvsStorageDriver::initialize() {
 
     g_deviceSettings.setBrokerUri(broker);
     g_deviceSettings.setSn(sn);
-
+	
+	esp_err_t err = nvs_flash_init_partition(nvsNamespace);
+    if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND){
+        ESP_ERROR_CHECK(err);
+        err = nvs_flash_init_partition(nvsNamespace);
+    }
     return ESP_OK;
 }
 
@@ -63,7 +71,17 @@ void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
 
 esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, size_t* size) {
     // TODO read from NVS, following code is for demonstration purpose
+	esp_err_t err;
+    nvs_handle_t nvsHandle;
+    
+    // Open NVS Partition
+    err = nvs_open_partition(nvsNamespace, NVS_READWRITE, &nvsHandle);
+	
+    if(err != ESP_OK){
+        return err;
+    }
 
+    // TODO read from NVS
     if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
         *data = (void*)sn;
         *size = sizeof(sn);
@@ -91,12 +109,23 @@ esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, 
         ESP_LOGW("HumiDevice", "Configuration '%s' is not supported by NVS Storage", name);
         return ESP_ERR_INVALID_ARG;
     } 
-    
+
+    nvs_close(nvsHandle);   // Close NVS Partition
     return ESP_OK;
 }
 
+    
 esp_err_t NvsStorageDriver::writeConfiguration(const char8_t* name, const void* data, const size_t size) {
     // TODO write to NVS
+    esp_err_t err;
+    nvs_handle_t nvsHandle;
+    
+    // Open NVS Partition
+    err = nvs_open_partition(nvsNamespace, NVS_READWRITE, &nvsHandle);
+
+    if(err != ESP_OK){
+        return err;
+    }
 
     if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
         ESP_LOGI("HumiDevice", "Write %s:%s", name, data);
@@ -121,6 +150,10 @@ esp_err_t NvsStorageDriver::writeConfiguration(const char8_t* name, const void* 
         ESP_LOGW("HumiDevice", "Configuration '%s' is not supported by NVS Storage", name);
         return ESP_ERR_INVALID_ARG;
     } 
-    
+    err = nvs_commit(nvsHandle);  // Commit any changes made to NVS Storage
+    if(err != ESP_OK){
+        return err;
+    }
+    nvs_close(nvsHandle);       // Close NVS Partition
     return ESP_OK;
 }
