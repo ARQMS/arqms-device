@@ -32,6 +32,11 @@ public:
      * @see ConfigProviderIfc::writeConfiguration
      */
     virtual esp_err_t writeConfiguration(const char* name, const void* data, const size_t size) override;
+
+    /**
+     * @see StorageDriverIfc::readWifiConfig
+     */
+    virtual const WifiParameters* readWifiConfig() override;
 };
 
 

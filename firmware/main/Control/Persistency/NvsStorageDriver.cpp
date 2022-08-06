@@ -19,6 +19,10 @@ NvsStorageDriver::~NvsStorageDriver() {
     
 }
 
+const WifiParameters* NvsStorageDriver::readWifiConfig() {
+    return NULL; // TODO
+}
+
 esp_err_t NvsStorageDriver::readConfiguration(const char* name, void** data, size_t* size) {
     // TODO read from NVS
 
