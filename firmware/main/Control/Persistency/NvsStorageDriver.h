@@ -36,7 +36,7 @@ public:
     /**
      * @see StorageDriverIfc::readWifiConfig
      */
-    virtual const WifiParameters* readWifiConfig() override;
+    virtual void readWifiConfig(WifiParameters* pWifiParam) override;
 };
 
 

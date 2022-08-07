@@ -18,12 +18,14 @@ void ControlTask::onInitialize()  {
 }
 
 void ControlTask::onStart() {
-    const WifiParameters* wifiConfig = s_pNvsStorageDriver->readWifiConfig();
-    if (wifiConfig == NULL || wifiConfig->isWifiCfgValid()) {
+    WifiParameters wifiConfig;
+    s_pNvsStorageDriver->readWifiConfig(&wifiConfig);
+
+    if (!wifiConfig.isWifiCfgValid()) {
         m_coreSm.onServiceMode();
     }
     else {
-        m_coreSm.tryConnection(*wifiConfig);
+        m_coreSm.onNormalMode(wifiConfig);
     }
 }
 

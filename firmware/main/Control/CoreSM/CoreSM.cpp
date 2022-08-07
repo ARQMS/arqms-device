@@ -26,7 +26,7 @@ void CoreSM::onServiceMode() {
     runStateMachine();
 }
 
-void CoreSM::tryConnection(const WifiParameters& param) {
+void CoreSM::onNormalMode(const WifiParameters& param) {
     m_isConnecting = true;
     m_activeWifiSettings.setMode(WifiMode::STA);
     m_activeWifiSettings.setSSID(param.ssid);

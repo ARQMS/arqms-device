@@ -50,7 +50,7 @@ public:
      * Starts standby mode
      * @param param wifi settings
      */
-    void tryConnection(const WifiParameters& param);
+    void onNormalMode(const WifiParameters& param);
 
     /**
      * on idle state

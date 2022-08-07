@@ -21,9 +21,9 @@ public:
     /**
      * Gets the wifi configuration from underlaying storage
      * 
-     * @return const WifiParameters* 
+     * @param const WifiParameters* 
      */
-    virtual const WifiParameters* readWifiConfig() = 0;
+    virtual void readWifiConfig(WifiParameters* pWifiParam) = 0;
 };
 
 
