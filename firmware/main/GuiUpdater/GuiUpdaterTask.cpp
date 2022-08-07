@@ -56,6 +56,9 @@ void GuiUpdaterTask::onHandleWifiStatus(const WifiStatusEvent& wifiStatus) {
     if (wifiStatus.getWifiStatus() == WifiStatus::CLIENT_SEARCHING) {
         m_wlanIndicator.setColor({0, 0, 255}, 500);
     }
+    if (wifiStatus.getWifiStatus() == WifiStatus::CONNECTING) {
+        m_wlanIndicator.setColor({0, 0, 255}, 100);
+    }
     else if (wifiStatus.getWifiStatus() == WifiStatus::CLIENT_CONNECTED) {
         m_wlanIndicator.setColor({0, 0, 255});
     } 

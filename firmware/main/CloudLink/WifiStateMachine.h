@@ -10,6 +10,7 @@
 // Project include
 #include "WifiStateMachineIfc.h"
 #include "LocalCtrlHandlerIfc.h"
+#include "Events/WifiSettingsEvent.h"
 
 /**
  * Represents the state machine for wifi controller
@@ -23,6 +24,7 @@ public:
         OFF,
         SERVICE_WAITING,
         SERVICE,
+        NORMAL_CONNECTING,
         NORMAL,
         FAILURE
     };
@@ -44,8 +46,16 @@ public:
 
     /**
      * Start service mode
+     * @param wifiSetting wifi settings
      */
-    void onStartServiceMode();
+    void startServiceMode(const WifiSettingsEvent& wifiSetting);
+
+    /**
+     * Normal mode
+     * 
+     * @param wifiSetting wifi settings
+     */
+    void startNormalMode(const WifiSettingsEvent& wifiSetting);
 
     /**
      * Client connected in service mode
@@ -84,7 +94,11 @@ public:
      * @return bool true if current state is equal to state; otherwise false
      */
     bool isCurrentState(const State state) const;
+
 private:
+    // maximum retry
+    const static uint8_t MAXIMUM_RETRY = 5U;
+
     /**
      * Deleted copy constructor.
      * @param other The copied instance.
@@ -110,13 +124,14 @@ private:
     void handleEvent(bool* const pFlag, const State nextState);
     // helper
     void startWifiAsAp();
+    void startWifiAsSta();
     void checkEspError(const esp_err_t status);
     static void onWifiEventHandler(void* param, esp_event_base_t eventBase, int32_t eventId, void* eventData);
-
 
     // Member variables
     WifiStateMachineIfc& m_sender;
     LocalCtrlHandlerIfc& m_ctrlHandler;
+    WifiSettingsEvent m_wifiSettings;
 
     // state
     State m_currentState;
@@ -125,8 +140,12 @@ private:
     bool m_clientConnected;
     bool m_clientDisonnected;
     bool m_serviceWaiting;
-    bool m_normalMode;
+    bool m_connected;
+    bool m_connectionLost;
+    bool m_normalConnecting;
     bool m_failure;
+
+    uint8_t m_retryNum;
 };
 
 
