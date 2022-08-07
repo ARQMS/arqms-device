@@ -1,13 +1,13 @@
 #include "ControlTask.h"
 
 #include "Events/EventIdentifiers.h"
-#include "Events/WifiSettingsEvent.h"
     
 StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
 
 ControlTask::ControlTask() :
     GuiSettings(),
-    WifiSettings() {
+    WifiSettings(),
+    m_coreSm(*this) {
 }
 
 ControlTask::~ControlTask() {
@@ -18,17 +18,15 @@ void ControlTask::onInitialize()  {
 }
 
 void ControlTask::onStart() {
-    // TODO replace with proper main state machine (https://github.com/ARQMS/arqms-device/wiki/Firmware#main-statemachine)
-    // var wifiConfig = persistancy.readWifiConfig();
-    // if (wifiConfig != null)
-    //      CloudLink.send(WIFI_SETTINGS_EVENT, &wifiSettings)
-    // else
-    //      m_deviceStateMachine.onServiceMode()
+    WifiParameters wifiConfig;
+    s_pNvsStorageDriver->readWifiConfig(&wifiConfig);
 
-    // TODO delete demo code
-    WifiSettingsEvent wifiSettings;
-    wifiSettings.setMode(WifiMode::AP);
-    WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
+    if (!wifiConfig.isWifiCfgValid()) {
+        m_coreSm.onServiceMode();
+    }
+    else {
+        m_coreSm.onNormalMode(wifiConfig);
+    }
 }
 
 void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
@@ -48,11 +46,8 @@ void ControlTask::onHandleTimer(const TimerId timerId) {
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
-    if (status.getWifiStatus() == WifiStatus::CONNECTING) {
-        // m_deviceStateMachine.onConnecting();
-    }
-    else if (status.getWifiStatus() == WifiStatus::CONNECTED) {
-        // m_deviceStateMachine.onIdle();
+    if (status.getWifiStatus() == WifiStatus::CONNECTED) {
+        m_coreSm.onConnected();
     }
     else if (status.getWifiStatus() == WifiStatus::CLIENT_DISCONNECTED || status.getWifiStatus() == WifiStatus::CLIENT_TIMEOUT) {
         // TODO perform shutdown, seems IDF does not support shutdown, 
@@ -60,5 +55,8 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
         // battery charger
         esp_restart();
     }
-    
+}
+
+void ControlTask::sendWifi(WifiSettingsEvent& wifiEvent) {
+    WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiEvent);
 }

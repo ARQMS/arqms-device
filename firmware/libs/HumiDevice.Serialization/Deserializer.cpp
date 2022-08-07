@@ -56,6 +56,16 @@ Deserializer& Deserializer::operator>>(bool& data) {
     return *this;
 }
 
+Deserializer& Deserializer::operator>>(char8_t& data) {
+    const size_t nSizeOfData = 1U;
+    if ((m_bufferPos + nSizeOfData) > m_bufferSize) return *this;
+        
+    data = m_pBuffer[m_bufferPos];
+    
+    m_bufferPos += nSizeOfData;
+    return *this;
+}
+
 Deserializer& Deserializer::operator>>(uint8_t& data) {
     const size_t nSizeOfData = 1U;
     if ((m_bufferPos + nSizeOfData) > m_bufferSize) return *this;

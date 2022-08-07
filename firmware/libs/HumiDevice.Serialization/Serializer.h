@@ -91,6 +91,13 @@ public:
     Serializer& operator<<(const bool data);
 
     /**
+     * Puts a char8_t into the Serializer.
+     * @param data Data to put into the serializer.
+     * @return Reference to this serializer.
+     */
+    Serializer& operator<<(const char8_t data);
+
+    /**
      * Puts a uint8_t into the Serializer.
      * @param data Data to put into the serializer.
      * @return Reference to this serializer.

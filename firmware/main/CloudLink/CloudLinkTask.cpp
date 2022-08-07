@@ -39,12 +39,12 @@ void CloudLinkTask::onHandleTimer(TimerId timerId) {
 
 void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
     if (settings.getMode() == WifiMode::AP) {
-        m_wifiStateMachine.onStartServiceMode();
-
+        m_wifiStateMachine.startServiceMode(settings);
         m_pTimeoutTimer->start();
     }
     else if (settings.getMode() == WifiMode::STA) {
-        // TODO
+        m_wifiStateMachine.startNormalMode(settings);
+        m_pTimeoutTimer->start();
     }
     else {
         m_wifiStateMachine.reset();
@@ -56,6 +56,8 @@ void CloudLinkTask::onHandleTimeout() {
         sendWifiStatus(WifiStatus::CLIENT_TIMEOUT);
 
         m_wifiStateMachine.reset();
+    } else if (m_wifiStateMachine.isCurrentState(WifiStateMachine::State::NORMAL_CONNECTING)) {
+        sendWifiStatus(WifiStatus::CLIENT_TIMEOUT);
     }
 }
 

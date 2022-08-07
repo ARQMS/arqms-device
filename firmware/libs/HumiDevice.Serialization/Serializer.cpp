@@ -68,6 +68,16 @@ Serializer& Serializer::operator<<(const bool data) {
     return *this;
 }
 
+Serializer& Serializer::operator<<(const char8_t data) {
+    const size_t nSizeOfData = 1U;
+    if ((m_bufferPos + nSizeOfData) > m_bufferSize) return *this;
+
+    m_pBuffer[m_bufferPos] = data;
+
+    m_bufferPos += nSizeOfData;
+    return *this;
+}
+
 Serializer& Serializer::operator<<(const uint8_t data) {
     const size_t nSizeOfData = 1U;
     if ((m_bufferPos + nSizeOfData) > m_bufferSize) return *this;

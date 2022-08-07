@@ -102,6 +102,13 @@ public:
      * @param data Holds returned data.
      * @return Reference to this deserializer.
      */
+    Deserializer& operator>>(char8_t& data);
+
+    /**
+     * Returns data out of the Deserializer.
+     * @param data Holds returned data.
+     * @return Reference to this deserializer.
+     */
     Deserializer& operator>>(uint16_t& data);
 
     /**

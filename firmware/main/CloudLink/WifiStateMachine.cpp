@@ -11,13 +11,17 @@
 WifiStateMachine::WifiStateMachine(WifiStateMachineIfc& sender, LocalCtrlHandlerIfc& ctrlHandler) :
     m_sender(sender),
     m_ctrlHandler(ctrlHandler),
+    m_wifiSettings(),
     m_currentState(State::OFF),
     m_nextState(State::OFF),
     m_clientConnected(false),
     m_clientDisonnected(false),
     m_serviceWaiting(false),
-    m_normalMode(false),
-    m_failure(false) {
+    m_connected(false),
+    m_connectionLost(false),
+    m_normalConnecting(false),
+    m_failure(false),
+    m_retryNum(0U) {
 }
 
 WifiStateMachine::~WifiStateMachine() {
@@ -26,10 +30,14 @@ WifiStateMachine::~WifiStateMachine() {
 void WifiStateMachine::reset() {   
     m_failure = false;
 
-    m_normalMode = false;
+    m_connected = false;
     m_clientConnected = false;
     m_clientDisonnected = false;
     m_serviceWaiting = false;
+    m_normalConnecting = false;
+    m_connectionLost = false;
+
+    m_retryNum = 0U;
 
     m_nextState = State::OFF;
     m_currentState = State::OFF;
@@ -42,8 +50,17 @@ void WifiStateMachine::reset() {
     esp_wifi_deinit();
 }
 
-void WifiStateMachine::onStartServiceMode() {
+void WifiStateMachine::startServiceMode(const WifiSettingsEvent& wifiSetting) {
+    m_wifiSettings = wifiSetting;
+
     m_serviceWaiting = true;
+    runStateMachine();
+}
+
+void WifiStateMachine::startNormalMode(const WifiSettingsEvent& wifiSetting) {
+    m_wifiSettings = wifiSetting;
+
+    m_normalConnecting = true;
     runStateMachine();
 }
 
@@ -67,11 +84,15 @@ void WifiStateMachine::onClientSearching() {
 }
 
 void WifiStateMachine::onWifiConnecting() {
-    runStateMachine();
     m_sender.sendWifiStatus(WifiStatus::CONNECTING);
+
+    esp_wifi_connect();
+    runStateMachine();
 }
 
 void WifiStateMachine::onWifiConnected() {
+    m_connected = true;
+    m_retryNum = 0;
     runStateMachine();
 
     wifi_ap_record_t ap;
@@ -80,8 +101,15 @@ void WifiStateMachine::onWifiConnected() {
 }
 
 void WifiStateMachine::onWifiDisconnected() {
+    if (m_retryNum < MAXIMUM_RETRY) {
+        esp_wifi_connect();
+        m_retryNum++;
+    }
+    else {
+        m_connectionLost = true;
+    }
+
     runStateMachine();
-    // -100dB is bad rssi
     m_sender.sendWifiStatus(WifiStatus::DISCONNECTED, -100);
 }
 
@@ -97,15 +125,19 @@ void WifiStateMachine::runStateMachine(void) {
         switch (m_currentState) {
             case State::OFF:
                 handleEvent(&m_serviceWaiting, State::SERVICE_WAITING);
-                handleEvent(&m_normalMode, State::NORMAL);
+                handleEvent(&m_normalConnecting, State::NORMAL_CONNECTING);
                 break;
 
             case State::SERVICE_WAITING:
                 handleEvent(&m_clientConnected, State::SERVICE);
                 break;
 
+            case State::NORMAL_CONNECTING:
+                handleEvent(&m_connected, State::NORMAL);
+                break;
+
             case State::NORMAL:
-                // TODO check connection, RECONNECTING?
+                handleEvent(&m_connectionLost, State::NORMAL_CONNECTING);
                 break;
 
             case State::SERVICE:
@@ -141,6 +173,10 @@ void WifiStateMachine::onEnterState(const State state) {
     switch (m_currentState) {
         case State::SERVICE_WAITING:          
             startWifiAsAp();
+            break;
+
+        case State::NORMAL_CONNECTING:
+            startWifiAsSta();
             break;
 
         case State::FAILURE:
@@ -219,6 +255,27 @@ void WifiStateMachine::startWifiAsAp() {
     checkEspError(esp_wifi_start());
 
     checkEspError(m_ctrlHandler.startService());
+}
+
+void WifiStateMachine::startWifiAsSta() {
+    esp_netif_create_default_wifi_sta();
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    checkEspError(esp_wifi_init(&cfg));
+    checkEspError(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &WifiStateMachine::onWifiEventHandler, (void*)this, NULL));
+
+    char8_t ssid[WifiSettingsEvent::MAX_SSID_LENGTH];
+    char8_t pwd[WifiSettingsEvent::MAX_PWD_LENGTH];
+    m_wifiSettings.getSSID(ssid);
+    m_wifiSettings.getPWD(pwd);
+
+    wifi_config_t wifiConfig = {};
+    wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+    memcpy(&wifiConfig.sta.ssid, ssid, m_wifiSettings.MAX_SSID_LENGTH);
+    memcpy(&wifiConfig.sta.password, pwd, m_wifiSettings.MAX_PWD_LENGTH);
+
+    checkEspError(esp_wifi_set_mode(WIFI_MODE_STA));
+    checkEspError(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
+    checkEspError(esp_wifi_start());
 }
 
 void WifiStateMachine::handleEvent(bool* const pFlag, const State nextState) { 

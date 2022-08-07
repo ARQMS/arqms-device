@@ -1,12 +1,12 @@
 #include "NvsStorageDriver.h"
 
 // TODO remove demo. Use struct or NVS with fixed length strings to avvoid dynamic memory!
-static const char sn[]           = "AR-0001";
-static const char room[]         = "OfficeRoom1";
-static const char broker[]       = "https://192.168.0.16";
-static const char wifi_ssid[]    = "SSID";
-static const char wiif_pwd[]     = "PWD";
-static const int  interval       = 15;
+static char8_t sn[32]           = "AR-0001";
+static char8_t room[32]         = "OfficeRoom1";
+static char8_t broker[64]       = "https://192.168.0.16";
+static char8_t wifi_ssid[32]    = "SSID";
+static char8_t wifi_pwd[64]     = "PWD";
+static int  interval            = 15;
 
 // checks given char* with expected property name with optional NULL-Termination
 #define CHECK_PROP(name, expected) strncmp(name, expected, sizeof(expected) - 1) == 0
@@ -17,6 +17,13 @@ NvsStorageDriver::NvsStorageDriver() {
 
 NvsStorageDriver::~NvsStorageDriver() {
     
+}
+
+void NvsStorageDriver::readWifiConfig(WifiParameters* pWifiParam) {
+    if (pWifiParam == NULL) return;
+
+    strncpy(pWifiParam->ssid, wifi_ssid, sizeof(pWifiParam->ssid));
+    strncpy(pWifiParam->password, wifi_pwd, sizeof(pWifiParam->password));
 }
 
 esp_err_t NvsStorageDriver::readConfiguration(const char* name, void** data, size_t* size) {
@@ -42,8 +49,8 @@ esp_err_t NvsStorageDriver::readConfiguration(const char* name, void** data, siz
         *size = sizeof(wifi_ssid);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_PASSPHRASE)) {
-        *data = (void*)wiif_pwd;
-        *size = sizeof(wiif_pwd);
+        *data = (void*)wifi_pwd;
+        *size = sizeof(wifi_pwd);
     } 
     else {
         ESP_LOGW("HumiDevice", "Configuration '%s' is not supported by NVS Storage", name);
