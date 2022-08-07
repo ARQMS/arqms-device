@@ -105,6 +105,9 @@ void SK6805Driver::refresh() {
     if (m_info.tickCounter <= 0 && m_info.period > 0) {
         m_info.isOn = !m_info.isOn;
         m_info.tickCounter = m_info.period;
+    } else if (m_info.period == 0) {
+        m_info.isOn = true;
+        m_info.tickCounter = 0;
     }
 
     uint8_t* pData = m_info.isOn ? m_info.colorBuffer : DISABLED_BUFFER;
