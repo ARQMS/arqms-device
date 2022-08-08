@@ -9,7 +9,7 @@
 
 // Project include
 #include "WifiStateMachineIfc.h"
-#include "LocalCtrlHandlerIfc.h"
+#include "ConfigurationService/ConfigurationServiceIfc.h"
 #include "Events/WifiSettingsEvent.h"
 
 /**
@@ -32,7 +32,7 @@ public:
     /**
      * Constructor
      */
-    explicit WifiStateMachine(WifiStateMachineIfc& sender, LocalCtrlHandlerIfc& ctrlHandler);
+    explicit WifiStateMachine(WifiStateMachineIfc& sender, ConfigurationServiceIfc& ctrlHandler);
 
     /**
      * Destructor
@@ -130,7 +130,7 @@ private:
 
     // Member variables
     WifiStateMachineIfc& m_sender;
-    LocalCtrlHandlerIfc& m_ctrlHandler;
+    ConfigurationServiceIfc& m_ctrlHandler;
     WifiSettingsEvent m_wifiSettings;
 
     // state

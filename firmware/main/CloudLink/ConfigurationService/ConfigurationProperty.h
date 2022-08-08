@@ -1,5 +1,5 @@
-#ifndef LOCALCTRLPROPERTY_H_
-#define LOCALCTRLPROPERTY_H_
+#ifndef CONFIGURATION_PROPERTY_H_
+#define CONFIGURATION_PROPERTY_H_
 
 // Platform includes
 #include <HumiDevice.Platform/Platform.h>
@@ -68,4 +68,4 @@ private:
     Value value;
 };
 
-#endif // LOCALCTRLPROPERTY_H_
+#endif // CONFIGURATION_PROPERTY_H_

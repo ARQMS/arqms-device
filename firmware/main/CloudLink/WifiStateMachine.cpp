@@ -8,7 +8,7 @@
 #define HUMIDEVICE_ESP_WIFI_CHANNEL   CONFIG_ESP_WIFI_CHANNEL
 #define HUMIDEVICE_MAX_STA_CONN       1
 
-WifiStateMachine::WifiStateMachine(WifiStateMachineIfc& sender, LocalCtrlHandlerIfc& ctrlHandler) :
+WifiStateMachine::WifiStateMachine(WifiStateMachineIfc& sender, ConfigurationServiceIfc& ctrlHandler) :
     m_sender(sender),
     m_ctrlHandler(ctrlHandler),
     m_wifiSettings(),

@@ -6,12 +6,12 @@
 
 // Project includes
 #include "StorageDriverIfc.h"
-#include "CloudLink/ConfigProviderIfc.h"
+#include "CloudLink/ConfigurationService/ConfigurationProviderIfc.h"
 
 /**
  * This Storage Driver handles access to underlaying NVS architecture.
  */
-class NvsStorageDriver : public StorageDriverIfc, public ConfigProviderIfc {
+class NvsStorageDriver : public StorageDriverIfc, public ConfigurationProviderIfc {
 public:
     /**
      * Constructor
@@ -24,12 +24,12 @@ public:
     ~NvsStorageDriver();
 
     /**
-     * @see ConfigProviderIfc::readConfiguration
+     * @see ConfigurationProviderIfc::readConfiguration
      */
     virtual esp_err_t readConfiguration(const char* name, void** data, size_t* size) override;
 
     /**
-     * @see ConfigProviderIfc::writeConfiguration
+     * @see ConfigurationProviderIfc::writeConfiguration
      */
     virtual esp_err_t writeConfiguration(const char* name, const void* data, const size_t size) override;
 
