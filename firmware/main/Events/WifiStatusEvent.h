@@ -31,37 +31,82 @@ enum class WifiStatus : uint8_t {
  */
 class WifiStatusEvent : public EventIfc {
 public:
+    
     /**
-     * Constructor
+     * Default constructor.
      */
-    explicit WifiStatusEvent();
-    WifiStatusEvent(Deserializer& deserialize);
+    WifiStatusEvent(void);
 
     /**
-     * Destructor
+     * Custom constructor.
      */
-    virtual ~WifiStatusEvent();
+    WifiStatusEvent(const int32_t rssi, const WifiStatus status);
+
+    /**
+     * Copy constructor.
+     * @param other The copied instance.
+     */
+    WifiStatusEvent(const WifiStatusEvent& other);
+
+    /**
+     * Constructor from deserializer.
+     */
+    explicit WifiStatusEvent(Deserializer& deserializer);
+
+    /**
+     * Destructor.
+     */
+    virtual ~WifiStatusEvent(void);
+
+    /**
+     * Assignment operator.
+     * @param other the assignator instance.
+     */
+    WifiStatusEvent& operator=(const WifiStatusEvent& other);
+
+    /**
+     * Equality operator.
+     */
+    bool operator==(const WifiStatusEvent& right) const;
+
+    /**
+     * Inequality operator.
+     */
+    bool operator!=(const WifiStatusEvent& right) const;
 
     /**
      * @see SerializableIfc
      */
-    virtual void deserialize(Deserializer& deserializer) override;
+    virtual void deserialize(Deserializer& deserializer);
 
     /**
      * @see SerializableIfc
      */
-    virtual void serialize(Serializer& serializer) const override;
+    virtual void serialize(Serializer& serializer) const;
 
-    // Getter & Setter
-    void setRssi(const int32_t value);
-    int32_t getRssi() const;
+    /**
+     * Setter for rssi
+     */
+    void setRssi(const int32_t rssi);
 
-    void setWifiStatus(const WifiStatus value);
-    WifiStatus getWifiStatus() const;
+    /**
+     * Getter for rssi
+     */
+    int32_t getRssi(void) const;
+
+    /**
+     * Setter for status
+     */
+    void setStatus(const WifiStatus status);
+
+    /**
+     * Getter for status
+     */
+    WifiStatus getStatus(void) const;
     
 private:
     int32_t m_rssi; 
-    WifiStatus m_wifiStatus;
+    WifiStatus m_status;
 };
 
 

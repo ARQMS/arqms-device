@@ -15,34 +15,79 @@ public:
     static const size_t MAX_BROKER_URI_LENGTH  = 64;
 
     /**
-     * Constructor
+     * Default constructor.
      */
-    explicit DeviceSettingsEvent();
-    DeviceSettingsEvent(Deserializer& deserialize);
+    DeviceSettingsEvent(void);
 
     /**
-     * Destructor
+     * Custom constructor.
      */
-    virtual ~DeviceSettingsEvent();
+    DeviceSettingsEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t sn[MAX_SN_LENGTH]);
+
+    /**
+     * Copy constructor.
+     * @param other The copied instance.
+     */
+    DeviceSettingsEvent(const DeviceSettingsEvent& other);
+
+    /**
+     * Constructor from deserializer.
+     */
+    explicit DeviceSettingsEvent(Deserializer& deserializer);
+
+    /**
+     * Destructor.
+     */
+    virtual ~DeviceSettingsEvent(void);
+
+    /**
+     * Assignment operator.
+     * @param other the assignator instance.
+     */
+    DeviceSettingsEvent& operator=(const DeviceSettingsEvent& other);
+
+    /**
+     * Equality operator.
+     */
+    bool operator==(const DeviceSettingsEvent& right) const;
+
+    /**
+     * Inequality operator.
+     */
+    bool operator!=(const DeviceSettingsEvent& right) const;
 
     /**
      * @see SerializableIfc
      */
-    virtual void deserialize(Deserializer& deserializer) override;
+    virtual void deserialize(Deserializer& deserializer);
 
     /**
      * @see SerializableIfc
      */
-    virtual void serialize(Serializer& serializer) const override;
+    virtual void serialize(Serializer& serializer) const;
 
-    void setSn(const char8_t password[MAX_SN_LENGTH]);
-    void getSn(char8_t password[MAX_SN_LENGTH]) const;
-
+    /**
+     * Setter for brokerUri
+     */
     void setBrokerUri(const char8_t brokerUri[MAX_BROKER_URI_LENGTH]);
+
+    /**
+     * Getter for brokerUri
+     */
     void getBrokerUri(char8_t brokerUri[MAX_BROKER_URI_LENGTH]) const;
 
+    /**
+     * Setter for sn
+     */
+    void setSn(const char8_t sn[MAX_SN_LENGTH]);
+
+    /**
+     * Getter for sn
+     */
+    void getSn(char8_t sn[MAX_SN_LENGTH]) const;
+
 private:
-    char8_t m_Sn[MAX_SN_LENGTH];
+    char8_t m_sn[MAX_SN_LENGTH];
     char8_t m_brokerUri[MAX_BROKER_URI_LENGTH];
 };
 

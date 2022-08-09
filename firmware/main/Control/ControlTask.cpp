@@ -47,10 +47,10 @@ void ControlTask::onHandleTimer(const TimerId timerId) {
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
-    if (status.getWifiStatus() == WifiStatus::CONNECTED) {
+    if (status.getStatus() == WifiStatus::CONNECTED) {
         m_coreSm.onConnected();
     }
-    else if (status.getWifiStatus() == WifiStatus::CLIENT_DISCONNECTED || status.getWifiStatus() == WifiStatus::CLIENT_TIMEOUT) {
+    else if (status.getStatus() == WifiStatus::CLIENT_DISCONNECTED || status.getStatus() == WifiStatus::CLIENT_TIMEOUT) {
         // TODO perform shutdown, seems IDF does not support shutdown, 
         // so we must connect GPIO 1 (PCU_STATE2) as output and connect to Latch Power or 
         // battery charger

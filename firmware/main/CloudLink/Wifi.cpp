@@ -73,8 +73,8 @@ void Wifi::startNormalMode() {
 
     char8_t ssid[WifiSettingsEvent::MAX_SSID_LENGTH];
     char8_t pwd[WifiSettingsEvent::MAX_PWD_LENGTH];
-    m_wifiSettings.getSSID(ssid);
-    m_wifiSettings.getPWD(pwd);
+    m_wifiSettings.getSsid(ssid);
+    m_wifiSettings.getPassword(pwd);
 
     wifi_config_t wifiConfig = {};
     wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;

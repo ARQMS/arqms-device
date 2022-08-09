@@ -27,8 +27,8 @@ NvsStorageDriver::~NvsStorageDriver() {
 
 esp_err_t NvsStorageDriver::initialize() {
     const WifiMode mode = strnlen(wifi_ssid, sizeof(wifi_ssid)) > 0 ? WifiMode::STA : WifiMode::AP;
-    g_wifiSettings.setSSID(wifi_ssid);
-    g_wifiSettings.setPWD(wifi_pwd);
+    g_wifiSettings.setSsid(wifi_ssid);
+    g_wifiSettings.setPassword(wifi_pwd);
     g_wifiSettings.setMode(mode);
 
     g_deviceSettings.setBrokerUri(broker);

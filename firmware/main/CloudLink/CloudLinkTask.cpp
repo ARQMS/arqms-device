@@ -70,7 +70,7 @@ void CloudLinkTask::onHandleTimeout() {
 
 void CloudLinkTask::sendWifiStatus(const WifiStatus status, const int32_t rssi) {
     WifiStatusEvent event;
-    event.setWifiStatus(status);
+    event.setStatus(status);
     event.setRssi(rssi);
 
     StatusEvent.send(EventIdentifiers::WIFI_STATUS_EVENT, &event);
