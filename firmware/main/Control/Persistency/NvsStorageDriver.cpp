@@ -58,7 +58,7 @@ void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
     g_deviceSettings.serialize(serializer);
 
     Deserializer deserializer(binaryBlob, sizeof(DeviceSettingsEvent));
-    g_deviceSettings.deserialize(deserializer);
+    pDeviceParam->deserialize(deserializer);
 }
 
 esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, size_t* size) {

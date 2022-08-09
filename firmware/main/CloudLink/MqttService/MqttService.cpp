@@ -20,12 +20,11 @@ esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
     char8_t sn[DeviceSettingsEvent::MAX_SN_LENGTH];
     deviceSettings.getSn(sn);
 
-    ESP_LOGW("HumiMqtt", "Connect to mqtt broker %s, ClientId: %s", brokerUri, sn);
-
     const esp_mqtt_client_config_t mqtt_cfg = {
-        .uri = brokerUri,
-        .client_id = sn
+       .uri = brokerUri,
+       .client_id = sn
     };
+
     m_mqttClient = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_register_event(m_mqttClient, MQTT_EVENT_ANY, &MqttService::mqttEventHandler, this);
     return esp_mqtt_client_start(m_mqttClient);
