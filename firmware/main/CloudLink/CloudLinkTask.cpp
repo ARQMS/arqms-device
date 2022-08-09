@@ -28,11 +28,13 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             onHandleWifiSettings(msg);
         }
         break;
+        
         case EventIdentifiers::DEVICE_SETTINGS_EVENT: {
             DeviceSettingsEvent msg(*pEvent);
             onHandleDeviceSettings(msg);
         }
         break;
+
     default:
         break;
     }

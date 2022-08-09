@@ -1,16 +1,11 @@
 #include "MqttService.h"
 
-#include "esp_tls.h"
 
 // MQTT Channels
-#define MQTT_SUB_NEW_FIRMWARE "/devices/#/updates"
-#define MQTT_SUB_CFG          "/devices/development/cfg"
-
-// extern const uint8_t mqtt_pem_start[] asm("_binary_mqtt_pem_start");
-// extern const uint8_t mqtt_pem_end[]   asm("_binary_mqtt_pem_end");
+#define MQTT_SUB_NEW_FIRMWARE "devices/+/updates"
 
 MqttService::MqttService() :
-    m_mqttClient() {
+    m_mqttClient(NULL) {
 }
 
 esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
@@ -47,20 +42,19 @@ void MqttService::onEvent(esp_event_base_t base, int32_t id, void* data) {
 
 void MqttService::onConnected() {
     esp_mqtt_client_subscribe(m_mqttClient, MQTT_SUB_NEW_FIRMWARE, AT_LEAST_ONCE);
-    esp_mqtt_client_subscribe(m_mqttClient, MQTT_SUB_CFG, AT_LEAST_ONCE);
 }
 
 void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
-    ESP_LOGW("HumiMqtt", "received topic %s", event->topic);
+    ESP_LOGI("Humi", "Received %.*s", event->topic_len, event->topic);
 
     if (strcmp(event->topic, MQTT_SUB_NEW_FIRMWARE)) {
-        // DeviceFirmwareInfo info = {};
-        //eventLoop.sendEvent(DEVICE_EVENTS, AppEvents::NEW_FIRMWARE_FOUND, &info, sizeof(DeviceFirmwareInfo));
+        // TODO handle new firmware
     }
 }
 
 void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data) {
     MqttService* pHandler = static_cast<MqttService*>(handler_args);
+    esp_mqtt_event_handle_t event = (esp_mqtt_event_handle_t)event_data;
 
     switch ((esp_mqtt_event_id_t)event_id) {
         case MQTT_EVENT_CONNECTED:
@@ -73,10 +67,11 @@ void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, in
             }
             break;
 
-        case MQTT_EVENT_DISCONNECTED:
         case MQTT_EVENT_ERROR:
-            ESP_LOGE("HumiMqtt", "Error or disconnected");
-            // TODO
+            ESP_LOGE("HumiMqtt", "MQTT_EVENT_ERROR");
+            if (event->error_handle->error_type == MQTT_ERROR_TYPE_TCP_TRANSPORT) {
+                ESP_LOGW("HumiMqtt", "Last errno string (%s)", strerror(event->error_handle->esp_transport_sock_errno));
+            }
             break;
 
         default:
