@@ -7,7 +7,7 @@
 NvsStorageDriver StartupController::s_nvsDriver;
 
 void StartupController::initialize() {
-    ESP_LOGI("Startup", "%p", &StartupController::s_nvsDriver);
+    s_nvsDriver.initialize();
 
     ControlTask::setStorageDriver(&StartupController::s_nvsDriver);
     ConfigurationService::setStorageDriver(&StartupController::s_nvsDriver);

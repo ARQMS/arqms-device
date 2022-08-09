@@ -1,6 +1,8 @@
 #include "ControlTask.h"
 
 #include "Events/EventIdentifiers.h"
+#include "Events/WifiSettingsEvent.h"
+#include "Events/DeviceSettingsEvent.h"
     
 StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
 
@@ -18,15 +20,14 @@ void ControlTask::onInitialize()  {
 }
 
 void ControlTask::onStart() {
-    WifiParameters wifiConfig;
-    s_pNvsStorageDriver->readWifiConfig(&wifiConfig);
+    WifiSettingsEvent wifiSettings;
+    s_pNvsStorageDriver->readWifiConfig(&wifiSettings);
 
-    if (!wifiConfig.isWifiCfgValid()) {
-        m_coreSm.onServiceMode();
-    }
-    else {
-        m_coreSm.onNormalMode(wifiConfig);
-    }
+    DeviceSettingsEvent deviceSettings;
+    s_pNvsStorageDriver->readDeviceConfig(&deviceSettings);
+
+    WifiSettings.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
+    WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
 }
 
 void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {

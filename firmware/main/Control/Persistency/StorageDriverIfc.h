@@ -5,7 +5,8 @@
 #include <HumiDevice.Platform/Platform.h>
 
 // Project include
-#include "Control/Persistency/NvsStorageLayout.h"
+#include "Events/DeviceSettingsEvent.h"
+#include "Events/WifiSettingsEvent.h"
 
 /**
  * Storage driver provides access to configuration
@@ -23,7 +24,14 @@ public:
      * 
      * @param const WifiParameters* 
      */
-    virtual void readWifiConfig(WifiParameters* pWifiParam) = 0;
+    virtual void readWifiConfig(WifiSettingsEvent* pWifiParam) = 0;
+
+    /**
+     * Gets the device configuration from underlaying storage
+     * 
+     * @param const DeviceParameters* 
+     */
+    virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) = 0;
 };
 
 

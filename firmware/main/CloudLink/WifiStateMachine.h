@@ -4,14 +4,6 @@
 // Platform include
 #include <HumiDevice.Platform/Platform.h>
 
-// IDF includes
-#include "esp_wifi.h"
-
-// Project include
-#include "WifiStateMachineIfc.h"
-#include "ConfigurationService/ConfigurationServiceIfc.h"
-#include "Events/WifiSettingsEvent.h"
-
 /**
  * Represents the state machine for wifi controller
  */
@@ -21,18 +13,23 @@ public:
      * States provided by this state machine
      */
     enum class State {
+        // Common
         OFF,
-        SERVICE_WAITING,
-        SERVICE,
-        NORMAL_CONNECTING,
-        NORMAL,
-        FAILURE
+        FAILURE,
+
+        // AP
+        AP_SERVICE_WAITING,
+        AP_SERVICE,
+
+        // STA
+        STA_NORMAL_CONNECTING,
+        STA_CONNECTED
     };
 
     /**
      * Constructor
      */
-    explicit WifiStateMachine(WifiStateMachineIfc& sender, ConfigurationServiceIfc& ctrlHandler);
+    explicit WifiStateMachine();
 
     /**
      * Destructor
@@ -44,48 +41,16 @@ public:
      */
     void reset();
 
-    /**
-     * Start service mode
-     * @param wifiSetting wifi settings
-     */
-    void startServiceMode(const WifiSettingsEvent& wifiSetting);
+    // State junctions
+    void onStaMode();
+    void onGotIp();
+    void onLostIp();
 
-    /**
-     * Normal mode
-     * 
-     * @param wifiSetting wifi settings
-     */
-    void startNormalMode(const WifiSettingsEvent& wifiSetting);
-
-    /**
-     * Client connected in service mode
-     */
+    void onApMode();
     void onClientConnected();
-
-    /**
-     * Client disconnected in service mode
-     */
     void onClientDisconnected();
 
-    /**
-     * Wait for client
-     */
-    void onClientSearching();
-
-    /**
-     * Connection started, but not ready to use. See onWifiConnected
-     */
-    void onWifiConnecting();
-
-    /**
-     * Connected to a external wifi access point
-     */
-    void onWifiConnected();
-
-    /**
-     * Connection list
-     */
-    void onWifiDisconnected();
+    void onFailure();
 
     /**
      * Checks if given state is the current state of STM
@@ -96,9 +61,6 @@ public:
     bool isCurrentState(const State state) const;
 
 private:
-    // maximum retry
-    const static uint8_t MAXIMUM_RETRY = 5U;
-
     /**
      * Deleted copy constructor.
      * @param other The copied instance.
@@ -122,30 +84,20 @@ private:
     void onLeaveState(const State state);
     // transitions
     void handleEvent(bool* const pFlag, const State nextState);
-    // helper
-    void startWifiAsAp();
-    void startWifiAsSta();
-    void checkEspError(const esp_err_t status);
-    static void onWifiEventHandler(void* param, esp_event_base_t eventBase, int32_t eventId, void* eventData);
-
-    // Member variables
-    WifiStateMachineIfc& m_sender;
-    ConfigurationServiceIfc& m_ctrlHandler;
-    WifiSettingsEvent m_wifiSettings;
+    void handleEvent(const bool condition, const State nextState);
 
     // state
     State m_currentState;
     State m_nextState;
 
-    bool m_clientConnected;
-    bool m_clientDisonnected;
-    bool m_serviceWaiting;
-    bool m_connected;
-    bool m_connectionLost;
-    bool m_normalConnecting;
     bool m_failure;
 
-    uint8_t m_retryNum;
+    bool m_startSta;
+    bool m_gotIp;
+    bool m_lostIp;
+
+    bool m_startAp;
+    size_t m_clientCounter;
 };
 
 

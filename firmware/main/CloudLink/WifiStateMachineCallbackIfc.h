@@ -10,13 +10,13 @@
 /**
  * Represents the state machine callback interface
  */
-class WifiStateMachineIfc {
+class WifiStateMachineCallbackIfc {
 public:
 
     /**
      * Destructor
      */
-    virtual ~WifiStateMachineIfc() {};
+    virtual ~WifiStateMachineCallbackIfc() {};
 
     /**
      * 

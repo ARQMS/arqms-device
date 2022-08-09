@@ -29,7 +29,7 @@ public:
      * @param size the size. Only required for dynamic sizes like strings; for primitive propertie types, the default value is used
      * @return esp_err_t 
      */
-    virtual esp_err_t readConfiguration(const char* name, void** data, size_t* size) = 0;
+    virtual esp_err_t readConfiguration(const char8_t* name, void** data, size_t* size) = 0;
 
     /**
      * writes the setting with given name to config provider.
@@ -39,7 +39,7 @@ public:
      * @param size the size
      * @return esp_err_t 
      */
-    virtual esp_err_t writeConfiguration(const char* name, const void* data, const size_t size) = 0;
+    virtual esp_err_t writeConfiguration(const char8_t* name, const void* data, const size_t size) = 0;
 };
 
 #endif // CONFIGURATION_PROVIDER_IFC_H_

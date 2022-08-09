@@ -24,19 +24,31 @@ public:
     ~NvsStorageDriver();
 
     /**
+     * Initialize NVS storage
+     * 
+     * @return esp_err_t error code
+     */
+    esp_err_t initialize();
+
+    /**
      * @see ConfigurationProviderIfc::readConfiguration
      */
-    virtual esp_err_t readConfiguration(const char* name, void** data, size_t* size) override;
+    virtual esp_err_t readConfiguration(const char8_t* name, void** data, size_t* size) override;
 
     /**
      * @see ConfigurationProviderIfc::writeConfiguration
      */
-    virtual esp_err_t writeConfiguration(const char* name, const void* data, const size_t size) override;
+    virtual esp_err_t writeConfiguration(const char8_t* name, const void* data, const size_t size) override;
 
     /**
      * @see StorageDriverIfc::readWifiConfig
      */
-    virtual void readWifiConfig(WifiParameters* pWifiParam) override;
+    virtual void readWifiConfig(WifiSettingsEvent* pWifiParam) override;
+
+    /**
+     * @see StorageDriverIfc::readDeviceConfig
+     */
+    virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) override;
 };
 
 

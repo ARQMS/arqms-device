@@ -6,7 +6,8 @@
 CloudLinkTask::CloudLinkTask() :
     StatusEvent(),
     m_ctrlHandler(),
-    m_wifiStateMachine(*this, m_ctrlHandler),
+    m_mqttService(),
+    m_wifi(*this, m_ctrlHandler, m_mqttService),
     m_pTimeoutTimer(NULL) {
 }
 
@@ -26,6 +27,12 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             WifiSettingsEvent msg(*pEvent);
             onHandleWifiSettings(msg);
         }
+        break;
+        case EventIdentifiers::DEVICE_SETTINGS_EVENT: {
+            DeviceSettingsEvent msg(*pEvent);
+            onHandleDeviceSettings(msg);
+        }
+        break;
     default:
         break;
     }
@@ -38,27 +45,27 @@ void CloudLinkTask::onHandleTimer(TimerId timerId) {
 }
 
 void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
+    m_wifi.updateWifiSettings(settings);
+
     if (settings.getMode() == WifiMode::AP) {
-        m_wifiStateMachine.startServiceMode(settings);
+        m_wifi.startServiceMode();
         m_pTimeoutTimer->start();
     }
     else if (settings.getMode() == WifiMode::STA) {
-        m_wifiStateMachine.startNormalMode(settings);
+        m_wifi.startNormalMode();
         m_pTimeoutTimer->start();
     }
     else {
-        m_wifiStateMachine.reset();
+        m_wifi.reset();
     }
 }
 
-void CloudLinkTask::onHandleTimeout() {
-    if (m_wifiStateMachine.isCurrentState(WifiStateMachine::State::SERVICE_WAITING)) {
-        sendWifiStatus(WifiStatus::CLIENT_TIMEOUT);
+void CloudLinkTask::onHandleDeviceSettings(const DeviceSettingsEvent& settings) {
+    m_wifi.updateDeviceSettings(settings);
+}
 
-        m_wifiStateMachine.reset();
-    } else if (m_wifiStateMachine.isCurrentState(WifiStateMachine::State::NORMAL_CONNECTING)) {
-        sendWifiStatus(WifiStatus::CLIENT_TIMEOUT);
-    }
+void CloudLinkTask::onHandleTimeout() {
+    m_wifi.onTimeout();    
 }
 
 void CloudLinkTask::sendWifiStatus(const WifiStatus status, const int32_t rssi) {
