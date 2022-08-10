@@ -55,7 +55,7 @@ void WifiStatusEvent::deserialize(Deserializer& deserializer) {
 
 void WifiStatusEvent::serialize(Serializer& serializer) const {
     serializer << m_rssi;
-    serializer << static_cast<uint32_t>(m_status);
+    serializer << static_cast<uint8_t>(m_status);
 }
 
 void WifiStatusEvent::setRssi(const int32_t rssi) {
