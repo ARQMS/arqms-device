@@ -1,21 +1,20 @@
-#ifndef LOCALCTRLHANDLER_IFC_H
-#define LOCALCTRLHANDLER_IFC_H
+#ifndef CONFIGURATION_SERVICE_IFC_H_
+#define CONFIGURATION_SERVICE_IFC_H_
 
 // Platform includes
 #include <HumiDevice.Platform/Platform.h>
-
 
 /**
  * Used for local ctrl actions to get and set configurations.
  * 
  * @see https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/protocols/esp_local_ctrl.html
  */
-class LocalCtrlHandlerIfc {
+class ConfigurationServiceIfc {
 public:
     /**
      * Deconstructor
      */
-    virtual ~LocalCtrlHandlerIfc() { }
+    virtual ~ConfigurationServiceIfc() { }
 
     /**
      * Starts the ctrl service
@@ -28,4 +27,4 @@ public:
     virtual esp_err_t stopService() = 0;
 };
 
-#endif // LOCALCTRLHANDLER_IFC_H
+#endif // CONFIGURATION_SERVICE_IFC_H_

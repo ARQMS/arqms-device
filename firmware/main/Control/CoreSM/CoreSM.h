@@ -6,7 +6,8 @@
 
 // Project include
 #include "CoreSMIfc.h"
-#include "Control/Persistency/NvsStorageLayout.h"
+#include "Events/WifiSettingsEvent.h"
+#include "Events/DeviceSettingsEvent.h"
 
 /**
  * Represents the state machine for core control
@@ -48,9 +49,10 @@ public:
 
     /**
      * Starts standby mode
-     * @param param wifi settings
+     * @param wifiParam wifi settings
+     * @param deviceParam device settings
      */
-    void onNormalMode(const WifiParameters& param);
+    void onNormalMode(const WifiSettingsEvent& wifiParam, const DeviceSettingsEvent& deviceParam);
 
     /**
      * on idle state
@@ -95,6 +97,7 @@ private:
     bool m_isBooting;
 
     WifiSettingsEvent m_activeWifiSettings;
+    DeviceSettingsEvent m_activeDeviceSettings;
 };
 
 

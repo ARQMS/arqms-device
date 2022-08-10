@@ -53,22 +53,34 @@ void GuiUpdaterTask::onHandleAirQuality(const AirQualityEvent& qualityEvent) {
 }
 
 void GuiUpdaterTask::onHandleWifiStatus(const WifiStatusEvent& wifiStatus) {
-    if (wifiStatus.getWifiStatus() == WifiStatus::CLIENT_SEARCHING) {
+    if (wifiStatus.getStatus() == WifiStatus::CLIENT_SEARCHING) {
         m_wlanIndicator.setColor({0, 0, 255}, 500);
     }
-    if (wifiStatus.getWifiStatus() == WifiStatus::CONNECTING) {
+    if (wifiStatus.getStatus() == WifiStatus::CONNECTING) {
         m_wlanIndicator.setColor({0, 0, 255}, 100);
     }
-    else if (wifiStatus.getWifiStatus() == WifiStatus::CLIENT_CONNECTED) {
+    else if (wifiStatus.getStatus() == WifiStatus::CLIENT_CONNECTED) {
         m_wlanIndicator.setColor({0, 0, 255});
     } 
-    else if (wifiStatus.getWifiStatus() == WifiStatus::CONNECTED) {
+    else if (wifiStatus.getStatus() == WifiStatus::CONNECTED) {
+        m_wlanIndicator.setColor({0, 0, 50}, 100);
+    } 
+    else if (wifiStatus.getStatus() == WifiStatus::MQTT_CONNECTED) {
         m_wlanIndicator.setColor({0, 0, 255});
     } 
-    else if (wifiStatus.getWifiStatus() == WifiStatus::UNKNOWN_ERROR) {
+    else if (wifiStatus.getStatus() == WifiStatus::MQTT_DISCONNECTED) {
+        m_wlanIndicator.setColor({0, 0, 50}, 100);
+    } 
+    else if (wifiStatus.getStatus() == WifiStatus::MQTT_SENDING) {
+        m_wlanIndicator.setColor({255, 255, 0}, 50);
+    } 
+    else if (wifiStatus.getStatus() == WifiStatus::MQTT_SENDED) {
+        m_wlanIndicator.setColor({0, 0, 255});
+    } 
+    else if (wifiStatus.getStatus() == WifiStatus::UNKNOWN_ERROR) {
         m_wlanIndicator.setColor({255, 0, 0}, 100);
     } 
-    // else if (wifiStatus.getWifiStatus() == WifiStatus::SENDING) {
+    // else if (wifiStatus.getStatus() == WifiStatus::SENDING) {
     //     // m_wlanIndicator.startBlink(50, yellow); // blink yellow
     // } 
     else {

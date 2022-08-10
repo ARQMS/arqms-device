@@ -19,18 +19,18 @@ CoreSM::~CoreSM() {
 
 void CoreSM::onServiceMode() {
     m_isService = true;
-    m_activeWifiSettings.setPWD(NULL);
-    m_activeWifiSettings.setSSID(NULL);
+
+    m_activeWifiSettings = WifiSettingsEvent();
     m_activeWifiSettings.setMode(WifiMode::AP);
 
     runStateMachine();
 }
 
-void CoreSM::onNormalMode(const WifiParameters& param) {
+void CoreSM::onNormalMode(const WifiSettingsEvent& wifiParam, const DeviceSettingsEvent& deviceParam) {
     m_isConnecting = true;
-    m_activeWifiSettings.setMode(WifiMode::STA);
-    m_activeWifiSettings.setSSID(param.ssid);
-    m_activeWifiSettings.setPWD(param.password);
+
+    m_activeWifiSettings = wifiParam;
+    m_activeDeviceSettings = deviceParam;
 
     runStateMachine();
 }

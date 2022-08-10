@@ -1,5 +1,5 @@
-#ifndef LOCALCTRLHANDLER_H
-#define LOCALCTRLHANDLER_H
+#ifndef CONFIGURATION_SERVICE_H_
+#define CONFIGURATION_SERVICE_H_
 
 // IDF includes
 #include <esp_local_ctrl.h>
@@ -8,32 +8,32 @@
 #include <HumiDevice.Platform/Platform.h>
 
 // Project includes
-#include "LocalCtrlHandlerIfc.h"
-#include "LocalCtrlProperty.h"
-#include "ConfigProviderIfc.h"
+#include "ConfigurationServiceIfc.h"
+#include "ConfigurationProperty.h"
+#include "ConfigurationProviderIfc.h"
 
 /**
- * @see LocalCtrlHandlerIfc
+ * @see ConfigurationServiceIfc
  */
-class LocalCtrlHandler : public LocalCtrlHandlerIfc {
+class ConfigurationService : public ConfigurationServiceIfc {
 public:
     /**
      * Constructor
      */
-    explicit LocalCtrlHandler();
+    explicit ConfigurationService();
 
     /**
      * Deconstructor
      */
-    virtual ~LocalCtrlHandler() { }
+    virtual ~ConfigurationService() { }
 
     /**
-     * @see LocalCtrlHandlerIfc
+     * @see ConfigurationServiceIfc
      */
     virtual esp_err_t startService() override;
 
     /**
-     * @see LocalCtrlHandlerIfc
+     * @see ConfigurationServiceIfc
      */
     virtual esp_err_t stopService() override;
 
@@ -42,7 +42,7 @@ public:
      * 
      * @param pDriver 
      */
-    static void setStorageDriver(ConfigProviderIfc* const pDriver) {
+    static void setStorageDriver(ConfigurationProviderIfc* const pDriver) {
         s_pNvsStorageDriver = pDriver;
     }
 
@@ -50,12 +50,12 @@ private:
     /**
      * Private copy constructor.
      */
-    LocalCtrlHandler(const LocalCtrlHandler& other);
+    ConfigurationService(const ConfigurationService& other);
 
     /**
      * Private assignment operator.
      */
-    LocalCtrlHandler& operator=(const LocalCtrlHandler& other);
+    ConfigurationService& operator=(const ConfigurationService& other);
 
     
     // helper functions
@@ -111,7 +111,7 @@ private:
     static esp_err_t setPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], const esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx);
 
     // static members
-    static ConfigProviderIfc* s_pNvsStorageDriver;
+    static ConfigurationProviderIfc* s_pNvsStorageDriver;
 };
 
-#endif // LOCALCTRLHANDLER_H
+#endif // CONFIGURATION_SERVICE_H_

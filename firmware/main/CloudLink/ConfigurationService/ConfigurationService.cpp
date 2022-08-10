@@ -1,4 +1,4 @@
-#include "LocalCtrlHandler.h"
+#include "ConfigurationService.h"
 
 #include <mdns.h>
 #include <esp_https_server.h>
@@ -7,12 +7,12 @@
 // mDNS does not work at the moment, so we use IP
 #define ESP_CTRL_SERVICE_NAME               "192.168.4.1"
 
-ConfigProviderIfc* LocalCtrlHandler::s_pNvsStorageDriver = NULL;
+ConfigurationProviderIfc* ConfigurationService::s_pNvsStorageDriver = NULL;
 
-LocalCtrlHandler::LocalCtrlHandler() {
+ConfigurationService::ConfigurationService() {
 }
 
-esp_err_t LocalCtrlHandler::startService(void) {
+esp_err_t ConfigurationService::startService(void) {
     httpd_ssl_config_t httpsCfg = HTTPD_SSL_CONFIG_DEFAULT();
 
     // Load server certificate
@@ -38,8 +38,8 @@ esp_err_t LocalCtrlHandler::startService(void) {
             .pop            = NULL,
         },
         .handlers = {
-            .get_prop_values = &LocalCtrlHandler::getPropertyValues,
-            .set_prop_values = &LocalCtrlHandler::setPropertyValues,
+            .get_prop_values = &ConfigurationService::getPropertyValues,
+            .set_prop_values = &ConfigurationService::setPropertyValues,
             .usr_ctx         = s_pNvsStorageDriver,
             .usr_ctx_free_fn = NULL
         },
@@ -65,11 +65,11 @@ esp_err_t LocalCtrlHandler::startService(void) {
     return err;
 }
 
-esp_err_t LocalCtrlHandler::stopService() {
+esp_err_t ConfigurationService::stopService() {
     return esp_local_ctrl_stop();
 }
 
-void LocalCtrlHandler::registerProperty(const char* name, const PropertyType type, const bool isReadOnly) {
+void ConfigurationService::registerProperty(const char* name, const PropertyType type, const bool isReadOnly) {
     PropertyFlags flags = isReadOnly ? PropertyFlags::PROP_FLAG_READONLY : PropertyFlags::NONE;
 
     const esp_local_ctrl_prop_t property = {
@@ -84,8 +84,8 @@ void LocalCtrlHandler::registerProperty(const char* name, const PropertyType typ
     esp_local_ctrl_add_property(&property);
 }
 
-esp_err_t LocalCtrlHandler::getPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx) {
-    ConfigProviderIfc* pProvider = static_cast<ConfigProviderIfc*>(usr_ctx);
+esp_err_t ConfigurationService::getPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx) {
+    ConfigurationProviderIfc* pProvider = static_cast<ConfigurationProviderIfc*>(usr_ctx);
 
     for (uint32_t i = 0; i < props_count; i++) {
         // set default
@@ -99,8 +99,8 @@ esp_err_t LocalCtrlHandler::getPropertyValues(size_t props_count, const esp_loca
     return ESP_OK;
 }
 
-esp_err_t LocalCtrlHandler::setPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], const esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx) {
-    ConfigProviderIfc* pProvider = static_cast<ConfigProviderIfc*>(usr_ctx);
+esp_err_t ConfigurationService::setPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], const esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx) {
+    ConfigurationProviderIfc* pProvider = static_cast<ConfigurationProviderIfc*>(usr_ctx);
 
     for (uint32_t i = 0; i < props_count; i++) {
         if (props[i].flags & PropertyFlags::PROP_FLAG_READONLY) {

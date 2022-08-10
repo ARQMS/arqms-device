@@ -10,16 +10,18 @@
 // Project includes
 #include "Events/WifiSettingsEvent.h"
 #include "Events/WifiStatusEvent.h"
-#include "WifiStateMachine.h"
-#include "WifiStateMachineIfc.h"
-#include "LocalCtrlHandler.h"
+#include "Events/SensorDataEvent.h"
+#include "Wifi.h"
+#include "CloudLinkSenderIfc.h"
+#include "ConfigurationService/ConfigurationService.h"
+#include "MqttService/MqttService.h"
 
 /**
  * This item is responsible for connection to cloud
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class CloudLinkTask : public TaskBase<5, sizeof(WifiSettingsEvent)>, WifiStateMachineIfc {
+class CloudLinkTask : public TaskBase<5, sizeof(WifiSettingsEvent)>, CloudLinkSenderIfc {
 public:
     EventPublisherMultiple<2> StatusEvent;
 
@@ -35,7 +37,7 @@ public:
     virtual ~CloudLinkTask();
     
     /**
-     * @see WifiStateMachineIfc::sendWifiStatus
+     * @see CloudLinkSenderIfc::sendWifiStatus
      */
     virtual void sendWifiStatus(const WifiStatus status, const int32_t rssi = 0) override;
 
@@ -62,6 +64,8 @@ private:
 
     // Helper methods
     void onHandleWifiSettings(const WifiSettingsEvent& settings);
+    void onHandleDeviceSettings(const DeviceSettingsEvent& settings);
+    void onHandleSensorDataEvent(const SensorDataEvent& settings);
     void onHandleTimeout();
 
     /**
@@ -75,8 +79,9 @@ private:
     CloudLinkTask& operator=(const CloudLinkTask& other);
 
     // Private Members
-    LocalCtrlHandler m_ctrlHandler;
-    WifiStateMachine m_wifiStateMachine;
+    ConfigurationService m_ctrlHandler;
+    MqttService m_mqttService;
+    Wifi m_wifi;
     Timer* m_pTimeoutTimer;
 };
 

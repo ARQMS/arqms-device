@@ -7,6 +7,17 @@
 class Math {
 public:
     /**
+     * Compares two floating point numbers.
+     * @param left First number.
+     * @param right Second number.
+     * @return True if numbers are equal.
+     */
+    template<typename Type>
+    static inline bool areEqualFloats(const Type left, const Type right) {
+        return memcmp(&left, &right, sizeof(Type)) == 0;
+    }
+
+    /**
      * Force a value to be in the range given by min and max.
      * 
      * @param value The value to be forced.

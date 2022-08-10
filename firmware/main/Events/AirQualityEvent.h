@@ -10,31 +10,68 @@
  */
 class AirQualityEvent : public EventIfc {
 public:
-    /**
-     * Constructor
-     */
-    explicit AirQualityEvent();
-    AirQualityEvent(Deserializer& deserialize);
 
     /**
-     * Destructor
+     * Default constructor.
      */
-    virtual ~AirQualityEvent();
+    AirQualityEvent(void);
+
+    /**
+     * Custom constructor.
+     */
+    explicit AirQualityEvent(const float32_t Quality);
+
+    /**
+     * Copy constructor.
+     * @param other The copied instance.
+     */
+    AirQualityEvent(const AirQualityEvent& other);
+
+    /**
+     * Constructor from deserializer.
+     */
+    explicit AirQualityEvent(Deserializer& deserializer);
+
+    /**
+     * Destructor.
+     */
+    virtual ~AirQualityEvent(void);
+
+    /**
+     * Assignment operator.
+     * @param other the assignator instance.
+     */
+    AirQualityEvent& operator=(const AirQualityEvent& other);
+
+    /**
+     * Equality operator.
+     */
+    bool operator==(const AirQualityEvent& right) const;
+
+    /**
+     * Inequality operator.
+     */
+    bool operator!=(const AirQualityEvent& right) const;
 
     /**
      * @see SerializableIfc
      */
-    virtual void deserialize(Deserializer& deserializer) override;
+    virtual void deserialize(Deserializer& deserializer);
 
     /**
      * @see SerializableIfc
      */
-    virtual void serialize(Serializer& serializer) const override;
+    virtual void serialize(Serializer& serializer) const;
 
-    // Getter & Setter
-    void setQuality(const float32_t quality);
-    float32_t getQuality() const;
+    /**
+     * Setter for Quality
+     */
+    void setQuality(const float32_t Quality);
 
+    /**
+     * Getter for Quality
+     */
+    float32_t getQuality(void) const;
 private:
     // range 0..1
     // 0.0 means bad quality
