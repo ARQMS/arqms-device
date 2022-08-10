@@ -6,7 +6,7 @@
 CloudLinkTask::CloudLinkTask() :
     StatusEvent(),
     m_ctrlHandler(),
-    m_mqttService(),
+    m_mqttService(*this),
     m_wifi(*this, m_ctrlHandler, m_mqttService),
     m_pTimeoutTimer(NULL) {
 }
@@ -33,7 +33,8 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             DeviceSettingsEvent msg(*pEvent);
             onHandleDeviceSettings(msg);
         }
-
+        break;
+        
         case EventIdentifiers::SENSOR_DATA_EVENT: {
             SensorDataEvent msg(*pEvent);
             onHandleSensorDataEvent(msg);

@@ -48,7 +48,9 @@ public:
      * @return message_id of the subscribe message on success
      *         -1 on failure
      */
-    static int subscribe(esp_mqtt_client_handle_t client, const char8_t* topic) {
+    static int32_t subscribe(esp_mqtt_client_handle_t client, const char8_t* topic) {
+        if (client == NULL) return -1;
+
         std::string topicStr(topic);
         replacePlaceholders(topicStr);
 
@@ -68,7 +70,9 @@ public:
      *         -1 on failure.
       */
     template<typename T>
-    static int publish(esp_mqtt_client_handle_t client, const char8_t* topic, const T data) {
+    static int32_t publish(esp_mqtt_client_handle_t client, const char8_t* topic, const T data) {
+        if (client == NULL) return -1;
+
         std::string topicStr(topic);
         replacePlaceholders(topicStr);
 

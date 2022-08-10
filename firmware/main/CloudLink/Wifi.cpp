@@ -8,7 +8,7 @@
 #define HUMIDEVICE_ESP_WIFI_CHANNEL   CONFIG_ESP_WIFI_CHANNEL
 #define HUMIDEVICE_MAX_STA_CONN       1
 
-Wifi::Wifi(WifiStateMachineCallbackIfc& wifiCallback, ConfigurationServiceIfc& ctrlHandler, MqttServiceIfc& mqttService) : 
+Wifi::Wifi(CloudLinkSenderIfc& wifiCallback, ConfigurationServiceIfc& ctrlHandler, MqttServiceIfc& mqttService) : 
     m_wifiSettings(),
     m_deviceSettings(),
     m_wifiSm(),

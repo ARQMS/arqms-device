@@ -63,6 +63,18 @@ void GuiUpdaterTask::onHandleWifiStatus(const WifiStatusEvent& wifiStatus) {
         m_wlanIndicator.setColor({0, 0, 255});
     } 
     else if (wifiStatus.getStatus() == WifiStatus::CONNECTED) {
+        m_wlanIndicator.setColor({0, 0, 50}, 100);
+    } 
+    else if (wifiStatus.getStatus() == WifiStatus::MQTT_CONNECTED) {
+        m_wlanIndicator.setColor({0, 0, 255});
+    } 
+    else if (wifiStatus.getStatus() == WifiStatus::MQTT_DISCONNECTED) {
+        m_wlanIndicator.setColor({0, 0, 50}, 100);
+    } 
+    else if (wifiStatus.getStatus() == WifiStatus::MQTT_SENDING) {
+        m_wlanIndicator.setColor({255, 255, 0}, 50);
+    } 
+    else if (wifiStatus.getStatus() == WifiStatus::MQTT_SENDED) {
         m_wlanIndicator.setColor({0, 0, 255});
     } 
     else if (wifiStatus.getStatus() == WifiStatus::UNKNOWN_ERROR) {

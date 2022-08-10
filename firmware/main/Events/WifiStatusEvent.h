@@ -15,6 +15,13 @@ enum class WifiStatus : uint8_t {
     LOST,
     CONNECTING,
 
+    // Protocol
+    MQTT_CONNECTED,
+    MQTT_DISCONNECTED,
+    MQTT_RECEIVED,
+    MQTT_SENDING,
+    MQTT_SENDED,
+
     // AP mode
     CLIENT_SEARCHING,
     CLIENT_CONNECTED,

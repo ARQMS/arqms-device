@@ -10,7 +10,7 @@
 // Project includes
 #include "ConfigurationService/ConfigurationServiceIfc.h"
 #include "WifiStateMachine.h"
-#include "WifiStateMachineCallbackIfc.h"
+#include "CloudLinkSenderIfc.h"
 #include "MqttService/MqttServiceIfc.h"
 #include "Events/WifiSettingsEvent.h"
 #include "Events/DeviceSettingsEvent.h"
@@ -23,7 +23,7 @@ public:
     /**
      * Constructor
      */
-    Wifi(WifiStateMachineCallbackIfc& wifiCallback, ConfigurationServiceIfc& ctrlHandler, MqttServiceIfc& mqttService);
+    Wifi(CloudLinkSenderIfc& wifiCallback, ConfigurationServiceIfc& ctrlHandler, MqttServiceIfc& mqttService);
 
     /**
      * Destructor
@@ -89,7 +89,7 @@ private:
     DeviceSettingsEvent m_deviceSettings;
 
     WifiStateMachine m_wifiSm;
-    WifiStateMachineCallbackIfc& m_sender;
+    CloudLinkSenderIfc& m_sender;
     uint32_t m_retryCounter;
 
     ConfigurationServiceIfc& m_ctrlHandler;

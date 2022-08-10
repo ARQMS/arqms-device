@@ -12,7 +12,7 @@
 #include "Events/WifiStatusEvent.h"
 #include "Events/SensorDataEvent.h"
 #include "Wifi.h"
-#include "WifiStateMachineCallbackIfc.h"
+#include "CloudLinkSenderIfc.h"
 #include "ConfigurationService/ConfigurationService.h"
 #include "MqttService/MqttService.h"
 
@@ -21,7 +21,7 @@
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class CloudLinkTask : public TaskBase<5, sizeof(WifiSettingsEvent)>, WifiStateMachineCallbackIfc {
+class CloudLinkTask : public TaskBase<5, sizeof(WifiSettingsEvent)>, CloudLinkSenderIfc {
 public:
     EventPublisherMultiple<2> StatusEvent;
 
@@ -37,7 +37,7 @@ public:
     virtual ~CloudLinkTask();
     
     /**
-     * @see WifiStateMachineCallbackIfc::sendWifiStatus
+     * @see CloudLinkSenderIfc::sendWifiStatus
      */
     virtual void sendWifiStatus(const WifiStatus status, const int32_t rssi = 0) override;
 

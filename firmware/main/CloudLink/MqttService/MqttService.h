@@ -9,6 +9,7 @@
 
 // Project includes
 #include "MqttServiceIfc.h"
+#include "CloudLink/CloudLinkSenderIfc.h"
 #include "Events/SensorDataEvent.h"
 
 /**
@@ -21,7 +22,7 @@ public:
     /**
      * Constructor
      */
-    explicit MqttService();
+    explicit MqttService(CloudLinkSenderIfc& sender);
 
     /**
      * Deconstructor
@@ -56,17 +57,10 @@ private:
      */
     MqttService& operator=(const MqttService& other);
 
-    /**
-     * Is called when device is successfully connected to MQTT Broker.
-     * Just ensure you subscribe to interesting channels
-     */
+    // Helper
     void onConnected();
-
-    /**
-     * Is called when an event is received on subscribed channels
-     * 
-     * @param event data
-     */
+    void onDisconnected();
+    void onFailure(const esp_mqtt_event_handle_t event);
     void onMqttReceived(const esp_mqtt_event_handle_t event);
 
     /**
@@ -86,6 +80,7 @@ private:
 
     // Members
     esp_mqtt_client_handle_t m_pMqttClient;
+    CloudLinkSenderIfc& m_sender;
 };
 
 #endif // MqttService_H
