@@ -10,6 +10,7 @@
 // Project includes
 #include "Events/WifiSettingsEvent.h"
 #include "Events/WifiStatusEvent.h"
+#include "Events/SensorDataEvent.h"
 #include "Wifi.h"
 #include "WifiStateMachineCallbackIfc.h"
 #include "ConfigurationService/ConfigurationService.h"
@@ -64,6 +65,7 @@ private:
     // Helper methods
     void onHandleWifiSettings(const WifiSettingsEvent& settings);
     void onHandleDeviceSettings(const DeviceSettingsEvent& settings);
+    void onHandleSensorDataEvent(const SensorDataEvent& settings);
     void onHandleTimeout();
 
     /**

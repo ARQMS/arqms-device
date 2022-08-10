@@ -9,6 +9,7 @@
 
 // Project includes
 #include "MqttServiceIfc.h"
+#include "Events/SensorDataEvent.h"
 
 /**
  * MQTT handler to publish and receive any supported mqtt packages
@@ -36,6 +37,13 @@ public:
      * @see MqttServiceIfc::stopService
      */
     virtual esp_err_t stopService(void) override;
+
+    /**
+     * Publishes the sensor event data
+     * 
+     * @param data to publish
+     */
+    void publish(const SensorDataEvent& data);
 
 private:
     /**
@@ -73,18 +81,11 @@ private:
      */
     static void mqttEventHandler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
-    /**
-     * Qos state for events
-     * @see https://www.hivemq.com/blog/mqtt-essentials-part-6-mqtt-quality-of-service-levels/
-     */
-    enum MqttQoS {
-        AT_MOST_ONCE = 0,
-        AT_LEAST_ONCE = 1,
-        EXACTLY_INCE = 2,
-    };
+    // helper method
+    void publish(const char8_t* topic, const float32_t data);
 
     // Members
-    esp_mqtt_client_handle_t m_mqttClient;
+    esp_mqtt_client_handle_t m_pMqttClient;
 };
 
 #endif // MqttService_H

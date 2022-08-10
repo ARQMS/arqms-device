@@ -1,18 +1,16 @@
 #include "MqttService.h"
 
-
-// MQTT Channels
-#define MQTT_SUB_NEW_FIRMWARE "devices/+/updates"
+#include "MqttUtil.h"
 
 MqttService::MqttService() :
-    m_mqttClient(NULL) {
+    m_pMqttClient(NULL) {
 }
 
 esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
     char8_t brokerUri[DeviceSettingsEvent::MAX_BROKER_URI_LENGTH];
-    deviceSettings.getBrokerUri(brokerUri);
-
     char8_t sn[DeviceSettingsEvent::MAX_SN_LENGTH];
+
+    deviceSettings.getBrokerUri(brokerUri);
     deviceSettings.getSn(sn);
 
     const esp_mqtt_client_config_t mqtt_cfg = {
@@ -20,36 +18,46 @@ esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
        .client_id = sn
     };
 
-    m_mqttClient = esp_mqtt_client_init(&mqtt_cfg);
-    esp_mqtt_client_register_event(m_mqttClient, MQTT_EVENT_ANY, &MqttService::mqttEventHandler, this);
-    return esp_mqtt_client_start(m_mqttClient);
+    // register possible placeholders, just ensure MqttUtil::NUM_PLACEHOLDER matches!
+    MqttUtil::registerPlaceholder("$sn", sn);
+    MqttUtil::registerPlaceholder("$channel", "dev");
+
+    m_pMqttClient = esp_mqtt_client_init(&mqtt_cfg);
+    esp_mqtt_client_register_event(m_pMqttClient, MQTT_EVENT_ANY, &MqttService::mqttEventHandler, this);
+    return esp_mqtt_client_start(m_pMqttClient);
 }
 
 esp_err_t MqttService::stopService() {
-    return esp_mqtt_client_stop(m_mqttClient);
+    return esp_mqtt_client_stop(m_pMqttClient);
 }
-/*
-void MqttService::onEvent(esp_event_base_t base, int32_t id, void* data) {
-    if (base == SENSOR_EVENTS && id == DATA_ACQUIRED) { 
-        // SensorData* pSensorData = static_cast<SensorData*>(data);
-        // esp_mqtt_client_publish(client, "/device/<mysn>/room/humidity", pSensorData->relativeHumidity, sizeof(float32_t), AT_MOST_ONCE, false);
-        // esp_mqtt_client_publish(client, "/device/<mysn>/room/pressure", pSensorData->pressure, sizeof(float32_t), AT_MOST_ONCE, false);
-        // esp_mqtt_client_publish(client, "/device/<mysn>/room/temperature", pSensorData->temperature, sizeof(float32_t), AT_MOST_ONCE, false);
-        // esp_mqtt_client_publish(client, "/device/<mysn>/room/voc", pSensorData->voc, sizeof(float32_t), AT_MOST_ONCE, false);
-        // esp_mqtt_client_publish(client, "/device/<mysn>/room/co2", pSensorData->co2, sizeof(float32_t), AT_MOST_ONCE, false);
-    }
-}*/
+
+void MqttService::publish(const SensorDataEvent& data) {
+    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/humidity", data.getRelativeHumidity());
+    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/pressure", data.getPressure());
+    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/temperature", data.getTemperature());
+    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/voc", data.getVoc());
+    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/co2", data.getCo2());
+}
 
 void MqttService::onConnected() {
-    esp_mqtt_client_subscribe(m_mqttClient, MQTT_SUB_NEW_FIRMWARE, AT_LEAST_ONCE);
+    MqttUtil::subscribe(m_pMqttClient, "devices/$channel/update");
+    MqttUtil::subscribe(m_pMqttClient, "devices/$sn/config");
 }
 
 void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
-    ESP_LOGI("Humi", "Received %.*s", event->topic_len, event->topic);
+    ESP_LOGD("Humi", "Received %.*s", event->topic_len, event->topic);
 
-    if (strcmp(event->topic, MQTT_SUB_NEW_FIRMWARE)) {
-        // TODO handle new firmware
-    }
+    // Demo
+    SensorDataEvent msg(1.2, 98.8, 20.5, 12.2, 0.5);
+    publish(msg);
+
+    // TODO handle new firmware, Attention: update has a placehlder 'device/$sn/config
+    // if (strcmp(event->topic, MQTT_SUB_DEVICE_CONFIGURATION)) {
+    // }
+
+    // TODO handle new firmware, Attention: update has a placehlder 'device/$channel/update
+    // if (strcmp(event->topic, MQTT_SUB_NEW_FIRMWARE)) {
+    // }
 }
 
 void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data) {
@@ -70,7 +78,7 @@ void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, in
         case MQTT_EVENT_ERROR:
             ESP_LOGE("HumiMqtt", "MQTT_EVENT_ERROR");
             if (event->error_handle->error_type == MQTT_ERROR_TYPE_TCP_TRANSPORT) {
-                ESP_LOGW("HumiMqtt", "Last errno string (%s)", strerror(event->error_handle->esp_transport_sock_errno));
+                ESP_LOGE("HumiMqtt", "Last errno string (%s)", strerror(event->error_handle->esp_transport_sock_errno));
             }
             break;
 

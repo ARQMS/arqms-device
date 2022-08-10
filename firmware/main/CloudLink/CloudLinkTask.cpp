@@ -28,10 +28,15 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             onHandleWifiSettings(msg);
         }
         break;
-        
+
         case EventIdentifiers::DEVICE_SETTINGS_EVENT: {
             DeviceSettingsEvent msg(*pEvent);
             onHandleDeviceSettings(msg);
+        }
+
+        case EventIdentifiers::SENSOR_DATA_EVENT: {
+            SensorDataEvent msg(*pEvent);
+            onHandleSensorDataEvent(msg);
         }
         break;
 
@@ -60,6 +65,10 @@ void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
     else {
         m_wifi.reset();
     }
+}
+
+void CloudLinkTask::onHandleSensorDataEvent(const SensorDataEvent& settings) {
+    m_mqttService.publish(settings);
 }
 
 void CloudLinkTask::onHandleDeviceSettings(const DeviceSettingsEvent& settings) {
