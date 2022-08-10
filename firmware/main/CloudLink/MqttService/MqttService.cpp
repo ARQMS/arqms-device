@@ -51,6 +51,9 @@ void MqttService::onConnected() {
     MqttUtil::subscribe(m_pMqttClient, "devices/$sn/config");
 
     m_sender.sendWifiStatus(WifiStatus::MQTT_CONNECTED);
+
+    // TODO, remove demo
+    MqttUtil::publish(m_pMqttClient, "devices/$sn/status", "Device online: But data not decoded");
 }
 
 void MqttService::onDisconnected() {

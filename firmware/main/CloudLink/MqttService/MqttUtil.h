@@ -70,13 +70,17 @@ public:
      *         -1 on failure.
       */
     template<typename T>
-    static int32_t publish(esp_mqtt_client_handle_t client, const char8_t* topic, const T data) {
+    static int32_t publish(esp_mqtt_client_handle_t client, const char8_t* topic, const T& data) {
+        std::string valueStr(std::to_string(data));
+        return publish(client, topic, valueStr.c_str());
+    }
+    static int32_t publish(esp_mqtt_client_handle_t client, const char8_t* topic, const char8_t* data) {
         if (client == NULL) return -1;
 
         std::string topicStr(topic);
         replacePlaceholders(topicStr);
 
-        std::string valueStr(std::to_string(data));
+        std::string valueStr(data);
 
         ESP_LOGD("Humi publish", "Publish to %s with %s", topicStr.c_str(), valueStr.c_str());
 
