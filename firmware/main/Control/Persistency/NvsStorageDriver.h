@@ -53,7 +53,9 @@ public:
     virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) override;
     
 private:
-    const static char8_t* nvsNamespace = "DeviceConfig";
+    const static char8_t* partitionNamespace;
+    const static char8_t* wifiConfigKey;
+    const static char8_t* deviceConfigKey;
 };
 
 

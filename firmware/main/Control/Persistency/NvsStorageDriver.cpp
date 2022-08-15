@@ -13,9 +13,13 @@ DeviceSettingsEvent g_deviceSettings;
 static char8_t sn[DeviceSettingsEvent::MAX_SN_LENGTH]               = "AR-0001";
 static char8_t room[32]                                             = "OfficeRoom1";
 static char8_t broker[DeviceSettingsEvent::MAX_BROKER_URI_LENGTH]   = "mqtt://192.168.0.16:8883";
-static char8_t wifi_ssid[WifiSettingsEvent::MAX_SSID_LENGTH]        = "";
-static char8_t wifi_pwd[WifiSettingsEvent::MAX_PWD_LENGTH]          = "";
+static char8_t wifi_ssid[WifiSettingsEvent::MAX_SSID_LENGTH]        = "WN-7F35F0";
+static char8_t wifi_pwd[WifiSettingsEvent::MAX_PWD_LENGTH]          = "3cb8f33b37";
 static int  interval                                                = 15;
+
+const char8_t* NvsStorageDriver::partitionNamespace = "Settings";
+const char8_t* NvsStorageDriver::wifiConfigKey = "WifiConfig";
+const char8_t* NvsStorageDriver::deviceConfigKey = "DeviceConfig";
 
 // checks given char* with expected property name with optional NULL-Termination
 #define CHECK_PROP(name, expected) strncmp(name, expected, sizeof(expected) - 1) == 0
@@ -24,11 +28,13 @@ NvsStorageDriver::NvsStorageDriver() {
 
 }
 
-NvsStorageDriver::~NvsStorageDriver() {
-    nvs_deinit_partition(nvsNamespace);    
+NvsStorageDriver::~NvsStorageDriver(){
 }
 
 esp_err_t NvsStorageDriver::initialize() {
+    esp_err_t err;
+    nvs_handle_t nvsHandle;
+    
     const WifiMode mode = strnlen(wifi_ssid, sizeof(wifi_ssid)) > 0 ? WifiMode::STA : WifiMode::AP;
     g_wifiSettings.setSsid(wifi_ssid);
     g_wifiSettings.setPassword(wifi_pwd);
@@ -37,11 +43,16 @@ esp_err_t NvsStorageDriver::initialize() {
     g_deviceSettings.setBrokerUri(broker);
     g_deviceSettings.setSn(sn);
 	
-	esp_err_t err = nvs_flash_init_partition(nvsNamespace);
-    if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND){
-        ESP_ERROR_CHECK(err);
-        err = nvs_flash_init_partition(nvsNamespace);
+    // Initialize NVS Flash
+    err = nvs_flash_init();
+    if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        // NVS partition was truncated and needs to be erased
+        // Retry nvs_flash_init
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();   
     }
+
     return ESP_OK;
 }
 
@@ -71,11 +82,8 @@ void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
 
 esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, size_t* size) {
     // TODO read from NVS, following code is for demonstration purpose
-	esp_err_t err;
+	esp_err_t err = ESP_OK;
     nvs_handle_t nvsHandle;
-    
-    // Open NVS Partition
-    err = nvs_open_partition(nvsNamespace, NVS_READWRITE, &nvsHandle);
 	
     if(err != ESP_OK){
         return err;
@@ -109,19 +117,14 @@ esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, 
         ESP_LOGW("HumiDevice", "Configuration '%s' is not supported by NVS Storage", name);
         return ESP_ERR_INVALID_ARG;
     } 
-
-    nvs_close(nvsHandle);   // Close NVS Partition
     return ESP_OK;
 }
 
     
 esp_err_t NvsStorageDriver::writeConfiguration(const char8_t* name, const void* data, const size_t size) {
     // TODO write to NVS
-    esp_err_t err;
+    esp_err_t err = ESP_OK;
     nvs_handle_t nvsHandle;
-    
-    // Open NVS Partition
-    err = nvs_open_partition(nvsNamespace, NVS_READWRITE, &nvsHandle);
 
     if(err != ESP_OK){
         return err;
@@ -150,10 +153,6 @@ esp_err_t NvsStorageDriver::writeConfiguration(const char8_t* name, const void* 
         ESP_LOGW("HumiDevice", "Configuration '%s' is not supported by NVS Storage", name);
         return ESP_ERR_INVALID_ARG;
     } 
-    err = nvs_commit(nvsHandle);  // Commit any changes made to NVS Storage
-    if(err != ESP_OK){
-        return err;
-    }
-    nvs_close(nvsHandle);       // Close NVS Partition
+
     return ESP_OK;
 }
