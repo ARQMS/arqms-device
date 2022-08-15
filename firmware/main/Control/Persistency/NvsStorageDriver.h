@@ -56,6 +56,9 @@ private:
     const static char8_t* partitionNamespace;
     const static char8_t* wifiConfigKey;
     const static char8_t* deviceConfigKey;
+
+    // Helper Method
+    void storeData(SerializableIfc& serializer, size_t size, const char8_t* key);
 };
 
 
