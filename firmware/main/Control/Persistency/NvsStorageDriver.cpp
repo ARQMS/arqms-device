@@ -6,128 +6,84 @@
 #include "nvs.h"
 #include "nvs_flash.h"
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-// TODO remove demo. Use struct or NVS with fixed length strings to avvoid dynamic memory!
-WifiSettingsEvent g_wifiSettings;
-DeviceSettingsEvent g_deviceSettings;
-
-static char8_t sn[DeviceSettingsEvent::MAX_SN_LENGTH]               = "AR-0001";
-static char8_t room[32]                                             = "OfficeRoom1";
-static char8_t broker[DeviceSettingsEvent::MAX_BROKER_URI_LENGTH]   = "mqtt://192.168.0.16:8883";
-static char8_t wifi_ssid[WifiSettingsEvent::MAX_SSID_LENGTH]        = "";
-static char8_t wifi_pwd[WifiSettingsEvent::MAX_PWD_LENGTH]          = "";
-static int  interval                                                = 15;
-
-const char8_t* NvsStorageDriver::partitionNamespace = "Settings";
-const char8_t* NvsStorageDriver::wifiConfigKey = "WifiConfig";
-const char8_t* NvsStorageDriver::deviceConfigKey = "DeviceConfig";
+const char8_t* NvsStorageDriver::s_partitionNamespace   = "Settings";
+const char8_t* NvsStorageDriver::s_wifiConfigKey        = "WifiConfig";
+const char8_t* NvsStorageDriver::s_deviceConfigKey      = "DeviceConfig";
+const char8_t* NvsStorageDriver::s_versionKey           = "Version";
 
 // checks given char* with expected property name with optional NULL-Termination
 #define CHECK_PROP(name, expected) strncmp(name, expected, sizeof(expected) - 1) == 0
 
 NvsStorageDriver::NvsStorageDriver() {
-
 }
 
 NvsStorageDriver::~NvsStorageDriver(){
 }
 
 esp_err_t NvsStorageDriver::initialize() {
-    esp_err_t err;
-    nvs_handle_t nvsHandle;
-    
-    /*const WifiMode mode = WifiMode::STA;
-    g_wifiSettings.setSsid(wifi_ssid);
-    g_wifiSettings.setPassword(wifi_pwd);
-    g_wifiSettings.setMode(mode);
+    esp_err_t err = nvs_flash_init();
 
-    ESP_LOGI("initialize Mode", "%i", g_wifiSettings.getMode());
-
-    g_deviceSettings.setBrokerUri(broker);
-    g_deviceSettings.setSn(sn);*/
-	
-    // Initialize NVS Flash
-    err = nvs_flash_init();
-    if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
-        // NVS partition was truncated and needs to be erased
-        // Retry nvs_flash_init
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        err = nvs_flash_init();   
+    if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_LOGW("NvsStorageDriver", "Failed initialize NVS. No free pages or new version detected");
+        return err;
     }
 
-    /*static uint8_t binaryBlob[sizeof(WifiSettingsEvent)];
-    Serializer serializer(binaryBlob, sizeof(WifiSettingsEvent));
-    g_wifiSettings.serialize(serializer);
+    if (!checkVersion()) {
+        ESP_LOGI("NvsStorageDriver", "Version mismatch, restore default values");
+        restoreDefault();
+    }
 
-    err = nvs_open(partitionNamespace, NVS_READWRITE, &nvsHandle);
-    err = nvs_set_blob(nvsHandle, wifiConfigKey, &binaryBlob, serializer.getBufferPos());
-    ESP_LOGI("Buffer Position", "%i", serializer.getBufferPos());
-    nvs_commit(nvsHandle);
-    nvs_close(nvsHandle);*/
+    return ESP_OK;
+}
 
-    static uint8_t binaryBlob[sizeof(WifiSettingsEvent)];
-    Serializer serializer(binaryBlob, sizeof(WifiSettingsEvent));
-    g_wifiSettings.serialize(serializer);
+esp_err_t NvsStorageDriver::restoreDefault() {
+    const WifiMode mode = strlen(CONFIG_WIFI_SSID) > 0 ? WifiMode::STA : WifiMode::AP;
 
+    WifiSettingsEvent wifiSettings(mode, CONFIG_WIFI_SSID, CONFIG_WIFI_PASSWORD);
+    DeviceSettingsEvent deviceSettings(CONFIG_DEVICE_BROKER, CONFIG_DEVICE_SN);  
+    // TODO room CONFIG_ESP_DEVICE_ROOM
+    // TODO interval  CONFIG_ESP_DEVICE_INTERVAL
     
+    // update version
+    nvs_handle_t nvsHandle;
+    checkEspError(nvs_open(s_partitionNamespace, NVS_READWRITE, &nvsHandle));
+    checkEspError(nvs_set_i8(nvsHandle, s_versionKey, LAYOUT_VERSION));
+    nvs_close(nvsHandle);
+
+    storeData<WifiSettingsEvent>(wifiSettings, s_wifiConfigKey);
+    storeData<DeviceSettingsEvent>(deviceSettings, s_deviceConfigKey);
+
     return ESP_OK;
 }
 
 void NvsStorageDriver::readWifiConfig(WifiSettingsEvent* pWifiParam) {
-    esp_err_t err;
-    nvs_handle_t nvsHandle;
-    
     if (pWifiParam == NULL) return;
 
-    // Open NVS Storage
-    err = nvs_open(partitionNamespace, NVS_READWRITE, &nvsHandle);
-    // TODO use blobs in NVS system to deserialize binary data
-    static uint8_t binaryBlob[sizeof(WifiSettingsEvent)];
-    size_t size;
-    err = nvs_get_blob(nvsHandle, wifiConfigKey, &binaryBlob, &size );
-    Deserializer deserializer(binaryBlob, sizeof(WifiSettingsEvent));
-    pWifiParam->deserialize(deserializer);
-    ESP_LOGI("readWifiConfig", "%i \n %i", pWifiParam->getMode(), size);
-    
-    nvs_close(nvsHandle);
+    loadData<WifiSettingsEvent>(*pWifiParam, s_wifiConfigKey);
 }
 
 void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
-    esp_err_t err;
-    nvs_handle_t nvsHandle;
-    
     if (pDeviceParam == NULL) return;
 
-    /*static uint8_t binaryBlob[sizeof(DeviceSettingsEvent)];
-    Serializer serializer(binaryBlob, sizeof(DeviceSettingsEvent));
-    g_deviceSettings.serialize(serializer);
-
-    Deserializer deserializer(binaryBlob, sizeof(DeviceSettingsEvent));
-    pDeviceParam->deserialize(deserializer);*/
-    // TODO use blobs in NVS system to deserialize binary data
-    static uint8_t binaryBlob[sizeof(DeviceSettingsEvent)];
-    err = nvs_open(partitionNamespace, NVS_READWRITE, &nvsHandle);
-    err = nvs_get_blob(nvsHandle, deviceConfigKey, &binaryBlob, NULL);
-    Deserializer deserializer(binaryBlob, sizeof(DeviceSettingsEvent));
-    pDeviceParam->deserialize(deserializer);
-    nvs_close(nvsHandle);
+    loadData<DeviceSettingsEvent>(*pDeviceParam, s_deviceConfigKey);
 }
 
 esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, size_t* size) {
     // TODO read from NVS, following code is for demonstration purpose
 	esp_err_t err = ESP_OK;
-    nvs_handle_t nvsHandle;
 	
     if(err != ESP_OK){
         return err;
     }
 
     // TODO read from NVS
-    if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
-        *data = (void*)sn;
-        *size = sizeof(sn);
+    /*if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
+        DeviceSettingsEvent msg;
+        loadData<DeviceSettingsEvent>(msg, s_deviceConfigKey);
+
+        msg.getSn(*data);
+        //*data = (void*)sn;
+        //*size = sizeof(sn);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_ROOM)) {
         *data = (void*)room;
@@ -147,11 +103,12 @@ esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_PASSPHRASE)) {
         *data = (void*)wifi_pwd;
         *size = sizeof(wifi_pwd);
-    } 
+    } */
     else {
         ESP_LOGW("HumiDevice", "Configuration '%s' is not supported by NVS Storage", name);
         return ESP_ERR_INVALID_ARG;
-    } 
+    }
+
     return ESP_OK;
 }
 
@@ -159,7 +116,6 @@ esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, 
 esp_err_t NvsStorageDriver::writeConfiguration(const char8_t* name, const void* data, const size_t size) {
     // TODO write to NVS
     esp_err_t err = ESP_OK;
-    nvs_handle_t nvsHandle;
 
     if(err != ESP_OK){
         return err;
@@ -192,17 +148,48 @@ esp_err_t NvsStorageDriver::writeConfiguration(const char8_t* name, const void* 
     return ESP_OK;
 }
 
-void NvsStorageDriver::storeData(SerializableIfc& serializer, size_t size, const char8_t* key)
-{
-    esp_err_t err;
+esp_err_t NvsStorageDriver::storeData(SerializableIfc& data, const char8_t* key, uint8_t* buffer, const size_t size) {
+    Serializer serializer(buffer, size);
+    data.serialize(serializer);
+
     nvs_handle_t nvsHandle;
+    checkEspError(nvs_open(s_partitionNamespace, NVS_READWRITE, &nvsHandle));
+    checkEspError(nvs_set_blob(nvsHandle, key, &buffer, serializer.getBufferPos()));
+    checkEspError(nvs_commit(nvsHandle));
 
-    Serializer serializer(binaryBlob, sizeof(WifiSettingsEvent));
-    g_wifiSettings.serialize(serializer);
-
-    err = nvs_open(partitionNamespace, NVS_READWRITE, &nvsHandle);
-    err = nvs_set_blob(nvsHandle, wifiConfigKey, &binaryBlob, serializer.getBufferPos());
-    ESP_LOGI("Buffer Position", "%i", serializer.getBufferPos());
-    nvs_commit(nvsHandle);
     nvs_close(nvsHandle);
+
+    return ESP_OK;
+}
+
+esp_err_t NvsStorageDriver::loadData(SerializableIfc& data, const char8_t* key, uint8_t* buffer, size_t* size) const {
+    nvs_handle_t nvsHandle;
+    checkEspError(nvs_open(s_partitionNamespace, NVS_READWRITE, &nvsHandle));
+    checkEspError(nvs_get_blob(nvsHandle, key, buffer, size));
+
+    Deserializer deserializer(buffer, *size);
+    data.deserialize(deserializer);
+    
+    nvs_close(nvsHandle);
+
+    return ESP_OK;
+}
+
+bool NvsStorageDriver::checkVersion() const {
+    nvs_handle_t nvsHandle;
+    int8_t versionInFlash = -1;
+    checkEspError(nvs_open(s_partitionNamespace, NVS_READWRITE, &nvsHandle));
+    nvs_get_i8(nvsHandle, s_versionKey, &versionInFlash);
+    nvs_close(nvsHandle);
+
+    return versionInFlash == LAYOUT_VERSION;
+}
+
+bool NvsStorageDriver::checkEspError(const esp_err_t erroCode) const  {
+    if (erroCode != ESP_OK) {
+        ESP_LOGE("NvsStorageDriver", "Error in NvsStorageDriver: %s", esp_err_to_name(erroCode));
+        return false;
+    }
+
+    return true;
 }

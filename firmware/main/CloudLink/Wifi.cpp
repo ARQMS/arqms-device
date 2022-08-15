@@ -3,9 +3,9 @@
 // idf includes
 #include "sdkconfig.h"
 
-#define HUMIDEVICE_ESP_WIFI_SSID      CONFIG_ESP_WIFI_SSID
-#define HUMIDEVICE_ESP_WIFI_PASS      CONFIG_ESP_WIFI_PASSWORD
-#define HUMIDEVICE_ESP_WIFI_CHANNEL   CONFIG_ESP_WIFI_CHANNEL
+#define HUMIDEVICE_ESP_WIFI_SSID      CONFIG_SERVICE_WIFI_SSID
+#define HUMIDEVICE_ESP_WIFI_PASS      CONFIG_SERVICE_WIFI_PASSWORD
+#define HUMIDEVICE_ESP_WIFI_CHANNEL   CONFIG_SERVICE_WIFI_CHANNEL
 #define HUMIDEVICE_MAX_STA_CONN       1
 
 Wifi::Wifi(CloudLinkSenderIfc& wifiCallback, ConfigurationServiceIfc& ctrlHandler, MqttServiceIfc& mqttService) : 

@@ -1,22 +1,59 @@
 menu "HumiDevice Configuration"
 
-    config ESP_WIFI_SSID
-        string "WiFi SSID"
-        default "AR-xxxx"
+    config SERVICE_WIFI_SSID
+        string "Service AP WiFi SSID"
+        default "AR-develop"
         help
-            SSID (network name) for the HumiDevice to connect to.
+            The service SSID (network name) for the HumiDevice  Service Mode-
 
-    config ESP_WIFI_PASSWORD
-        string "WiFi Password"
+    config SERVICE_WIFI_PASSWORD
+        string "Service WiFi Password"
         default "password"
         help
-            WiFi password (WPA or WPA2) for the HumiDevice to use.
+            The service WiFi password (WPA or WPA2) for the HumiDevice Service Mode.
 
-    config ESP_WIFI_CHANNEL
-        int "WiFi Channel"
+    config SERVICE_WIFI_CHANNEL
+        int "Service WiFi Channel"
         range 1 13
         default 1
         help
-            WiFi channel (network channel) for the HumiDevice to use.
+            The service WiFi channel (network channel) for the HumiDevice Service Mode.
 
+    config WIFI_SSID
+        string "WiFi SSID"
+        default ""
+        help
+            SSID (network name) for the HumiDevice to connect to.
+
+    config WIFI_PASSWORD
+        string "WiFi Password"
+        default ""
+        help
+            WiFi password (WPA or WPA2).
+            
+    config DEVICE_SN
+        string "Serial Number"
+        default "AR-xxxx"
+        help
+            Serial number from device. Must be changed in production!
+
+    config DEVICE_ROOM
+        string "Default Room"
+        default "Office"
+        help
+            Default room. Is used when reseting flash
+
+    config DEVICE_BROKER
+        string "Default Broker URL"
+        default "mqtt://192.168.0.16:8883"
+        help
+            Default broker url. At the moment no DNS are supported. Eg mqtt://192.168.0.16:8883
+
+    config DEVICE_INTERVAL
+        int "Send interval"
+        range 1 1440
+        default 15
+        help
+            Default send interval. (In min)
+        
 endmenu
