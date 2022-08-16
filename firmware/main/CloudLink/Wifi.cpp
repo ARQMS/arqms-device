@@ -113,7 +113,7 @@ void Wifi::onTimeout() {
     } 
     else if (m_wifiSm.isCurrentState(WifiStateMachine::State::STA_NORMAL_CONNECTING)) {
         m_wifiSm.reset();
-        m_sender.sendWifiStatus(WifiStatus::CLIENT_TIMEOUT);
+        m_sender.sendWifiStatus(WifiStatus::STA_TIMEOUT);
     }
 }
 

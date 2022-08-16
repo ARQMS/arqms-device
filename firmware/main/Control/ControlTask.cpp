@@ -50,6 +50,9 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
     if (status.getStatus() == WifiStatus::CONNECTED) {
         m_coreSm.onConnected();
     }
+    else if (status.getStatus() == WifiStatus::STA_TIMEOUT) {
+        m_coreSm.onServiceMode();
+    }
     else if (status.getStatus() == WifiStatus::CLIENT_DISCONNECTED || status.getStatus() == WifiStatus::CLIENT_TIMEOUT) {
         // TODO perform shutdown, seems IDF does not support shutdown, 
         // so we must connect GPIO 1 (PCU_STATE2) as output and connect to Latch Power or 
