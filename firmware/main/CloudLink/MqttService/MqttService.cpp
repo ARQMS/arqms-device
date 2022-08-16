@@ -14,6 +14,11 @@ esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
     deviceSettings.getBrokerUri(brokerUri);
     deviceSettings.getSn(sn);
 
+    // just ensure broker is configured
+    if (strlen(brokerUri) <= 0) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
     const esp_mqtt_client_config_t mqtt_cfg = {
        .uri = brokerUri,
        .client_id = sn
