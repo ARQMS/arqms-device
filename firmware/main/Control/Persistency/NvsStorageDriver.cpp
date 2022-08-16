@@ -92,15 +92,11 @@ esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, 
         return ESP_ERR_INVALID_ARG;
     }
 
-    ESP_LOGI("NvsStorageDriver", "Read %s:%s", name, *data);
-
     return ESP_OK;
 }
 
     
 esp_err_t NvsStorageDriver::writeConfiguration(const char8_t* name, const void* data, const size_t size) {
-    ESP_LOGI("NvsStorageDriver", "Write %s:%s", name, data);
-
     if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
         // readonly, do not change serial number!
     } 

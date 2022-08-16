@@ -23,8 +23,6 @@ Wifi::~Wifi() {
 
 void Wifi::initialize() {
     if (m_wifiSm.isCurrentState(WifiStateMachine::State::OFF)) {
-        m_wifiSm.reset();
-
         checkEspError(esp_netif_init());
         checkEspError(esp_event_loop_create_default());
     }
@@ -59,8 +57,6 @@ void Wifi::startServiceMode() {
     checkEspError(esp_wifi_set_mode(WIFI_MODE_AP));
     checkEspError(esp_wifi_set_config(WIFI_IF_AP, &wifiConfig));
     checkEspError(esp_wifi_start());
-
-    checkEspError(m_ctrlHandler.startService());
 }
 
 void Wifi::startNormalMode() {
@@ -84,8 +80,6 @@ void Wifi::startNormalMode() {
     checkEspError(esp_wifi_set_mode(WIFI_MODE_STA));
     checkEspError(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
     checkEspError(esp_wifi_start());
-
-    checkEspError(m_mqttService.startService(m_deviceSettings));
 }
 
 void Wifi::updateWifiSettings(const WifiSettingsEvent& settings) {
@@ -108,25 +102,27 @@ void Wifi::updateDeviceSettings(const DeviceSettingsEvent& settings) {
 
 void Wifi::onTimeout() {
     if (m_wifiSm.isCurrentState(WifiStateMachine::State::AP_SERVICE_WAITING)) {
-        m_wifiSm.reset();
+        reset();
         m_sender.sendWifiStatus(WifiStatus::CLIENT_TIMEOUT);
     } 
     else if (m_wifiSm.isCurrentState(WifiStateMachine::State::STA_NORMAL_CONNECTING)) {
-        m_wifiSm.reset();
+        reset();
         m_sender.sendWifiStatus(WifiStatus::STA_TIMEOUT);
     }
 }
 
 void Wifi::reset() {
-    ESP_LOGI("HumiDevice", "Reset wifi phy");
-
-    m_sender.sendWifiStatus(WifiStatus::DISABLED);
-
-    if (m_wifiSm.isCurrentState(WifiStateMachine::State::FAILURE)) {
-        m_wifiSm.reset();
+    if (m_wifiSm.isCurrentState(WifiStateMachine::State::OFF)) {
+        return;
     }
 
-    esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &onWifiEventHandler);
+    ESP_LOGI("HumiDevice", "Reset wifi phy");
+
+    m_wifiSm.reset();
+
+    esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &Wifi::onWifiEventHandler);
+
+    esp_wifi_disconnect();
     esp_wifi_stop();
     esp_netif_deinit();
     esp_wifi_deinit();
@@ -138,6 +134,8 @@ void Wifi::onClientConnected() {
         m_sender.sendWifiStatus(WifiStatus::UNKNOWN_ERROR);
         return;
     }
+
+    checkEspError(m_ctrlHandler.startService());
 
     m_wifiSm.onClientConnected();
     m_sender.sendWifiStatus(WifiStatus::CLIENT_CONNECTED);
@@ -162,6 +160,8 @@ void Wifi::onStaStarted() {
 }
 
 void Wifi::onWifiConnected() {
+    checkEspError(m_mqttService.startService(m_deviceSettings));
+
     m_wifiSm.onGotIp();
     m_retryCounter = 0U;
 
@@ -173,7 +173,6 @@ void Wifi::onWifiConnected() {
 
 void Wifi::onWifiDisconnected() {
     if (m_wifiSm.isCurrentState(WifiStateMachine::State::OFF)) { 
-        reset();
         return; 
     }
 
@@ -186,7 +185,6 @@ void Wifi::onWifiDisconnected() {
     }
     else {
         m_sender.sendWifiStatus(WifiStatus::DISCONNECTED);
-        reset();
     }
 }
 
