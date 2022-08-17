@@ -54,7 +54,7 @@ void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
     pDeviceParam->setSn(m_layout.sn);
 }
 
-esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, size_t* size) {
+esp_err_t NvsStorageDriver::get(const char8_t* name, void** data, size_t* size) {
     esp_err_t err = m_layout.fetch();
     if(err != ESP_OK){
         return err;
@@ -96,7 +96,7 @@ esp_err_t NvsStorageDriver::readConfiguration(const char8_t* name, void** data, 
 }
 
     
-esp_err_t NvsStorageDriver::writeConfiguration(const char8_t* name, const void* data, const size_t size) {
+esp_err_t NvsStorageDriver::put(const char8_t* name, const void* data, const size_t size) {
     if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
         // readonly, do not change serial number!
     } 

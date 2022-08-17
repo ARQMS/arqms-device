@@ -7,7 +7,7 @@
 // mDNS does not work at the moment, so we use IP
 #define ESP_CTRL_SERVICE_NAME               "192.168.4.1"
 
-ConfigurationProviderIfc* ConfigurationService::s_pNvsStorageDriver = NULL;
+KeyValueStorageIfc* ConfigurationService::s_pNvsStorageDriver = NULL;
 
 ConfigurationService::ConfigurationService() {
 }
@@ -85,14 +85,14 @@ void ConfigurationService::registerProperty(const char* name, const PropertyType
 }
 
 esp_err_t ConfigurationService::getPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx) {
-    ConfigurationProviderIfc* pProvider = static_cast<ConfigurationProviderIfc*>(usr_ctx);
+    KeyValueStorageIfc* pProvider = static_cast<KeyValueStorageIfc*>(usr_ctx);
 
     for (uint32_t i = 0; i < props_count; i++) {
         // set default
         prop_values[i].size = (static_cast<PropertyType>(props[i].type)).getSize();
         prop_values[i].data = NULL;
 
-        esp_err_t err = pProvider->readConfiguration(props[i].name, &prop_values[i].data, &(prop_values[i].size));
+        esp_err_t err = pProvider->get(props[i].name, &prop_values[i].data, &(prop_values[i].size));
         if (err != ESP_OK) return err;
     }
 
@@ -100,7 +100,7 @@ esp_err_t ConfigurationService::getPropertyValues(size_t props_count, const esp_
 }
 
 esp_err_t ConfigurationService::setPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], const esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx) {
-    ConfigurationProviderIfc* pProvider = static_cast<ConfigurationProviderIfc*>(usr_ctx);
+    KeyValueStorageIfc* pProvider = static_cast<KeyValueStorageIfc*>(usr_ctx);
 
     for (uint32_t i = 0; i < props_count; i++) {
         if (props[i].flags & PropertyFlags::PROP_FLAG_READONLY) {
@@ -115,7 +115,7 @@ esp_err_t ConfigurationService::setPropertyValues(size_t props_count, const esp_
             return ESP_ERR_INVALID_ARG;
         }
 
-        esp_err_t err = pProvider->writeConfiguration(props[i].name, prop_values[i].data, dataSize);
+        esp_err_t err = pProvider->put(props[i].name, prop_values[i].data, dataSize);
         if (err != ESP_OK) return err;
     }
 
