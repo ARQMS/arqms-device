@@ -12,6 +12,7 @@ class DeviceSettingsEvent : public EventIfc {
 public:
     // Constants
     static const size_t MAX_SN_LENGTH  = 32;
+    static const size_t MAX_ROOM_LENGTH  = 32;
     static const size_t MAX_BROKER_URI_LENGTH  = 64;
 
     /**
@@ -22,7 +23,7 @@ public:
     /**
      * Custom constructor.
      */
-    DeviceSettingsEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t sn[MAX_SN_LENGTH]);
+    DeviceSettingsEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t sn[MAX_SN_LENGTH], const char8_t room[MAX_ROOM_LENGTH]);
 
     /**
      * Copy constructor.
@@ -86,8 +87,19 @@ public:
      */
     void getSn(char8_t sn[MAX_SN_LENGTH]) const;
 
+    /**
+     * Setter for room
+     */
+    void setRoom(const char8_t room[MAX_ROOM_LENGTH]);
+
+    /**
+     * Getter for room
+     */
+    void getRoom(char8_t room[MAX_ROOM_LENGTH]) const;
+
 private:
     char8_t m_sn[MAX_SN_LENGTH];
+    char8_t m_room[MAX_ROOM_LENGTH];
     char8_t m_brokerUri[MAX_BROKER_URI_LENGTH];
 };
 
