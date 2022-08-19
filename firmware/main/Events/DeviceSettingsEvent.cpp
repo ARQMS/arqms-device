@@ -1,12 +1,14 @@
 #include "DeviceSettingsEvent.h"
 
-DeviceSettingsEvent::DeviceSettingsEvent(void) {
+DeviceSettingsEvent::DeviceSettingsEvent(void) :
+    m_interval(0U) {
     memset(&m_brokerUri[0], 0, MAX_BROKER_URI_LENGTH * sizeof(char8_t));
     memset(&m_sn[0], 0, MAX_SN_LENGTH * sizeof(char8_t));
     memset(&m_room[0], 0, MAX_ROOM_LENGTH * sizeof(char8_t));
 }
 
-DeviceSettingsEvent::DeviceSettingsEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t sn[MAX_SN_LENGTH], const char8_t room[MAX_ROOM_LENGTH]) {
+DeviceSettingsEvent::DeviceSettingsEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t sn[MAX_SN_LENGTH], const char8_t room[MAX_ROOM_LENGTH], const uint32_t interval) :
+    m_interval(interval) {
     if (brokerUri != NULL) {
         memcpy(&m_brokerUri[0], &brokerUri[0], MAX_BROKER_URI_LENGTH * sizeof(char8_t));
     } else {
@@ -24,7 +26,8 @@ DeviceSettingsEvent::DeviceSettingsEvent(const char8_t brokerUri[MAX_BROKER_URI_
     }
 }
 
-DeviceSettingsEvent::DeviceSettingsEvent(const DeviceSettingsEvent& other) {
+DeviceSettingsEvent::DeviceSettingsEvent(const DeviceSettingsEvent& other) :
+    m_interval(other.m_interval) {
     memcpy(&m_brokerUri[0], &other.m_brokerUri[0], MAX_BROKER_URI_LENGTH * sizeof(char8_t));
     memcpy(&m_sn[0], &other.m_sn[0], MAX_SN_LENGTH * sizeof(char8_t));
     memcpy(&m_room[0], &other.m_room[0], MAX_ROOM_LENGTH * sizeof(char8_t));
@@ -45,11 +48,14 @@ DeviceSettingsEvent& DeviceSettingsEvent::operator=(const DeviceSettingsEvent& o
     memcpy(&m_brokerUri[0], &other.m_brokerUri[0], MAX_BROKER_URI_LENGTH * sizeof(char8_t));
     memcpy(&m_sn[0], &other.m_sn[0], MAX_SN_LENGTH * sizeof(char8_t));
     memcpy(&m_room[0], &other.m_room[0], MAX_ROOM_LENGTH * sizeof(char8_t));
+    m_interval = other.m_interval;
+
     return *this;
 }
 
 bool DeviceSettingsEvent::operator==(const DeviceSettingsEvent& right) const {
-    return (memcmp(this->m_brokerUri, right.m_brokerUri, MAX_BROKER_URI_LENGTH * sizeof(char8_t)) == 0) &&
+    return m_interval != right.m_interval &&
+        (memcmp(this->m_brokerUri, right.m_brokerUri, MAX_BROKER_URI_LENGTH * sizeof(char8_t)) == 0) &&
         (memcmp(this->m_sn, right.m_sn, MAX_SN_LENGTH * sizeof(char8_t)) == 0) &&
         (memcmp(this->m_room, right.m_room, MAX_ROOM_LENGTH * sizeof(char8_t)) == 0);
 }
@@ -68,6 +74,7 @@ void DeviceSettingsEvent::deserialize(Deserializer& deserializer) {
     for (uint32_t i = 0U; i < MAX_ROOM_LENGTH; i++) {
         deserializer >> m_room[i];
     }
+    deserializer >> m_interval;
 }
 
 void DeviceSettingsEvent::serialize(Serializer& serializer) const {
@@ -80,6 +87,7 @@ void DeviceSettingsEvent::serialize(Serializer& serializer) const {
     for (uint32_t i = 0U; i < MAX_ROOM_LENGTH; i++) {
         serializer << m_room[i];
     }
+    serializer << m_interval;
 }
 
 void DeviceSettingsEvent::setBrokerUri(const char8_t brokerUri[MAX_BROKER_URI_LENGTH]) {
@@ -116,4 +124,12 @@ void DeviceSettingsEvent::getRoom(char8_t room[MAX_ROOM_LENGTH]) const {
     if (room != NULL) {
         memcpy(&room[0], &m_room[0], MAX_ROOM_LENGTH * sizeof(char8_t));
     }
+}
+
+void DeviceSettingsEvent::setInterval(const uint32_t interval) {
+    m_interval = interval;
+}
+
+uint32_t DeviceSettingsEvent::getInterval() const {
+    return m_interval;
 }

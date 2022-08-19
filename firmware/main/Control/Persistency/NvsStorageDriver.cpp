@@ -47,6 +47,7 @@ void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
     pDeviceParam->setBrokerUri(m_layout.brokerUri);
     pDeviceParam->setSn(m_layout.sn);
     pDeviceParam->setRoom(m_layout.room);
+    pDeviceParam->setInterval(m_layout.interval);
 }
 
 esp_err_t NvsStorageDriver::fetch() {

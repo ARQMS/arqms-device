@@ -23,7 +23,7 @@ public:
     /**
      * Custom constructor.
      */
-    DeviceSettingsEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t sn[MAX_SN_LENGTH], const char8_t room[MAX_ROOM_LENGTH]);
+    DeviceSettingsEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t sn[MAX_SN_LENGTH], const char8_t room[MAX_ROOM_LENGTH], const uint32_t interval);
 
     /**
      * Copy constructor.
@@ -97,10 +97,21 @@ public:
      */
     void getRoom(char8_t room[MAX_ROOM_LENGTH]) const;
 
+    /**
+     * Setter for interval
+     */
+    void setInterval(const uint32_t interval);
+
+    /**
+     * Getter for interval
+     */
+    uint32_t getInterval() const;
+
 private:
     char8_t m_sn[MAX_SN_LENGTH];
     char8_t m_room[MAX_ROOM_LENGTH];
     char8_t m_brokerUri[MAX_BROKER_URI_LENGTH];
+    uint32_t m_interval;
 };
 
 
