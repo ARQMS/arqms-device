@@ -10,7 +10,7 @@
 // Project includes
 #include "ConfigurationServiceIfc.h"
 #include "ConfigurationProperty.h"
-#include "ConfigurationProviderIfc.h"
+#include "Control/Persistency/KeyValueStorageIfc.h"
 
 /**
  * @see ConfigurationServiceIfc
@@ -42,7 +42,7 @@ public:
      * 
      * @param pDriver 
      */
-    static void setStorageDriver(ConfigurationProviderIfc* const pDriver) {
+    static void setStorageDriver(KeyValueStorageIfc* const pDriver) {
         s_pNvsStorageDriver = pDriver;
     }
 
@@ -111,7 +111,7 @@ private:
     static esp_err_t setPropertyValues(size_t props_count, const esp_local_ctrl_prop_t props[], const esp_local_ctrl_prop_val_t prop_values[], void *usr_ctx);
 
     // static members
-    static ConfigurationProviderIfc* s_pNvsStorageDriver;
+    static KeyValueStorageIfc* s_pNvsStorageDriver;
 };
 
 #endif // CONFIGURATION_SERVICE_H_

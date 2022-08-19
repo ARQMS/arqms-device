@@ -64,7 +64,7 @@ void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
         m_pTimeoutTimer->start();
     }
     else {
-        m_wifi.reset();
+        ESP_LOGW("CloudLinkTask", "Mode %i not supported", settings.getMode());
     }
 }
 

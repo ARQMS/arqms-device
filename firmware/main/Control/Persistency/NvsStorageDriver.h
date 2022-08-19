@@ -6,12 +6,13 @@
 
 // Project includes
 #include "StorageDriverIfc.h"
-#include "CloudLink/ConfigurationService/ConfigurationProviderIfc.h"
+#include "NvsLayout.h"
+#include "KeyValueStorageIfc.h"
 
 /**
  * This Storage Driver handles access to underlaying NVS architecture.
  */
-class NvsStorageDriver : public StorageDriverIfc, public ConfigurationProviderIfc {
+class NvsStorageDriver : public StorageDriverIfc, public KeyValueStorageIfc {
 public:
     /**
      * Constructor
@@ -31,17 +32,29 @@ public:
     esp_err_t initialize();
 
     /**
-     * @see ConfigurationProviderIfc::readConfiguration
+     * @see KeyValueStorageIfc::get
      */
-    virtual esp_err_t readConfiguration(const char8_t* name, void** data, size_t* size) override;
+    virtual bool get(const char8_t* name, void** data, size_t* const size) override;
 
     /**
-     * @see ConfigurationProviderIfc::writeConfiguration
+     * @see KeyValueStorageIfc::put
      */
-    virtual esp_err_t writeConfiguration(const char8_t* name, const void* data, const size_t size) override;
+    virtual bool put(const char8_t* name, const void* data, size_t size) override;
 
     /**
-     * @see StorageDriverIfc::readWifiConfig
+     * @see KeyValueStorageIfc::fetch
+     */
+    virtual esp_err_t fetch() override;
+
+    /**
+     * @see KeyValueStorageIfc::commit
+     */
+    virtual esp_err_t commit() override;
+
+    /**
+     * @see  StorageDriverIfc::readWifiConfig
+     * 
+     * @param pWifiParam 
      */
     virtual void readWifiConfig(WifiSettingsEvent* pWifiParam) override;
 
@@ -49,6 +62,12 @@ public:
      * @see StorageDriverIfc::readDeviceConfig
      */
     virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) override;
+    
+private:
+    // Helper Method
+    bool checkVersion();
+
+    NvsLayout m_layout;
 };
 
 
