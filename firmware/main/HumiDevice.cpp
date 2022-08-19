@@ -45,6 +45,7 @@ extern "C" void app_main(void) {
     // connect tasks
     control.GuiSettings.connect(guiUpdater);
     control.WifiSettings.connect(cloudLink);
+    control.MeasSensor.connect(measSensor);
     cloudLink.StatusEvent.connect(control);
     cloudLink.StatusEvent.connect(guiUpdater);
     measSensor.Measurement.connect(cloudLink);

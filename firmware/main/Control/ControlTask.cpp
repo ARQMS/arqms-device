@@ -72,5 +72,8 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
             event.setMode(WifiMode::AP);
             WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &event);
         }
+        else if (status.getStatus() == WifiStatus::MQTT_CONNECTED) {
+            MeasSensor.send(EventIdentifiers::SENSOR_SNAPSHOT);
+        }
     }
 }

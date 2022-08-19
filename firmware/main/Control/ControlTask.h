@@ -21,6 +21,7 @@ class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
 public:
     EventPublisherSingle GuiSettings;
     EventPublisherSingle WifiSettings;
+    EventPublisherSingle MeasSensor;
 
 public:
     /**
