@@ -1,17 +1,11 @@
 #include "CoreSM.h"
 
-#include "Events/WifiSettingsEvent.h"
-
-CoreSM::CoreSM(CoreSMIfc& sender) :
-    m_sender(sender),
+CoreSM::CoreSM() :
     m_currentState(State::BootUp),
     m_nextState(State::BootUp),
     m_isService(false),
-    m_isConnecting(false),
-    m_isConnected(false),
-    m_isConnectionLost(false),
-    m_isBooting(false),
-    m_activeWifiSettings() {
+    m_isRunning(false),
+    m_isBooting(false) {
 }
 
 CoreSM::~CoreSM() {
@@ -19,24 +13,11 @@ CoreSM::~CoreSM() {
 
 void CoreSM::onServiceMode() {
     m_isService = true;
-
-    m_activeWifiSettings = WifiSettingsEvent();
-    m_activeWifiSettings.setMode(WifiMode::AP);
-
     runStateMachine();
 }
 
-void CoreSM::onNormalMode(const WifiSettingsEvent& wifiParam, const DeviceSettingsEvent& deviceParam) {
-    m_isConnecting = true;
-
-    m_activeWifiSettings = wifiParam;
-    m_activeDeviceSettings = deviceParam;
-
-    runStateMachine();
-}
-
-void CoreSM::onConnected() {
-    m_isConnected = true;
+void CoreSM::onRunning() {
+    m_isRunning = true;
     runStateMachine();
 }
 
@@ -51,20 +32,16 @@ void CoreSM::runStateMachine(void) {
         stateChanged = false;
         switch (m_currentState) {
             case State::BootUp:
-                handleEvent(&m_isConnecting, State::Connecting);
+                handleEvent(&m_isRunning, State::Running);
                 handleEvent(&m_isService, State::Service);
                 break;
             
             case State::Service:
+                // junction to running requires restart
                 break;
 
-            case State::Connecting:
-                handleEvent(&m_isConnected, State::Idle);
-                break;
-
-            case State::Idle:
-                handleEvent(&m_isConnectionLost, State::Connecting);
-
+            case State::Running:
+                handleEvent(&m_isService, State::Service);
                 break;
 
             default:
@@ -86,26 +63,7 @@ void CoreSM::runStateMachine(void) {
 }
 
 void CoreSM::onEnterState(const State state) { 
-    switch (m_currentState) {
-        case State::Service:
-            m_sender.sendWifi(m_activeWifiSettings);
-            break;
-
-        case State::Connecting:
-            m_sender.sendWifi(m_activeWifiSettings);
-            break;
-
-        case State::Idle:
-            // TODO start sensor reading
-            // m_sender.requestSensorData();
-            ESP_LOGE("HumiDevice", "Not implemented yet!");
-
-            break;
-
-        default: 
-            // nothnig to do
-            break;
-    }
+    // do nothing
 }
 
 void CoreSM::onRunState(const State state) const { 
@@ -113,11 +71,7 @@ void CoreSM::onRunState(const State state) const {
 }
 
 void CoreSM::onLeaveState(const State state) { 
-    switch (m_currentState) {
-        default: 
-            // nothnig to do
-            break;
-    }
+    // nothnig to do
 }
 
 void CoreSM::handleEvent(bool* const pFlag, const State nextState) { 

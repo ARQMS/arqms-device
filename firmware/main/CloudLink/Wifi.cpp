@@ -101,13 +101,10 @@ void Wifi::updateDeviceSettings(const DeviceSettingsEvent& settings) {
 }
 
 void Wifi::onTimeout() {
-    if (m_wifiSm.isCurrentState(WifiStateMachine::State::AP_SERVICE_WAITING)) {
+    if (m_wifiSm.isCurrentState(WifiStateMachine::State::AP_SERVICE_WAITING)
+     || m_wifiSm.isCurrentState(WifiStateMachine::State::STA_NORMAL_CONNECTING)) {
         reset();
-        m_sender.sendWifiStatus(WifiStatus::CLIENT_TIMEOUT);
-    } 
-    else if (m_wifiSm.isCurrentState(WifiStateMachine::State::STA_NORMAL_CONNECTING)) {
-        reset();
-        m_sender.sendWifiStatus(WifiStatus::STA_TIMEOUT);
+        m_sender.sendWifiStatus(WifiStatus::TIMEOUT);
     }
 }
 

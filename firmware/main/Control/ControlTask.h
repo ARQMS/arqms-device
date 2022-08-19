@@ -11,14 +11,13 @@
 #include "Events/WifiStatusEvent.h"
 #include "Control/Persistency/StorageDriverIfc.h"
 #include "Control/CoreSM/CoreSM.h"
-#include "Control/CoreSM/CoreSMIfc.h"
 
 /**
  * This item is responsible for central logic and status of the device
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)>, CoreSMIfc {
+class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
 public:
     EventPublisherSingle GuiSettings;
     EventPublisherSingle WifiSettings;
@@ -42,11 +41,6 @@ public:
     static void setStorageDriver(StorageDriverIfc* const pDriver) {
         s_pNvsStorageDriver = pDriver;
     }
-
-    /**
-     * @see CoreSMIfc::sendWifi 
-     */
-    virtual void sendWifi(WifiSettingsEvent& wifiEvent) override;
 
 protected:
     /**

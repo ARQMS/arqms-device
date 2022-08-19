@@ -9,7 +9,7 @@ StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
 ControlTask::ControlTask() :
     GuiSettings(),
     WifiSettings(),
-    m_coreSm(*this) {
+    m_coreSm() {
 }
 
 ControlTask::~ControlTask() {
@@ -25,6 +25,13 @@ void ControlTask::onStart() {
 
     DeviceSettingsEvent deviceSettings;
     s_pNvsStorageDriver->readDeviceConfig(&deviceSettings);
+
+    if (wifiSettings.getMode() == WifiMode::AP) {
+        m_coreSm.onServiceMode();
+    } 
+    else if (wifiSettings.getMode() == WifiMode::STA) {
+        m_coreSm.onRunning();
+    }
 
     WifiSettings.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
     WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
@@ -47,20 +54,23 @@ void ControlTask::onHandleTimer(const TimerId timerId) {
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
-    if (status.getStatus() == WifiStatus::CONNECTED) {
-        m_coreSm.onConnected();
+    if (m_coreSm.isCurrentState(CoreSM::State::Service)) {
+        if (status.getStatus() == WifiStatus::TIMEOUT
+         || status.getStatus() == WifiStatus::CLIENT_DISCONNECTED) {
+            // TODO perform shutdown, seems IDF does not support shutdown, 
+            // so we must connect GPIO 1 (PCU_STATE2) as output and connect to Latch Power or 
+            // battery charger
+            esp_restart();
+        }
     }
-    else if (status.getStatus() == WifiStatus::STA_TIMEOUT) {
-        m_coreSm.onServiceMode();
-    }
-    else if (status.getStatus() == WifiStatus::CLIENT_DISCONNECTED || status.getStatus() == WifiStatus::CLIENT_TIMEOUT) {
-        // TODO perform shutdown, seems IDF does not support shutdown, 
-        // so we must connect GPIO 1 (PCU_STATE2) as output and connect to Latch Power or 
-        // battery charger
-        esp_restart();
-    }
-}
+    else if (m_coreSm.isCurrentState(CoreSM::State::Running)) {
+        if (status.getStatus() == WifiStatus::TIMEOUT
+         || status.getStatus() == WifiStatus::DISCONNECTED) {
+            m_coreSm.onServiceMode();
 
-void ControlTask::sendWifi(WifiSettingsEvent& wifiEvent) {
-    WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiEvent);
+            WifiSettingsEvent event;
+            event.setMode(WifiMode::AP);
+            WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &event);
+        }
+    }
 }

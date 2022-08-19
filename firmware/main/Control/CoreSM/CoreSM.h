@@ -5,7 +5,6 @@
 #include <HumiDevice.Platform/Platform.h>
 
 // Project include
-#include "CoreSMIfc.h"
 #include "Events/WifiSettingsEvent.h"
 #include "Events/DeviceSettingsEvent.h"
 
@@ -19,15 +18,14 @@ public:
      */
     enum class State {
         BootUp,
-        Idle,
-        Connecting,
+        Running,
         Service
     };
 
     /**
      * Constructor
      */
-    explicit CoreSM(CoreSMIfc& sender);
+    explicit CoreSM();
 
     /**
      * Destructor
@@ -46,18 +44,12 @@ public:
      * Starts service mode
      */
     void onServiceMode();
-
+    
     /**
-     * Starts standby mode
-     * @param wifiParam wifi settings
-     * @param deviceParam device settings
+     * Starts normal mode
      */
-    void onNormalMode(const WifiSettingsEvent& wifiParam, const DeviceSettingsEvent& deviceParam);
-
-    /**
-     * on idle state
-     */
-    void onConnected();
+    void onRunning();
+    
 private:
     /**
      * Deleted copy constructor.
@@ -83,21 +75,13 @@ private:
     // transitions
     void handleEvent(bool* const pFlag, const State nextState);
 
-    // Member variables
-    CoreSMIfc& m_sender;
-
     // state
     State m_currentState;
     State m_nextState;
 
     bool m_isService;
-    bool m_isConnecting;
-    bool m_isConnected;
-    bool m_isConnectionLost;
+    bool m_isRunning;
     bool m_isBooting;
-
-    WifiSettingsEvent m_activeWifiSettings;
-    DeviceSettingsEvent m_activeDeviceSettings;
 };
 
 

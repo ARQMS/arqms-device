@@ -14,7 +14,6 @@ enum class WifiStatus : uint8_t {
     CONNECTED,
     LOST,
     CONNECTING,
-    STA_TIMEOUT,
 
     // Protocol
     MQTT_CONNECTED,
@@ -27,10 +26,10 @@ enum class WifiStatus : uint8_t {
     CLIENT_SEARCHING,
     CLIENT_CONNECTED,
     CLIENT_DISCONNECTED,
-    CLIENT_TIMEOUT,
 
     // common
     DISABLED,
+    TIMEOUT,
     UNKNOWN_ERROR
 };
 
