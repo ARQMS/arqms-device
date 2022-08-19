@@ -13,6 +13,7 @@ idf_component_register(
           "Control/ControlTask.cpp"
           "Control/Persistency/NvsStorageDriver.cpp"
           "Control/Persistency/NvsLayout.cpp"
+          "Control/Persistency/NvsUtil.cpp"
           "Control/CoreSM/CoreSM.cpp"
           
           "GuiUpdater/GuiUpdaterTask.cpp"

@@ -67,10 +67,8 @@ bool NvsStorageDriver::get(const char8_t* name, void** data, size_t* const size)
         *size = sizeof(m_layout.room);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_INTERVAL)) {
-        // TODO
-        static uint32_t INTERVAL = CONFIG_DEVICE_INTERVAL;
-        *data = (void*)&INTERVAL;
-        *size = sizeof(INTERVAL);
+        *data = &m_layout.interval;
+        *size = sizeof(m_layout.interval);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_BROKER_URI)) {
         *data = m_layout.brokerUri;

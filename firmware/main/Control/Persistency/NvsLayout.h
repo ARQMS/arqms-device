@@ -18,7 +18,7 @@ typedef uint8_t NvsVersion_t;
  */
 struct NvsLayout {
 public:
-    // Change this version on each layout change!!
+    // Change this version on each layout change!! Ensure you implement a new upgrade strategy in upgrade() method
     const static NvsVersion_t LAYOUT_VERSION = 1;
     // Represents a invalid version
     const static NvsVersion_t INVALID_VERSION = 0;
@@ -67,14 +67,7 @@ public:
     char8_t sn[DeviceSettingsEvent::MAX_SN_LENGTH];
     char8_t room[DeviceSettingsEvent::MAX_ROOM_LENGTH];
     char8_t brokerUri[DeviceSettingsEvent::MAX_BROKER_URI_LENGTH];
-
-private:
-    // Helper methods
-    static void setString(const char8_t* key, const char8_t* value);
-    static void getString(const char8_t* key, char8_t* value, const size_t valueLength, const char8_t* defaultVal, const size_t defaultLength);
-
-    static void setU8(const char8_t* key, const uint8_t value);
-    static void getU8(const char8_t* key, uint8_t* value, const uint8_t defaultVal);
+    uint32_t interval;
 };
 
 
