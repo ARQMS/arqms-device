@@ -34,9 +34,6 @@ esp_err_t NvsStorageDriver::initialize() {
 void NvsStorageDriver::readWifiConfig(WifiSettingsEvent* pWifiParam) {
     if (pWifiParam == NULL) return;
 
-    // update internal data
-    m_layout.fetch();
-
     const WifiMode mode = strlen(m_layout.ssid) > 0 ? WifiMode::STA : WifiMode::AP;
 
     pWifiParam->setSsid(m_layout.ssid);
@@ -47,33 +44,33 @@ void NvsStorageDriver::readWifiConfig(WifiSettingsEvent* pWifiParam) {
 void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
     if (pDeviceParam == NULL) return;
     
-    // update internal data
-    m_layout.fetch();
-
     pDeviceParam->setBrokerUri(m_layout.brokerUri);
     pDeviceParam->setSn(m_layout.sn);
+    pDeviceParam->setRoom(m_layout.room);
 }
 
-esp_err_t NvsStorageDriver::get(const char8_t* name, void** data, size_t* size) {
-    esp_err_t err = m_layout.fetch();
-    if(err != ESP_OK){
-        return err;
-    }
+esp_err_t NvsStorageDriver::fetch() {
+    return m_layout.fetch();
+}
 
+esp_err_t NvsStorageDriver::commit() {
+    return m_layout.commit();
+}
+
+bool NvsStorageDriver::get(const char8_t* name, void** data, size_t* const size) {
     if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
         *data = m_layout.sn;
         *size = sizeof(m_layout.sn);
     }
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_ROOM)) {
-        // TODO
-        static char8_t* ROOM = CONFIG_DEVICE_ROOM;
-        *data = (void*)ROOM;
-        *size = sizeof(ROOM);
+        *data = m_layout.room;
+        *size = sizeof(m_layout.room);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_INTERVAL)) {
         // TODO
         static uint32_t INTERVAL = CONFIG_DEVICE_INTERVAL;
         *data = (void*)&INTERVAL;
+        *size = sizeof(INTERVAL);
     } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_BROKER_URI)) {
         *data = m_layout.brokerUri;
@@ -89,59 +86,45 @@ esp_err_t NvsStorageDriver::get(const char8_t* name, void** data, size_t* size) 
     }
     else {
         ESP_LOGW("NvsStorageDriver", "Configuration '%s' is not supported by NVS Storage", name);
-        return ESP_ERR_INVALID_ARG;
+        return false;
+    }
+    ESP_LOGI("NvsStorageDriver", "Get %s = %s", name, *data);
+
+    return true;
+}
+    
+bool NvsStorageDriver::put(const char8_t* name, const void* data, size_t size) {
+    void* dest = NULL;
+    size_t capacity;
+
+    if (!get(name, &dest, &capacity)) {
+        return false;
     }
 
-    return ESP_OK;
-}
+    ESP_LOGI("NvsStorageDriver", "Replace %s: %s = %s", name, dest, data);
 
-    
-esp_err_t NvsStorageDriver::put(const char8_t* name, const void* data, const size_t size) {
-    if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_SN)) {
-        // readonly, do not change serial number!
-    } 
-    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_ROOM)) {
-        // TODO 
-        ESP_LOGI("NvsStorageDriver", "Write %s:%s", name, data);
-    } 
-    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_INTERVAL)) {
-        // TODO 
-        const uint32_t interval = *(const uint32_t*)data;
-        ESP_LOGI("NvsStorageDriver", "Write %s:%i", name, interval);
-    } 
-    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_BROKER_URI)) {
-        memcpy(m_layout.brokerUri, data, size);
-    } 
-    else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_SSID)) {
-        memcpy(m_layout.ssid, data, size);
-    } 
-    else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_PASSPHRASE)) {
-        memcpy(m_layout.password, data, size);
-    } 
-    else {
-        ESP_LOGW("NvsStorageDriver", "Configuration '%s' is not supported by NVS Storage", name);
-        return ESP_ERR_INVALID_ARG;
-    } 
+    if (size > capacity) {
+        ESP_LOGW("NvsStorageDriver", "Storage Size for Property %s is not big enough (%i < %i) ", name, size, capacity);
+        size = capacity;
+    }
 
-    return m_layout.commit();
+    memcpy(dest, data, size);
+
+    return true;
 }
 
 bool NvsStorageDriver::checkVersion() {
-    m_layout.fetch();
-
     if (m_layout.version == NvsLayout::INVALID_VERSION) {
         ESP_LOGW("NvsStorageDriver", "Invalid NVS Cfg Version! Restore default values.");
 
-        m_layout.restoreDefault();
+        m_layout.reset();
         return false;
     }
     else if (m_layout.version < NvsLayout::LAYOUT_VERSION) {
         ESP_LOGW("NvsStorageDriver", "Detected unsupported NVS Cfg Version %i. Update values to new version %i", m_layout.version, NvsLayout::LAYOUT_VERSION);
+        m_layout.upgrade(m_layout.version, NvsLayout::LAYOUT_VERSION);
 
-        m_layout.version = NvsLayout::LAYOUT_VERSION;
-        // TODO update layout
-
-        return true;
+        return m_layout.commit() == ESP_OK;
     }
     else if (m_layout.version  == NvsLayout::LAYOUT_VERSION) {
         ESP_LOGI("NvsStorageDriver", "Detected NVS Cfg Version %i!", m_layout.version);
@@ -149,7 +132,7 @@ bool NvsStorageDriver::checkVersion() {
     }
     else {
         ESP_LOGE("NvsStorageDriver", "Detected unsupported NVS Cfg Version %i. Can not downgrade to Version %i", m_layout.version, NvsLayout::LAYOUT_VERSION);
-        m_layout.restoreDefault();
+        m_layout.reset();
 
         return false;
     }

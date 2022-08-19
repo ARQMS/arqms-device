@@ -10,7 +10,7 @@
 // Project includes
 #include "ConfigurationServiceIfc.h"
 #include "ConfigurationProperty.h"
-#include "KeyValueStorageIfc.h"
+#include "Control/Persistency/KeyValueStorageIfc.h"
 
 /**
  * @see ConfigurationServiceIfc

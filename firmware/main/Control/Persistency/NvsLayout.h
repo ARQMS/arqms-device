@@ -31,11 +31,20 @@ public:
     esp_err_t initialize();
 
     /**
-     * Restore default values in flash
+     * Restore default values
      * 
      * @return esp_err_t error code
      */
-    esp_err_t restoreDefault();
+    esp_err_t reset();
+
+    /**
+     * Upgrade layout to given version
+     * 
+     * @param oldVersion The old version 
+     * @param newVersion The new version
+     * @return esp_err_t error code
+     */
+    esp_err_t upgrade(const NvsVersion_t oldVersion, const NvsVersion_t newVersion);
 
     /**
      * Fetch data from NVS into variables
@@ -56,12 +65,13 @@ public:
     char8_t ssid[WifiSettingsEvent::MAX_SSID_LENGTH];
     char8_t password[WifiSettingsEvent::MAX_PWD_LENGTH];
     char8_t sn[DeviceSettingsEvent::MAX_SN_LENGTH];
+    char8_t room[DeviceSettingsEvent::MAX_ROOM_LENGTH];
     char8_t brokerUri[DeviceSettingsEvent::MAX_BROKER_URI_LENGTH];
 
 private:
     // Helper methods
     static void setString(const char8_t* key, const char8_t* value);
-    static void getString(const char8_t* key, char8_t* value, const char8_t* defaultVal, const size_t defaultLength);
+    static void getString(const char8_t* key, char8_t* value, const size_t valueLength, const char8_t* defaultVal, const size_t defaultLength);
 
     static void setU8(const char8_t* key, const uint8_t value);
     static void getU8(const char8_t* key, uint8_t* value, const uint8_t defaultVal);

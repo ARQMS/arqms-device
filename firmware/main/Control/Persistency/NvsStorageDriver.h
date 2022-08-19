@@ -7,7 +7,7 @@
 // Project includes
 #include "StorageDriverIfc.h"
 #include "NvsLayout.h"
-#include "CloudLink/ConfigurationService/KeyValueStorageIfc.h"
+#include "KeyValueStorageIfc.h"
 
 /**
  * This Storage Driver handles access to underlaying NVS architecture.
@@ -32,21 +32,24 @@ public:
     esp_err_t initialize();
 
     /**
-     * Restore default values in flash
-     * 
-     * @return esp_err_t error code
-     */
-    esp_err_t restoreDefault();
-
-    /**
      * @see KeyValueStorageIfc::get
      */
-    virtual esp_err_t get(const char8_t* name, void** data, size_t* size) override;
+    virtual bool get(const char8_t* name, void** data, size_t* const size) override;
 
     /**
      * @see KeyValueStorageIfc::put
      */
-    virtual esp_err_t put(const char8_t* name, const void* data, const size_t size) override;
+    virtual bool put(const char8_t* name, const void* data, size_t size) override;
+
+    /**
+     * @see KeyValueStorageIfc::fetch
+     */
+    virtual esp_err_t fetch() override;
+
+    /**
+     * @see KeyValueStorageIfc::commit
+     */
+    virtual esp_err_t commit() override;
 
     /**
      * @see  StorageDriverIfc::readWifiConfig
