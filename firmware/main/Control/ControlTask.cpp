@@ -37,6 +37,12 @@ void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             onHandleWifiStatus(msg);
         }
         break;
+        
+        case EventIdentifiers::BATTERY_LEVEL_EVENT:{
+            BatteryStatusEvent msg(*pEvent);
+            onHandleBatteryStatus(msg);
+        }
+        break;
     default:
         break;
     }
@@ -59,6 +65,10 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
         // battery charger
         esp_restart();
     }
+}
+
+void ControlTask::onHandleBatteryStatus(const BatteryStatusEvent& status){
+    ESP_LOGI("Control Task", "Handle Battery Status Event");
 }
 
 void ControlTask::sendWifi(WifiSettingsEvent& wifiEvent) {

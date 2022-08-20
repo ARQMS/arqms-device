@@ -5,6 +5,7 @@ idf_component_register(
           "Events/WifiSettingsEvent.cpp"
           "Events/DeviceSettingsEvent.cpp"
           "Events/SensorDataEvent.cpp"
+          "Events/BatteryStatusEvent.cpp"
 
           "HumiDevice.cpp"
           "Drivers/StartupController.cpp"
@@ -24,7 +25,9 @@ idf_component_register(
           "CloudLink/WifiStateMachine.cpp"
           "CloudLink/ConfigurationService/ConfigurationService.cpp"
           "CloudLink/MqttService/MqttService.cpp"
+
+          "PowerManagement/PowerManagementTask.cpp"
      INCLUDE_DIRS "."
-     REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform esp_local_ctrl mdns mqtt
+     REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform esp_local_ctrl mdns mqtt 
      EMBED_TXTFILES "../certs/cacert.pem" "../certs/prvtkey.pem"
 )

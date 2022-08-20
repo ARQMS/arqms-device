@@ -9,6 +9,7 @@
 
 // Project includes
 #include "Events/WifiStatusEvent.h"
+#include "Events/BatteryStatusEvent.h"
 #include "Control/Persistency/StorageDriverIfc.h"
 #include "Control/CoreSM/CoreSM.h"
 #include "Control/CoreSM/CoreSMIfc.h"
@@ -68,6 +69,7 @@ protected:
 private:
     // Helper methods
     void onHandleWifiStatus(const WifiStatusEvent& status);
+    void onHandleBatteryStatus(const BatteryStatusEvent& status);
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
