@@ -7,8 +7,10 @@ idf_component_register(
           "Events/SensorDataEvent.cpp"
 
           "HumiDevice.cpp"
+          "Drivers/ApplicationHardwareConfig.cpp"
           "Drivers/StartupController.cpp"
           "Drivers/SK6805Driver.cpp"
+          "Drivers/BME680Driver.cpp"
 
           "Control/ControlTask.cpp"
           "Control/Persistency/NvsStorageDriver.cpp"

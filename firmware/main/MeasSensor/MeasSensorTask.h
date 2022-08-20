@@ -9,6 +9,7 @@
 
 // Project includes
 #include "Events/WifiStatusEvent.h"
+#include "Drivers/BME680Driver.h"
 
 /**
  * This item is responsible for sensor measurements (opt. sensor calibration)
@@ -60,6 +61,9 @@ private:
      * Provide the private assignment operator so the compiler does not generate the default one.
      */
     MeasSensorTask& operator=(const MeasSensorTask& other);
+
+    // Members
+    BME680Driver m_bme680Driver;
 };
 
 

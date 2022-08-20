@@ -1,16 +1,18 @@
 #include "MeasSensorTask.h"
 
+#include "Drivers/ApplicationHardwareConfig.h"
 #include "Events/EventIdentifiers.h"
 #include "Events/SensorDataEvent.h"
     
-MeasSensorTask::MeasSensorTask() {
+MeasSensorTask::MeasSensorTask() :
+    m_bme680Driver() {
 }
 
 MeasSensorTask::~MeasSensorTask() {
 }
 
 void MeasSensorTask::onInitialize() {
-    // TODO initialize BME680 Driver
+    m_bme680Driver.initialzie(s_pSpi);
 }
 
 void MeasSensorTask::onStart() {
