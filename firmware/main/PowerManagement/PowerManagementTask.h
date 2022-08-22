@@ -9,6 +9,7 @@
 
 // Project includes
 #include "Events/BatteryStatusEvent.h"
+#include "Drivers/ADC.h"
 
 /**
  * This unit reads the Batteries Level
@@ -64,6 +65,7 @@ private:
 
     // Private Members
     Timer* m_pRefreshTimer;
+    ADC m_adc;
 };
 
 #endif // POWER_MANAGEMENT_TASK_H_

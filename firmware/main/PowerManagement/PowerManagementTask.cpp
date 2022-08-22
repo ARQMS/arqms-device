@@ -12,6 +12,7 @@ PowerManagementTask::~PowerManagementTask(){
 
 void PowerManagementTask::onInitialize(){
     m_pRefreshTimer = createPeriodicTimer(REFRESH_RATE);
+    m_adc.initialize();
 }
 
 void PowerManagementTask::onStart(){
@@ -23,6 +24,7 @@ void PowerManagementTask::onHandleEvent(EventId eventId, Deserializer* pEvent){
 }
 
 void PowerManagementTask::onHandleTimer(const TimerId timerId){
-    BatteryStatusEvent status(100);
+    int value = m_adc.readADC();
+    BatteryStatusEvent status(value);
     Control.send(EventIdentifiers::BATTERY_LEVEL_EVENT, &status);
 }
