@@ -16,7 +16,7 @@ BME680Driver::BME680Driver() :
 BME680Driver::~BME680Driver() {
 }
 
-/*
+
 struct bme68x_dev bme;
 int8_t rslt;
 struct bme68x_conf conf;
@@ -25,10 +25,42 @@ struct bme68x_data data;
 uint32_t del_period;
 uint8_t n_fields;
 uint16_t sample_count = 1;
-uint8_t rxBuffer[SPI_MAX_DMA_LEN];
-*/
 
-/*
+
+BME68X_INTF_RET_TYPE bme68x_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr) {
+    uint8_t rxBuffer[len+1];
+    uint8_t txBuffer[len+1];
+
+    txBuffer[0] = reg_addr;
+
+    spi_transaction_t transaction = {0};
+    transaction.tx_buffer = txBuffer;
+    transaction.rx_buffer = rxBuffer;
+    transaction.length = (len + 1) * 8;
+
+    spi_device_polling_transmit(s_pSpi, &transaction);
+
+    memcpy(reg_data, &rxBuffer[1], len);
+
+    return BME68X_OK;
+}
+
+BME68X_INTF_RET_TYPE bme68x_spi_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, void *intf_ptr) {
+    uint8_t txBuffer[len+1];
+
+    txBuffer[0] = reg_addr;
+    memcpy(&txBuffer[1], reg_data, len);
+
+    spi_transaction_t transaction = {0};
+    transaction.flags = SPI_TRANS_USE_RXDATA;
+    transaction.tx_buffer = txBuffer;
+    transaction.length = (len + 1) * 8;
+    
+    spi_device_polling_transmit(s_pSpi, &transaction);
+
+    return BME68X_OK;
+}
+
 void bme68x_delay_us(uint32_t period, void *intf_ptr) {
         vTaskDelay(period / 1000 / portTICK_PERIOD_MS );
 }
@@ -66,9 +98,6 @@ void bme68x_check_rslt(const char api_name[], int8_t rslt) {
 int8_t bme68x_interface_init(struct bme68x_dev *bme, uint8_t intf) {
     int8_t rslt = BME68X_OK;
     
-    // rxBuffer = static_cast<uint8_t*>(heap_caps_malloc(SPI_MAX_DMA_LEN, MALLOC_CAP_DMA));
-    memset(rxBuffer,0, SPI_MAX_DMA_LEN);
-
     printf("SPI Interface\n");
     bme->read = bme68x_spi_read;
     bme->write = bme68x_spi_write;
@@ -80,56 +109,10 @@ int8_t bme68x_interface_init(struct bme68x_dev *bme, uint8_t intf) {
     return rslt;
 }
 
-*/
 
-BME68X_INTF_RET_TYPE bme68x_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr) {
-    spi_transaction_t transaction = {0};
-    transaction.tx_data[0] = 0x80 | reg_addr;
-    transaction.flags = SPI_TRANS_USE_TXDATA;
-    transaction.length = (len+1)*8;
-
-    // if (len > 1) {
-    //     transaction.rx_buffer = rxBuffer;
-    //     spi_device_polling_transmit(s_pSpi, &transaction);
-    //     memcpy(reg_data, &rxBuffer[1], len);
-
-    //     // printf("Stream %i bits\n", transaction.length);
-    //     // for (int i = 0; i < len; i++) {
-    //     //     printf("\t%i - Reg:0x%X, Val:0x%X\n", i, reg_addr+i, reg_data[i]);
-    //     // }
-    // } else {
-        transaction.flags = SPI_TRANS_USE_TXDATA | SPI_TRANS_USE_RXDATA;
-        spi_device_polling_transmit(s_pSpi, &transaction);
-        *reg_data = *(uint8_t*)&transaction.rx_data[1];
-
-        ESP_LOGI("BME680", "Read Reg:0x%X (0x%X), Val:0x%X", reg_addr, transaction.tx_data[0], reg_data[0]);
-        // for (int i = 0; i < 4;i++) {
-        //     printf("\t%i - 0x%X (%x)", i, *(uint8_t*)&transaction.rx_data[i], *&transaction.rx_data[i]);
-        // }
-        // printf("\n");
-    // }
-
-    return BME68X_OK;
-}
-
-BME68X_INTF_RET_TYPE bme68x_spi_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, void *intf_ptr) {
-    for (int i = 0; i < len; i++) {
-        spi_transaction_t transaction = {0};
-        transaction.flags = SPI_TRANS_USE_TXDATA | SPI_TRANS_USE_RXDATA;
-        transaction.tx_data[0] = (reg_addr + i) & 0x7F;
-        transaction.tx_data[1] = reg_data[i];
-        transaction.length = 16;
-
-        ESP_LOGI("Driver", "set 0x%X = 0x%X", transaction.tx_data[0], transaction.tx_data[1]);
-
-        spi_device_polling_transmit(s_pSpi, &transaction);
-    }
-
-    return BME68X_OK;
-}
 
 void BME680Driver::initialzie(spi_device_handle_t pSpi) {
-    m_pSpi = pSpi;
+    /*m_pSpi = pSpi;
 
     reset();
 
@@ -194,22 +177,21 @@ void BME680Driver::initialzie(spi_device_handle_t pSpi) {
     ctrlGas1().np_conv = BME680Registers::HEATER_PROFILE_SP_0;
     ctrlGas1().run_gas = true;
     writeRegister(ctrlGas1);
-    //readTemp();
-/*
+    //readTemp();*/
+
     rslt = bme68x_interface_init(&bme, BME68X_SPI_INTF);
     bme68x_check_rslt("bme68x_interface_init", rslt);
 
-    uint8_t data[128];
-    bme68x_spi_read(0xe1, data, 14, NULL);
+    rslt = bme68x_init(&bme);
+    bme68x_check_rslt("bme68x_init", rslt);
 
-    // rslt = bme68x_init(&bme);
-    //bme68x_check_rslt("bme68x_init", rslt);
+    ESP_LOGI("BME680", "par_t1: %i, par_t2: %i, par_t3: %i", bme.calib.par_t1,  bme.calib.par_t2,  bme.calib.par_t3);
 
     // Check if rslt == BME68X_OK, report or handle if otherwise
     conf.filter = BME68X_FILTER_OFF;
     conf.odr = BME68X_ODR_NONE;
-    conf.os_hum = BME68X_OS_1X;
-    conf.os_pres = BME68X_OS_1X;
+    conf.os_hum = BME68X_OS_NONE;
+    conf.os_pres = BME68X_OS_NONE;
     conf.os_temp = BME68X_OS_2X;
     rslt = bme68x_set_conf(&conf, &bme);
     bme68x_check_rslt("bme68x_set_conf", rslt);
@@ -221,16 +203,16 @@ void BME680Driver::initialzie(spi_device_handle_t pSpi) {
     rslt = bme68x_set_heatr_conf(BME68X_FORCED_MODE, &heatr_conf, &bme);
     bme68x_check_rslt("bme68x_set_heatr_conf", rslt);
 
-    printf("Sample, Temperature(deg C), Pressure(Pa), Humidity(%%), Gas resistance(ohm), Status\n");*/
+    printf("Sample, Temperature(deg C), Pressure(Pa), Humidity(%%), Gas resistance(ohm), Status\n");
 }
 
-void BME680Driver::readTemp() {
+void BME680Driver::readTemp() {/*
     BME680Registers::Ctrl_meas ctrlMeas;
     readRegister(ctrlMeas);
     ctrlMeas().mode = BME680Registers::FORCED_MODE;
     writeRegister(ctrlMeas);
 
-/*
+
     vTaskDelay(1000/ portTICK_PERIOD_MS);
     setMemPage(0x00);
     for (int i = 0x00; i < 0x80; i++) {
@@ -243,7 +225,7 @@ void BME680Driver::readTemp() {
         uint8_t value = 0;
         bme68x_spi_read(i, &value, 1, NULL);
     }
-*/
+
     vTaskDelay(5000/ portTICK_PERIOD_MS);
 
     // // read data
@@ -261,12 +243,9 @@ void BME680Driver::readTemp() {
     float32_t temp_comp = t_fine / 5120.f;
 
     ESP_LOGI("BME680", "Temperatur %f (comp: %f)", t_fine, temp_comp);
-
-/*
+*/
     rslt = bme68x_set_op_mode(BME68X_FORCED_MODE, &bme);
     bme68x_check_rslt("bme68x_set_op_mode", rslt);
-
-    // vTaskDelay(200/ portTICK_PERIOD_MS);
 
     // Calculate delay period in microseconds
     del_period = bme68x_get_meas_dur(BME68X_FORCED_MODE, &conf, &bme) + (heatr_conf.heatr_dur * 1000);
@@ -287,7 +266,7 @@ void BME680Driver::readTemp() {
             data.gas_index,
             data.meas_index);
 
-    vTaskDelay(2000/ portTICK_PERIOD_MS);*/
+    vTaskDelay(2000/ portTICK_PERIOD_MS);
 }
 
 void BME680Driver::reset() {
