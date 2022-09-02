@@ -29,6 +29,8 @@ public:
      */
     void initialzie(spi_device_handle_t pSpi);
 
+    void readTemp();
+
     /**
      * Resets the hardware
      */
@@ -49,6 +51,10 @@ private:
     spi_device_handle_t m_pSpi;
     uint8_t m_chipId;
     BME680Registers::Status m_status;
+
+    uint16_t par_t1;
+    int16_t par_t2;
+    int8_t par_t3;
 };
 
 #endif // BME680DRIVER_H_

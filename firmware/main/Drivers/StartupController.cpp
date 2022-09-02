@@ -58,8 +58,8 @@ void StartupController::initializeSpi1() {
     spi_device_interface_config_t spiDevCfg = {
         .command_bits    = 0,
         .address_bits    = 0,
-        .mode            = 3,                                       // Datasheet [0] page 40
-        .clock_speed_hz  = SPI_MASTER_FREQ_10M,                     // Datasheet [0] page 3
+        .mode            = 0,                                       // Datasheet [0] page 40
+        .clock_speed_hz  = SPI_MASTER_FREQ_1M,                      // Datasheet [0] page 3
         .spics_io_num    = static_cast<int32_t>(BME680_SPI_SS),
         .queue_size      = 7
     };

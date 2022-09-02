@@ -11,6 +11,7 @@ idf_component_register(
           "Drivers/StartupController.cpp"
           "Drivers/SK6805Driver.cpp"
           "Drivers/BME680Driver.cpp"
+          "Drivers/bme68x.c"
 
           "Control/ControlTask.cpp"
           "Control/Persistency/NvsStorageDriver.cpp"

@@ -22,7 +22,7 @@ private:
     union CtrlMeasRegister {
         BitField<0, 2> mode;
         BitField<2, 3> osrs_p;
-        BitField<4, 3> osrs_t;
+        BitField<5, 3> osrs_t;
     };
 
     union CtrlHumRegister {
@@ -62,55 +62,55 @@ private:
     };
 
 public:
-    typedef Register<0x73, 8, StatusRegister> Status;
+    typedef Register<0xF3, 8, StatusRegister> Status;
     typedef Register<0x60, 8, uint8_t> Reset;
-    typedef Register<0xD0, 8, uint8_t> Id;
-    typedef Register<0x75, 8, ConfigRegister> Config;
-    typedef Register<0x74, 8, CtrlMeasRegister> Ctrl_meas;
-    typedef Register<0x72, 8, CtrlHumRegister> Ctrl_hum;
-    typedef Register<0x71, 8, CtrlGas1Register> Ctrl_gas_1;
-    typedef Register<0x70, 8, CtrlGas0Register> Ctrl_gas_0;
-    typedef Register<0x64, 8, uint8_t> Gas_wait_0;
-    typedef Register<0x65, 8, uint8_t> Gas_wait_1;
-    typedef Register<0x66, 8, uint8_t> Gas_wait_2;
-    typedef Register<0x67, 8, uint8_t> Gas_wait_3;
-    typedef Register<0x68, 8, uint8_t> Gas_wait_4;
-    typedef Register<0x69, 8, uint8_t> Gas_wait_5;
-    typedef Register<0x6A, 8, uint8_t> Gas_wait_6;
-    typedef Register<0x6B, 8, uint8_t> Gas_wait_7;
-    typedef Register<0x6C, 8, uint8_t> Gas_wait_8;
-    typedef Register<0x6D, 8, uint8_t> Gas_wait_9;
-    typedef Register<0x5A, 8, uint8_t> Res_heat_0;
-    typedef Register<0x5B, 8, uint8_t> Res_heat_1;
-    typedef Register<0x5C, 8, uint8_t> Res_heat_2;
-    typedef Register<0x5D, 8, uint8_t> Res_heat_3;
-    typedef Register<0x5E, 8, uint8_t> Res_heat_4;
-    typedef Register<0x5F, 8, uint8_t> Res_heat_5;
-    typedef Register<0x60, 8, uint8_t> Res_heat_6;
-    typedef Register<0x61, 8, uint8_t> Res_heat_7;
-    typedef Register<0x62, 8, uint8_t> Res_heat_8;
-    typedef Register<0x63, 8, uint8_t> Res_heat_9;
-    typedef Register<0x50, 8, uint8_t> Idac_heat_0;
-    typedef Register<0x51, 8, uint8_t> Idac_heat_1;
-    typedef Register<0x52, 8, uint8_t> Idac_heat_2;
-    typedef Register<0x53, 8, uint8_t> Idac_heat_3;
-    typedef Register<0x54, 8, uint8_t> Idac_heat_4;
-    typedef Register<0x55, 8, uint8_t> Idac_heat_5;
-    typedef Register<0x56, 8, uint8_t> Idac_heat_6;
-    typedef Register<0x57, 8, uint8_t> Idac_heat_7;
-    typedef Register<0x58, 8, uint8_t> Idac_heat_8;
-    typedef Register<0x59, 8, uint8_t> Idac_heat_9;
-    typedef Register<0x2B, 8, GasRLsbRegister> Gas_r_lsb;
-    typedef Register<0x2A, 8, uint8_t> Gas_r_msb;
-    typedef Register<0x26, 8, uint8_t> Hum_lsb;
-    typedef Register<0x25, 8, uint8_t> Hum_msb;
-    typedef Register<0x24, 8, TempXlsbRegister> Temp_xlsb;
-    typedef Register<0x23, 8, uint8_t> Temp_lsb;
-    typedef Register<0x22, 8, uint8_t> Temp_msb;
-    typedef Register<0x21, 8, PreasXlsbRegister> Press_xlsb;
-    typedef Register<0x20, 8, uint8_t> Press_lsb;
-    typedef Register<0x1F, 8, uint8_t> Press_msb;
-    typedef Register<0x1D, 8, EasStatus0Register> Eas_status_0;
+    typedef Register<0x50, 8, uint8_t> Id;
+    typedef Register<0xF5, 8, ConfigRegister> Config;
+    typedef Register<0xF4, 8, CtrlMeasRegister> Ctrl_meas;
+    typedef Register<0xF2, 8, CtrlHumRegister> Ctrl_hum;
+    typedef Register<0xF1, 8, CtrlGas1Register> Ctrl_gas_1;
+    typedef Register<0xF0, 8, CtrlGas0Register> Ctrl_gas_0;
+    typedef Register<0xE4, 8, uint8_t> Gas_wait_0;
+    typedef Register<0xE5, 8, uint8_t> Gas_wait_1;
+    typedef Register<0xE6, 8, uint8_t> Gas_wait_2;
+    typedef Register<0xE7, 8, uint8_t> Gas_wait_3;
+    typedef Register<0xE8, 8, uint8_t> Gas_wait_4;
+    typedef Register<0xE9, 8, uint8_t> Gas_wait_5;
+    typedef Register<0xEA, 8, uint8_t> Gas_wait_6;
+    typedef Register<0xEB, 8, uint8_t> Gas_wait_7;
+    typedef Register<0xEC, 8, uint8_t> Gas_wait_8;
+    typedef Register<0xED, 8, uint8_t> Gas_wait_9;
+    typedef Register<0xDA, 8, uint8_t> Res_heat_0;
+    typedef Register<0xDB, 8, uint8_t> Res_heat_1;
+    typedef Register<0xDC, 8, uint8_t> Res_heat_2;
+    typedef Register<0xDD, 8, uint8_t> Res_heat_3;
+    typedef Register<0xDE, 8, uint8_t> Res_heat_4;
+    typedef Register<0xDF, 8, uint8_t> Res_heat_5;
+    typedef Register<0xE0, 8, uint8_t> Res_heat_6;
+    typedef Register<0xE1, 8, uint8_t> Res_heat_7;
+    typedef Register<0xE2, 8, uint8_t> Res_heat_8;
+    typedef Register<0xE3, 8, uint8_t> Res_heat_9;
+    typedef Register<0xD0, 8, uint8_t> Idac_heat_0;
+    typedef Register<0xD1, 8, uint8_t> Idac_heat_1;
+    typedef Register<0xD2, 8, uint8_t> Idac_heat_2;
+    typedef Register<0xD3, 8, uint8_t> Idac_heat_3;
+    typedef Register<0xD4, 8, uint8_t> Idac_heat_4;
+    typedef Register<0xD5, 8, uint8_t> Idac_heat_5;
+    typedef Register<0xD6, 8, uint8_t> Idac_heat_6;
+    typedef Register<0xD7, 8, uint8_t> Idac_heat_7;
+    typedef Register<0xD8, 8, uint8_t> Idac_heat_8;
+    typedef Register<0xD9, 8, uint8_t> Idac_heat_9;
+    typedef Register<0xAB, 8, GasRLsbRegister> Gas_r_lsb;
+    typedef Register<0xAA, 8, uint8_t> Gas_r_msb;
+    typedef Register<0xA6, 8, uint8_t> Hum_lsb;
+    typedef Register<0xA5, 8, uint8_t> Hum_msb;
+    typedef Register<0xA4, 8, TempXlsbRegister> Temp_xlsb;
+    typedef Register<0xA3, 8, uint8_t> Temp_lsb;
+    typedef Register<0xA2, 8, uint8_t> Temp_msb;
+    typedef Register<0xA1, 8, PreasXlsbRegister> Press_xlsb;
+    typedef Register<0xA0, 8, uint8_t> Press_lsb;
+    typedef Register<0x9F, 8, uint8_t> Press_msb;
+    typedef Register<0x9D, 8, EasStatus0Register> Eas_status_0;
 
     // factory calibration values. Datasheet page 18
     typedef Register<0xE9, 8, uint8_t> Par_t1_lsb;
@@ -118,7 +118,6 @@ public:
     typedef Register<0x8A, 8, uint8_t> Par_t2_lsb;
     typedef Register<0x8B, 8, uint8_t> Par_t2_msb;
     typedef Register<0x8C, 8, uint8_t> Par_t3;
-
 
     // unique chip identifier
     static const uint8_t BME680_ID = 0x61; 

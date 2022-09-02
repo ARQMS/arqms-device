@@ -20,6 +20,7 @@ static const gpio_num_t LED_WLAN        = GPIO_NUM_2;
 extern spi_device_handle_t s_pSpi;
 
 #define BME680_SPI_BUS SPI2_HOST
+#define SPI_MASTER_FREQ_1M      (APB_CLK_FREQ/80)
 static const gpio_num_t BME680_SPI_SCK  = GPIO_NUM_4;
 static const gpio_num_t BME680_SPI_SS   = GPIO_NUM_7;
 static const gpio_num_t BME680_SPI_MOSI = GPIO_NUM_6;
