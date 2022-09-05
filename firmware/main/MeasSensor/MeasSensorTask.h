@@ -1,5 +1,5 @@
-#ifndef CONTROL_TASK_H_ 
-#define CONTROL_TASK_H_
+#ifndef MEAS_SENSOR_TASK_H_ 
+#define MEAS_SENSOR_TASK_H_
 
 // Platform
 #include <HumiDevice.Platform/Platform.h>
@@ -9,40 +9,27 @@
 
 // Project includes
 #include "Events/WifiStatusEvent.h"
-#include "Control/Persistency/StorageDriverIfc.h"
-#include "Control/CoreSM/CoreSM.h"
 
 /**
- * This item is responsible for central logic and status of the device
+ * This item is responsible for sensor measurements (opt. sensor calibration)
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
+class MeasSensorTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
 public:
-    EventPublisherSingle GuiSettings;
-    EventPublisherSingle WifiSettings;
-    EventPublisherSingle MeasSensor;
+    EventPublisherSingle Measurement;
 
 public:
     /**
      * Constructor
      */
-    ControlTask();
+    MeasSensorTask();
 
     /**
      * Destructor
      */
-    virtual ~ControlTask();
+    virtual ~MeasSensorTask();
     
-    /**
-     * @brief Set the Storage Driver object
-     * 
-     * @param pDriver 
-     */
-    static void setStorageDriver(StorageDriverIfc* const pDriver) {
-        s_pNvsStorageDriver = pDriver;
-    }
-
 protected:
     /**
      * @see TaskBase::onInitialize()
@@ -62,22 +49,18 @@ protected:
 
 private:
     // Helper methods
-    void onHandleWifiStatus(const WifiStatusEvent& status);
+    void onHandleSnapshot();
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
      */
-    ControlTask(const ControlTask& other);
+    MeasSensorTask(const MeasSensorTask& other);
 
     /**
      * Provide the private assignment operator so the compiler does not generate the default one.
      */
-    ControlTask& operator=(const ControlTask& other);
-
-    // Members
-    static StorageDriverIfc* s_pNvsStorageDriver;
-    CoreSM m_coreSm;
+    MeasSensorTask& operator=(const MeasSensorTask& other);
 };
 
 
-#endif // CONTROL_TASK_H_
+#endif // MEAS_SENSOR_TASK_H_

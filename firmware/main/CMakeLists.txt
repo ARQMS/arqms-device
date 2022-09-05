@@ -24,6 +24,8 @@ idf_component_register(
           "CloudLink/WifiStateMachine.cpp"
           "CloudLink/ConfigurationService/ConfigurationService.cpp"
           "CloudLink/MqttService/MqttService.cpp"
+
+          "MeasSensor/MeasSensorTask.cpp"
      INCLUDE_DIRS "."
      REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform esp_local_ctrl mdns mqtt
      EMBED_TXTFILES "../certs/cacert.pem" "../certs/prvtkey.pem"

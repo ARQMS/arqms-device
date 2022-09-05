@@ -24,7 +24,7 @@ esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
        .client_id = sn
     };
 
-    // register possible placeholders, just ensure MqttUtil::NUM_PLACEHOLDER matches!
+    // register possible placeholders, just ensure MqttUtil::NUM_PLACEHOLDER matches and length is not longer than MqttUtil::MAX_PLACEHOLDER_LENGTH
     MqttUtil::registerPlaceholder("$sn", sn);
     MqttUtil::registerPlaceholder("$channel", "dev");
 

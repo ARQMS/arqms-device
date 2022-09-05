@@ -9,7 +9,8 @@
 #include <string>
 
 // The number of supports placeholders
-#define NUM_PLACEHOLDER 2
+#define NUM_PLACEHOLDER 3
+#define MAX_PLACEHOLDER_LENGTH 32
 
 /**
  * Qos state for events
@@ -31,11 +32,11 @@ public:
      * @param name the placeholder name
      * @param value the placeholder value
      */
-    static void registerPlaceholder(const char8_t name[32], const char8_t value[32]) {
+    static void registerPlaceholder(const char8_t name[MAX_PLACEHOLDER_LENGTH], const char8_t value[MAX_PLACEHOLDER_LENGTH]) {
         assert(s_placeholderIndex < NUM_PLACEHOLDER);
 
-        strncpy(s_placeholderName[s_placeholderIndex], name, 32);
-        strncpy(s_placeholderValue[s_placeholderIndex], value, 32);
+        strncpy(s_placeholderName[s_placeholderIndex], name, MAX_PLACEHOLDER_LENGTH);
+        strncpy(s_placeholderValue[s_placeholderIndex], value, MAX_PLACEHOLDER_LENGTH);
 
         s_placeholderIndex++;
     }
@@ -112,12 +113,12 @@ private:
     ~MqttUtil();
 
     static size_t s_placeholderIndex;
-    static char8_t s_placeholderName[NUM_PLACEHOLDER][32];
-    static char8_t s_placeholderValue[NUM_PLACEHOLDER][32];
+    static char8_t s_placeholderName[NUM_PLACEHOLDER][MAX_PLACEHOLDER_LENGTH];
+    static char8_t s_placeholderValue[NUM_PLACEHOLDER][MAX_PLACEHOLDER_LENGTH];
 };
 
 size_t MqttUtil::s_placeholderIndex = 0;
-char8_t MqttUtil::s_placeholderName[NUM_PLACEHOLDER][32] = {0};
-char8_t MqttUtil::s_placeholderValue[NUM_PLACEHOLDER][32] = {0};
+char8_t MqttUtil::s_placeholderName[NUM_PLACEHOLDER][MAX_PLACEHOLDER_LENGTH] = {0};
+char8_t MqttUtil::s_placeholderValue[NUM_PLACEHOLDER][MAX_PLACEHOLDER_LENGTH] = {0};
 
 #endif // MQTT_UTIL_H_

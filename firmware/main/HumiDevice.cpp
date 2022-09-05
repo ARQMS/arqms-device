@@ -12,10 +12,12 @@
 #include "Control/ControlTask.h"
 #include "GuiUpdater/GuiUpdaterTask.h"
 #include "CloudLink/CloudLinkTask.h"
+#include "MeasSensor/MeasSensorTask.h"
 
 // Create task definitions
 CREATE_TASK_DEF(Control, 0x8000, 10) // 4kB Stack
 CREATE_TASK_DEF(GuiUpdater, 0x800, 10) // 2kB Stack
+CREATE_TASK_DEF(MeasSensor, 0x800, 10) // 2kB Stack
 CREATE_TASK_DEF(CloudLink, 0x8000, 11) // 4kB Stack
 
 /**
@@ -38,16 +40,20 @@ extern "C" void app_main(void) {
     ControlTask& control = *createControlTask();
     GuiUpdaterTask& guiUpdater = *createGuiUpdaterTask();
     CloudLinkTask& cloudLink = *createCloudLinkTask();
+    MeasSensorTask& measSensor = *createMeasSensorTask();
 
     // connect tasks
     control.GuiSettings.connect(guiUpdater);
     control.WifiSettings.connect(cloudLink);
+    control.MeasSensor.connect(measSensor);
     cloudLink.StatusEvent.connect(control);
     cloudLink.StatusEvent.connect(guiUpdater);
+    measSensor.Measurement.connect(cloudLink);
 
     // start tasks
     startGuiUpdaterTask();
     startControlTask();
     startCloudLinkTask();
+    startMeasSensorTask();
 }
 
