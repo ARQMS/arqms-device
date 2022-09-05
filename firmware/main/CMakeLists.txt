@@ -7,7 +7,9 @@ idf_component_register(
           "Events/SensorDataEvent.cpp"
 
           "HumiDevice.cpp"
+          "Drivers/ApplicationHardwareConfig.cpp"
           "Drivers/StartupController.cpp"
+          "Drivers/BME680Driver.cpp"
           "Drivers/SK6805Driver.cpp"
 
           "Control/ControlTask.cpp"
@@ -27,6 +29,6 @@ idf_component_register(
 
           "MeasSensor/MeasSensorTask.cpp"
      INCLUDE_DIRS "."
-     REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform esp_local_ctrl mdns mqtt
+     REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform Bosch68x.Api esp_local_ctrl mdns mqtt
      EMBED_TXTFILES "../certs/cacert.pem" "../certs/prvtkey.pem"
 )

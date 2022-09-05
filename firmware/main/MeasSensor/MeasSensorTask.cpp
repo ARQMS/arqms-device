@@ -3,17 +3,28 @@
 #include "Events/EventIdentifiers.h"
 #include "Events/SensorDataEvent.h"
     
-MeasSensorTask::MeasSensorTask() {
+MeasSensorTask::MeasSensorTask() : 
+    m_bosch680Sensor(),
+    m_pWaitDataTimer(NULL) {
 }
 
 MeasSensorTask::~MeasSensorTask() {
 }
 
 void MeasSensorTask::onInitialize() {
-    // TODO initialize BME680 Driver
+    m_bosch680Sensor.initialize();
+
+    // m_pWaitDataTimer = createOneShotTimer(m_bosch680Sensor.getWaitForNewDataMs());
+    m_pWaitDataTimer = createOneShotTimer(5000);
 }
 
 void MeasSensorTask::onStart() {
+    if (!m_bosch680Sensor.selfCheck()) {
+        // TODO send sensor error to ControlTask! TBD what happen when ControlTask receives sensor error
+        //  - Do not read sensor values
+        //  - Notify UI
+        //  - Notify CloudLink
+    }
 }
 
 void MeasSensorTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
@@ -28,22 +39,23 @@ void MeasSensorTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
 }
 
 void MeasSensorTask::onHandleTimer(const TimerId timerId) {
-    // nothing to do
+    if (timerId == m_pWaitDataTimer->id) {
+        onHandleDataAvailable();
+    }
 }
 
 void MeasSensorTask::onHandleSnapshot() {
-    // TODO request data from BME680
+    m_bosch680Sensor.startSnapshot();
+    m_pWaitDataTimer->start();
+}
 
-    // TODO send data to Measurement
+void MeasSensorTask::onHandleDataAvailable() {
     SensorDataEvent event;
-    event.setCo2(0.04f);
-    event.setPressure(1024.0f);
-    event.setRelativeHumidity(0.25f);
-    event.setTemperature(24.4f);
-    event.setVoc(98.4f);
+    m_bosch680Sensor.getData(event);
 
-    for (int i = 0; i < 5; i++) {
-        Measurement.send(EventIdentifiers::SENSOR_DATA_EVENT, &event);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
+    Measurement.send(EventIdentifiers::SENSOR_DATA_EVENT, &event);
+
+    // TODO remove demo
+    onHandleSnapshot();
+
 }
