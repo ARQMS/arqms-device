@@ -1,6 +1,7 @@
 #include "MqttService.h"
 
 #include "MqttUtil.h"
+#include <cJSON.h>
 
 MqttService::MqttService(CloudLinkSenderIfc& sender) :
     m_pMqttClient(NULL),
@@ -41,11 +42,28 @@ esp_err_t MqttService::stopService() {
 void MqttService::publish(const SensorDataEvent& data) {
     m_sender.sendWifiStatus(WifiStatus::MQTT_SENDING);
 
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/humidity", data.getRelativeHumidity());
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/pressure", data.getPressure());
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/temperature", data.getTemperature());
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/voc", data.getVoc());
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/co2", data.getCo2());
+    cJSON* obj = cJSON_CreateObject();
+    cJSON* item = NULL;
+
+    item = cJSON_CreateNumber(data.getRelativeHumidity());
+    cJSON_AddItemToObject(obj, "Humidity", item);
+
+    item = cJSON_CreateNumber(data.getPressure());
+    cJSON_AddItemToObject(obj, "Pressure", item);
+
+    item = cJSON_CreateNumber(data.getTemperature());
+    cJSON_AddItemToObject(obj, "Temperature", item);
+
+    item = cJSON_CreateNumber(data.getVoc());
+    cJSON_AddItemToObject(obj, "VOC", item);
+
+    item = cJSON_CreateNumber(data.getCo2());
+    cJSON_AddItemToObject(obj, "CO2", item);
+
+    char8_t* json = cJSON_Print(obj);
+    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/info", json);
+
+    cJSON_Delete(obj);
 
     m_sender.sendWifiStatus(WifiStatus::MQTT_SENDED);
 }
