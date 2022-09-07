@@ -55,7 +55,8 @@ private:
 
     // Helper methods
     void onHandleSensorData(SensorDataEvent& data);
-    void publish();
+    void process();
+    float32_t calcAirIndex(const float32_t humidity, const float32_t temperature) const;
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.

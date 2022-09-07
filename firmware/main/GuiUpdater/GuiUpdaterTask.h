@@ -9,6 +9,7 @@
 #include "AirIndicatorDriver.h"
 #include "Events/AirQualityEvent.h"
 #include "Events/WifiStatusEvent.h"
+#include "Events/SensorDataEvent.h"
 
 #include "Drivers/SK6805Driver.h"
 
@@ -57,6 +58,7 @@ private:
     // Helper methods
     void onHandleAirQuality(const AirQualityEvent& quality);
     void onHandleWifiStatus(const WifiStatusEvent& wifiStatus);
+    void onHandleSensorData(const SensorDataEvent& data);
     void onHandleRefresh();
 
     /**

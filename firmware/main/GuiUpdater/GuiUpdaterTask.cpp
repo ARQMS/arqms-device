@@ -37,6 +37,11 @@ void GuiUpdaterTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
         }
         break;
 
+        case EventIdentifiers::SENSOR_DATA_EVENT: {
+            SensorDataEvent event(*pEvent);
+            onHandleSensorData(event);
+        }
+        break;
     default:
         break;
     }
@@ -50,6 +55,10 @@ void GuiUpdaterTask::onHandleTimer(const TimerId timerId) {
 
 void GuiUpdaterTask::onHandleAirQuality(const AirQualityEvent& qualityEvent) {
     m_airIndicator.setQuality(qualityEvent.getQuality());
+}
+
+void GuiUpdaterTask::onHandleSensorData(const SensorDataEvent& data) {
+    // nothing to do
 }
 
 void GuiUpdaterTask::onHandleWifiStatus(const WifiStatusEvent& wifiStatus) {
