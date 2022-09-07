@@ -77,6 +77,7 @@ private:
 
     // Members
     static StorageDriverIfc* s_pNvsStorageDriver;
+    Timer* m_pDelayTimer;
     CoreSM m_coreSm;
 };
 

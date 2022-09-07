@@ -19,7 +19,7 @@
  */
 class MeasFilterTask : public TaskBase<5, sizeof(SensorDataEvent)> {
 public:
-    EventPublisherMultiple<2> Measurement;
+    EventPublisherMultiple<3> Measurement;
 
 public:
     /**

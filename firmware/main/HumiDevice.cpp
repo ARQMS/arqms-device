@@ -55,6 +55,7 @@ extern "C" void app_main(void) {
     measSensor.Measurement.connect(measFilter);
     measFilter.Measurement.connect(cloudLink);
     measFilter.Measurement.connect(guiUpdater);
+    measFilter.Measurement.connect(control);
 
     // start tasks
     startGuiUpdaterTask();

@@ -36,6 +36,8 @@ void ControlTask::onStart() {
     CloudLink.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
     CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
     MeasFilter.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
+
+    m_pDelayTimer = createOneShotTimer(deviceSettings.getInterval() * 1000);
 }
 
 void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
@@ -45,13 +47,22 @@ void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             onHandleWifiStatus(msg);
         }
         break;
+
+        // TODO remove demo code
+        case EventIdentifiers::SENSOR_DATA_EVENT: {
+            m_pDelayTimer->start();
+        }
+        break;
     default:
         break;
     }
 }
 
 void ControlTask::onHandleTimer(const TimerId timerId) {
-    // nothing to do
+    // TODO remove demo code
+    if (m_pDelayTimer->id == timerId) {
+        MeasSensor.send(EventIdentifiers::SENSOR_SNAPSHOT);
+    }
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
