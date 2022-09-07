@@ -54,11 +54,8 @@ void MqttService::publish(const SensorDataEvent& data) {
     item = cJSON_CreateNumber(data.getTemperature());
     cJSON_AddItemToObject(obj, "Temperature", item);
 
-    item = cJSON_CreateNumber(data.getVoc());
-    cJSON_AddItemToObject(obj, "VOC", item);
-
-    item = cJSON_CreateNumber(data.getCo2());
-    cJSON_AddItemToObject(obj, "CO2", item);
+    item = cJSON_CreateNumber(data.getGasResistance());
+    cJSON_AddItemToObject(obj, "GasResistance", item);
 
     char8_t* json = cJSON_Print(obj);
     MqttUtil::publish(m_pMqttClient, "devices/$sn/room/info", json);

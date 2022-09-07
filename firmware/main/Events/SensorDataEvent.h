@@ -19,7 +19,7 @@ public:
     /**
      * Custom constructor.
      */
-    SensorDataEvent(const float32_t pressure, const float32_t relativeHumidity, const float32_t temperature, const float32_t voc, const float32_t co2);
+    SensorDataEvent(const float32_t pressure, const float32_t relativeHumidity, const float32_t temperature, const float32_t gasResistance);
 
     /**
      * Copy constructor.
@@ -94,32 +94,21 @@ public:
     float32_t getTemperature(void) const;
 
     /**
-     * Setter for voc
+     * Setter for gas resistance
      */
-    void setVoc(const float32_t voc);
+    void setGasResistance(const float32_t gasResistance);
 
     /**
-     * Getter for voc
+     * Getter for gas resistance
      */
-    float32_t getVoc(void) const;
-
-    /**
-     * Setter for co2
-     */
-    void setCo2(const float32_t co2);
-
-    /**
-     * Getter for co2
-     */
-    float32_t getCo2(void) const;
+    float32_t getGasResistance(void) const;
 
 private:
 
     float32_t m_pressure;
     float32_t m_relativeHumidity;
     float32_t m_temperature;
-    float32_t m_voc;
-    float32_t m_co2;
+    float32_t m_gasResistance;
 };
 
 

@@ -66,8 +66,7 @@ void BME680Driver::getData(SensorDataEvent& data) {
     data.setPressure(values.pressure);
     data.setRelativeHumidity(values.humidity);
     data.setTemperature(values.temperature);
-    // data.setCo2(0f); // TODO
-    // data.setVoc(0f); // TODO
+    data.setGasResistance(values.gas_resistance);
 }
 
 uint32_t BME680Driver::getWaitForNewDataMs() const {
