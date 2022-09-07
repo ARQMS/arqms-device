@@ -83,6 +83,20 @@ public:
         return esp_mqtt_client_publish(client, topicStr.c_str(), valueStr.c_str(), 0, AT_MOST_ONCE, false);
     }
 
+    /**
+     * Compares expected topic with placeholders and actual topic
+     * 
+     * @param expected the expected topic (with placeholder)
+     * @param topic the actual topic
+     * @return true whenever expected topic matches with actual topic
+     */
+    static bool isTopic(const char8_t* expected, const char8_t* topic) {
+        std::string expectedTopicStr(expected);
+        replacePlaceholders(expectedTopicStr);
+
+        return expectedTopicStr.compare(topic) == 0;
+    }
+
 private:
     // helper methods
     static void replacePlaceholders(std::string& str) {

@@ -71,9 +71,6 @@ void MqttService::onConnected() {
     MqttUtil::subscribe(m_pMqttClient, "devices/$sn/config");
 
     m_sender.sendWifiStatus(WifiStatus::MQTT_CONNECTED);
-
-    // TODO, remove demo
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/status", "Device online: But data not decoded");
 }
 
 void MqttService::onDisconnected() {
@@ -87,19 +84,14 @@ void MqttService::onFailure(const esp_mqtt_event_handle_t event) {
 void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
     m_sender.sendWifiStatus(WifiStatus::MQTT_RECEIVED);
 
-    ESP_LOGI("Humi", "Received %.*s", event->topic_len, event->topic);
-
-    // Demo
-    SensorDataEvent msg(1.2, 98.8, 20.5, 12.2, 0.5);
-    publish(msg);
-
-    // TODO handle new firmware, Attention: update has a placehlder 'device/$sn/config
-    // if (strcmp(event->topic, MQTT_SUB_DEVICE_CONFIGURATION)) {
-    // }
-
-    // TODO handle new firmware, Attention: update has a placehlder 'device/$channel/update
-    // if (strcmp(event->topic, MQTT_SUB_NEW_FIRMWARE)) {
-    // }
+    if (MqttUtil::isTopic("devices/$sn/config", event->topic)) {
+        // TODO
+        ESP_LOGW("MQTTService", "Received new configuration. Not implemented yet");
+    } 
+    else if (MqttUtil::isTopic("devices/$channel/update", event->topic)) {
+        // TODO
+        ESP_LOGW("MQTTService", "Received new firmware. Not implemented yet");
+    }
 }
 
 void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data) {
