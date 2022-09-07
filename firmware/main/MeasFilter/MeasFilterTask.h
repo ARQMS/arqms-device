@@ -1,36 +1,36 @@
-#ifndef MEAS_SENSOR_TASK_H_ 
-#define MEAS_SENSOR_TASK_H_
+#ifndef MEAS_FILTER_TASK_H_ 
+#define MEAS_FILTER_TASK_H_
 
 // Platform
 #include <HumiDevice.Platform/Platform.h>
 #include <HumiDevice.Rtos/TaskBase.h>
-#include <HumiDevice.Rtos/EventPublisherSingle.h>
+#include <HumiDevice.Rtos/EventPublisherMultiple.h>
 #include <HumiDevice.Rtos/TimerEvent.h>
 
 // Project includes
-#include "Drivers/BME680Driver.h"
 #include "Drivers/ApplicationHardwareConfig.h"
-#include "Events/DeviceSettingsEvent.h"
+#include "Events/SensorDataEvent.h"
+#include "MovingAvgFilter.h"
 
 /**
- * This item is responsible for sensor measurements (opt. sensor calibration)
+ * This unit filters the measurements.
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class MeasSensorTask : public TaskBase<5, sizeof(DeviceSettingsEvent)> {
+class MeasFilterTask : public TaskBase<5, sizeof(SensorDataEvent)> {
 public:
-    EventPublisherSingle Measurement;
+    EventPublisherMultiple<2> Measurement;
 
 public:
     /**
      * Constructor
      */
-    MeasSensorTask();
+    MeasFilterTask();
 
     /**
      * Destructor
      */
-    virtual ~MeasSensorTask();
+    virtual ~MeasFilterTask();
     
 protected:
     /**
@@ -54,27 +54,25 @@ private:
     const static uint32_t READ_SENSOR_BURST_NO = SENSOR_AVG_FILTER_COUNT;
 
     // Helper methods
-    void onHandleSnapshot();
-    void onHandleDataAvailable();
-
-    // start a new snapshot and increase burst index
-    void startSnapshot();
+    void onHandleSensorData(SensorDataEvent& data);
+    void publish();
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
      */
-    MeasSensorTask(const MeasSensorTask& other);
+    MeasFilterTask(const MeasFilterTask& other);
 
     /**
      * Provide the private assignment operator so the compiler does not generate the default one.
      */
-    MeasSensorTask& operator=(const MeasSensorTask& other);
+    MeasFilterTask& operator=(const MeasFilterTask& other);
 
-    // Members
-    BME680Driver m_bosch680Sensor;
-    Timer* m_pWaitDataTimer;
-    uint32_t m_burstIdx;
+    // members
+    MovingAvgFilter m_tempFilter;
+    MovingAvgFilter m_pressureFilter;
+    MovingAvgFilter m_gasResistanceFilter;
+    MovingAvgFilter m_humidtyFilter;
 };
 
 
-#endif // MEAS_SENSOR_TASK_H_
+#endif // MEAS_FILTER_TASK_H_

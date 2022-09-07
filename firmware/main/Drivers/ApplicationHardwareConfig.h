@@ -25,5 +25,7 @@ static const gpio_num_t BME680_SPI_SS   = GPIO_NUM_7;
 static const gpio_num_t BME680_SPI_MOSI = GPIO_NUM_6;
 static const gpio_num_t BME680_SPI_MISO = GPIO_NUM_5;
 
+// Constants
+const static uint32_t SENSOR_AVG_FILTER_COUNT = 5; //< Number of reads per snapshot
 
 #endif // APPLICATION_HARDWARE_CONFIG_H_

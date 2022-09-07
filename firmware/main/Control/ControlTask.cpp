@@ -7,8 +7,8 @@
 StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
 
 ControlTask::ControlTask() :
-    GuiSettings(),
-    WifiSettings(),
+    Gui(),
+    CloudLink(),
     m_coreSm() {
 }
 
@@ -33,9 +33,9 @@ void ControlTask::onStart() {
         m_coreSm.onRunning();
     }
 
-    WifiSettings.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
-    WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
-    MeasSensor.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
+    CloudLink.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
+    CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
+    MeasFilter.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
 }
 
 void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
@@ -71,7 +71,7 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
 
             WifiSettingsEvent event;
             event.setMode(WifiMode::AP);
-            WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &event);
+            CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &event);
         }
         else if (status.getStatus() == WifiStatus::MQTT_CONNECTED) {
             MeasSensor.send(EventIdentifiers::SENSOR_SNAPSHOT);
