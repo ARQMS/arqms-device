@@ -9,6 +9,7 @@
 
 // Project includes
 #include "Events/WifiStatusEvent.h"
+#include "Events/DeviceSettingsEvent.h"
 #include "Drivers/BME680Driver.h"
 
 /**
@@ -16,7 +17,7 @@
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class MeasSensorTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
+class MeasSensorTask : public TaskBase<5, sizeof(DeviceSettingsEvent)> {
 public:
     EventPublisherSingle Measurement;
 
@@ -51,7 +52,9 @@ protected:
 private:
     // Helper methods
     void onHandleSnapshot();
+    void onHandleIntervalTimer();
     void onHandleDataAvailable();
+    void onHandleDeviceSettings(const DeviceSettingsEvent& settings);
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
@@ -66,6 +69,7 @@ private:
     // Members
     BME680Driver m_bosch680Sensor;
     Timer* m_pWaitDataTimer;
+    Timer* m_pIntervalTimer;
 };
 
 

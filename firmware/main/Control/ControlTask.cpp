@@ -35,6 +35,7 @@ void ControlTask::onStart() {
 
     WifiSettings.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
     WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
+    MeasSensor.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
 }
 
 void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {

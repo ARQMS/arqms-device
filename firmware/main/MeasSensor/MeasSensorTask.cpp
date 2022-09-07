@@ -33,7 +33,9 @@ void MeasSensorTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
         onHandleSnapshot();
         break;
         
-    default:
+    case EventIdentifiers::DEVICE_SETTINGS_EVENT:
+        DeviceSettingsEvent event(*pEvent);
+        onHandleDeviceSettings(event);
         break;
     }
 }
@@ -42,11 +44,19 @@ void MeasSensorTask::onHandleTimer(const TimerId timerId) {
     if (timerId == m_pWaitDataTimer->id) {
         onHandleDataAvailable();
     }
+    else if (timerId == m_pIntervalTimer->id) {
+        onHandleIntervalTimer();
+    }
+}
+
+void MeasSensorTask::onHandleIntervalTimer() {
+    m_bosch680Sensor.startSnapshot();
+    m_pWaitDataTimer->start();
 }
 
 void MeasSensorTask::onHandleSnapshot() {
-    m_bosch680Sensor.startSnapshot();
-    m_pWaitDataTimer->start();
+    // DEMO, only take single snapshot and do not start indefinty burst read
+    m_pIntervalTimer->start();
 }
 
 void MeasSensorTask::onHandleDataAvailable() {
@@ -54,8 +64,8 @@ void MeasSensorTask::onHandleDataAvailable() {
     m_bosch680Sensor.getData(event);
 
     Measurement.send(EventIdentifiers::SENSOR_DATA_EVENT, &event);
+}
 
-    // TODO remove demo
-    onHandleSnapshot();
-
+void MeasSensorTask::onHandleDeviceSettings(const DeviceSettingsEvent& settings) {
+    m_pIntervalTimer = createPeriodicTimer(settings.getInterval() * 1000);
 }
