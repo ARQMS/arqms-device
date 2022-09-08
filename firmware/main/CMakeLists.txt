@@ -5,6 +5,7 @@ idf_component_register(
           "Events/WifiSettingsEvent.cpp"
           "Events/DeviceSettingsEvent.cpp"
           "Events/SensorDataEvent.cpp"
+          "Events/SensorStatusEvent.cpp"
 
           "HumiDevice.cpp"
           "Drivers/ApplicationHardwareConfig.cpp"

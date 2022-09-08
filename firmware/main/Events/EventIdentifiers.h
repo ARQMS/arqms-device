@@ -18,6 +18,7 @@ struct EventIdentifiers {
     const static EventId DEVICE_SETTINGS_EVENT  = 60;
     const static EventId SENSOR_DATA_EVENT      = 61;
     const static EventId SENSOR_SNAPSHOT        = 62;
+    const static EventId SENSOR_STATUS          = 63;
 
     // WIFI 80..99
     const static EventId WIFI_SETTINGS_EVENT    = 80;

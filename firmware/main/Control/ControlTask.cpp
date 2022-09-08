@@ -2,6 +2,7 @@
 
 #include "Events/EventIdentifiers.h"
 #include "Events/WifiSettingsEvent.h"
+#include "Events/SensorStatusEvent.h"
 #include "Events/DeviceSettingsEvent.h"
     
 StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
@@ -42,17 +43,19 @@ void ControlTask::onStart() {
 
 void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
-        case EventIdentifiers::WIFI_STATUS_EVENT: {
-            WifiStatusEvent msg(*pEvent);
-            onHandleWifiStatus(msg);
+        case EventIdentifiers::WIFI_STATUS_EVENT: 
+            onHandleWifiStatus(WifiStatusEvent(*pEvent));
+            break;
+
+        // TODO job done, check if all jobs done configure sleep timer
+        case EventIdentifiers::SENSOR_STATUS: {
+            SensorStatusEvent status(*pEvent);
+            if (status.getStatus() == SensorStatus::IDLE) {
+                m_pDelayTimer->start();
+            }
         }
         break;
 
-        // TODO remove demo code
-        case EventIdentifiers::SENSOR_DATA_EVENT: {
-            m_pDelayTimer->start();
-        }
-        break;
     default:
         break;
     }

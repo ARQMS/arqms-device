@@ -5,12 +5,14 @@
 #include <HumiDevice.Platform/Platform.h>
 #include <HumiDevice.Rtos/TaskBase.h>
 #include <HumiDevice.Rtos/EventPublisherSingle.h>
+#include <HumiDevice.Rtos/EventPublisherMultiple.h>
 #include <HumiDevice.Rtos/TimerEvent.h>
 
 // Project includes
 #include "Drivers/BME680Driver.h"
 #include "Drivers/ApplicationHardwareConfig.h"
 #include "Events/DeviceSettingsEvent.h"
+#include "Events/SensorStatusEvent.h"
 
 /**
  * This item is responsible for sensor measurements (opt. sensor calibration)
@@ -20,6 +22,7 @@
 class MeasSensorTask : public TaskBase<5, sizeof(DeviceSettingsEvent)> {
 public:
     EventPublisherSingle Measurement;
+    EventPublisherMultiple<2> Status;
 
 public:
     /**
@@ -60,6 +63,9 @@ private:
     // start a new snapshot and increase burst index
     void startSnapshot();
 
+    // sends a event with given status
+    void sendStatus(const SensorStatus status);
+
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
      */
@@ -74,6 +80,7 @@ private:
     BME680Driver m_bosch680Sensor;
     Timer* m_pWaitDataTimer;
     uint32_t m_burstIdx;
+    bool_t m_initialized;
 };
 
 
