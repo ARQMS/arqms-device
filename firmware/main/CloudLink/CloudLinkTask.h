@@ -21,7 +21,7 @@
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class CloudLinkTask : public TaskBase<5, sizeof(DeviceSettingsEvent)>, CloudLinkSenderIfc {
+class CloudLinkTask : public TaskBase<10, sizeof(DeviceSettingsEvent)>, CloudLinkSenderIfc {
 public:
     EventPublisherMultiple<2> StatusEvent;
 

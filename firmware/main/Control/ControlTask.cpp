@@ -36,7 +36,6 @@ void ControlTask::onStart() {
 
     CloudLink.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
     CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
-    MeasFilter.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
 
     m_pDelayTimer = createOneShotTimer(deviceSettings.getInterval() * 1000);
 }
