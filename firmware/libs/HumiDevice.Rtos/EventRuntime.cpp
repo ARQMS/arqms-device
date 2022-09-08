@@ -77,7 +77,7 @@ void EventRuntime::process(TaskIfc& task, const void* pData, const size_t dataLe
 }
 
 Timer* EventRuntime::createTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic) {
-    if (g_timerCounter - 1 >= MAX_TIMER) {
+    if (g_timerCounter + 1 > MAX_TIMER) {
         ESP_LOGE("HumiDevice", "EventRuntime out of Timer. Increase MAX_TIMER define!");
         return NULL;
     }
