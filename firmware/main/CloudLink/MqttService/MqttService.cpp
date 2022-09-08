@@ -40,8 +40,6 @@ esp_err_t MqttService::stopService() {
 }
 
 void MqttService::publish(const SensorDataEvent& data) {
-    m_sender.sendWifiStatus(WifiStatus::MQTT_SENDING);
-
     cJSON* obj = cJSON_CreateObject();
     cJSON* item = NULL;
 
@@ -61,13 +59,9 @@ void MqttService::publish(const SensorDataEvent& data) {
     MqttUtil::publish(m_pMqttClient, "devices/$sn/room/info", json);
 
     cJSON_Delete(obj);
-
-    m_sender.sendWifiStatus(WifiStatus::MQTT_SENDED);
 }
 
 void MqttService::publish(const DeviceInfoEvent& data) {
-    m_sender.sendWifiStatus(WifiStatus::MQTT_SENDING);
-
     cJSON* obj = cJSON_CreateObject();
     cJSON* item = NULL;
 
@@ -84,8 +78,6 @@ void MqttService::publish(const DeviceInfoEvent& data) {
     MqttUtil::publish(m_pMqttClient, "devices/$sn/status", json);
 
     cJSON_Delete(obj);
-
-    m_sender.sendWifiStatus(WifiStatus::MQTT_SENDED);
 }
 
 void MqttService::onConnected() {
@@ -105,8 +97,6 @@ void MqttService::onFailure(const esp_mqtt_event_handle_t event) {
 }
 
 void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
-    m_sender.sendWifiStatus(WifiStatus::MQTT_RECEIVED);
-
     if (MqttUtil::isTopic("devices/$sn/config", event->topic)) {
         // TODO
         ESP_LOGW("MQTTService", "Received new configuration. Not implemented yet");

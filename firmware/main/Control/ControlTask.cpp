@@ -114,8 +114,6 @@ void ControlTask::onHandleBatteryStatus(const BatteryStatusEvent& status) {
     m_lastBatteryStatus = status;
     m_batteryReceived = true;
 
-    ESP_LOGI("Control Task", "Handle Battery Status Event");
-
     sendDeviceStatus();
 }
 
