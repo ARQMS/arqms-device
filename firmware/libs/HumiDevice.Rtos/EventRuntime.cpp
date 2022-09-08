@@ -31,8 +31,10 @@ extern "C" void taskProcess(void* parameter) {
 
     do {
         // Block thread until any event is received. weak at least every second to check shutdown request
-        size_t receivedBytes = xMessageBufferReceive(queueHandle, (void*)dataStream, MAX_MESSAGE_SIZE, 1000 / portTICK_PERIOD_MS);
-        EventRuntime::process(*pTask, dataStream, receivedBytes);
+        size_t receivedBytes = xMessageBufferReceive(queueHandle, (void*)dataStream, MAX_MESSAGE_SIZE, portMAX_DELAY);
+        if (receivedBytes > 0) {
+            EventRuntime::process(*pTask, dataStream, receivedBytes);
+        }
     } while (!pTask->isShutdownRequested());
 }
 
