@@ -39,7 +39,7 @@ public:
     /**
      * @see CloudLinkSenderIfc::sendWifiStatus
      */
-    virtual void sendWifiStatus(const WifiStatus status, const int32_t rssi = 0) override;
+    virtual void sendWifiStatus(const WifiStatus status) override;
 
 protected:
     /**
@@ -60,13 +60,15 @@ protected:
 
 private:
     // constant
-    static const uint32_t TIMEOUT_SERVICE_MODE = 60 * 1000; // 1min
+    static const uint32_t TIMEOUT_SERVICE_MODE_MS = 60 * 1000; // 1min
+    static const uint32_t RSSI_UPDATE_PERIOD_MS = 30 * 1000; // 30sec
 
     // Helper methods
     void onHandleWifiSettings(const WifiSettingsEvent& settings);
     void onHandleDeviceSettings(const DeviceSettingsEvent& settings);
     void onHandleSensorDataEvent(const SensorDataEvent& settings);
     void onHandleTimeout();
+    void onHandleRssiUpdate();
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
@@ -82,7 +84,10 @@ private:
     ConfigurationService m_ctrlHandler;
     MqttService m_mqttService;
     Wifi m_wifi;
+    WifiStatusEvent m_lastWifiEvent;
+
     Timer* m_pTimeoutTimer;
+    Timer* m_pRssiUpdater;
 };
 
 

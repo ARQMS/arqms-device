@@ -19,9 +19,11 @@ public:
     virtual ~CloudLinkSenderIfc() {};
 
     /**
+     * Sends a wifi status event to callback
      * 
+     * @param status the current status
      */
-    virtual void sendWifiStatus(const WifiStatus status, const int32_t rssi = 0) = 0;
+    virtual void sendWifiStatus(const WifiStatus status) = 0;
 };
 
 

@@ -8,17 +8,21 @@ CloudLinkTask::CloudLinkTask() :
     m_ctrlHandler(),
     m_mqttService(*this),
     m_wifi(*this, m_ctrlHandler, m_mqttService),
-    m_pTimeoutTimer(NULL) {
+    m_lastWifiEvent(),
+    m_pTimeoutTimer(NULL),
+    m_pRssiUpdater(NULL) {
 }
 
 CloudLinkTask::~CloudLinkTask() {
 }
 
 void CloudLinkTask::onInitialize()  {
-    m_pTimeoutTimer = createOneShotTimer(TIMEOUT_SERVICE_MODE);
+    m_pTimeoutTimer = createOneShotTimer(TIMEOUT_SERVICE_MODE_MS);
+    m_pRssiUpdater = createOneShotTimer(RSSI_UPDATE_PERIOD_MS);
 }
 
 void CloudLinkTask::onStart() {
+    // nothing to do
 }
 
 void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
@@ -43,6 +47,9 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
 void CloudLinkTask::onHandleTimer(TimerId timerId) {
     if (m_pTimeoutTimer->id == timerId) {
         onHandleTimeout();
+    }
+    else if (m_pRssiUpdater->id == timerId) {
+        onHandleRssiUpdate();
     }
 }
 
@@ -74,10 +81,16 @@ void CloudLinkTask::onHandleTimeout() {
     m_wifi.onTimeout();    
 }
 
-void CloudLinkTask::sendWifiStatus(const WifiStatus status, const int32_t rssi) {
-    WifiStatusEvent event;
-    event.setStatus(status);
-    event.setRssi(rssi);
+void CloudLinkTask::onHandleRssiUpdate() {
+    sendWifiStatus(m_lastWifiEvent.getStatus());
+}
 
-    StatusEvent.send(EventIdentifiers::WIFI_STATUS_EVENT, &event);
+void CloudLinkTask::sendWifiStatus(const WifiStatus status) {
+    m_lastWifiEvent.setStatus(status);
+    m_lastWifiEvent.setRssi(m_wifi.getSignalStrength());
+
+    StatusEvent.send(EventIdentifiers::WIFI_STATUS_EVENT, &m_lastWifiEvent);
+
+    // start new timeout, just ensure wifi status is updated periodicaly
+    m_pRssiUpdater->start();
 }

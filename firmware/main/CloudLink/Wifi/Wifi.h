@@ -66,6 +66,13 @@ public:
      * Resets the wifi peripheral
      */
     void reset();
+
+    /**
+     * Gets the signal strength in rssi format
+     * 
+     * @return int32_t rssi strength
+     */
+    int32_t getSignalStrength() const;
 private:
     // Constants
     const static uint8_t MAXIMUM_RETRY = 5U;            //< maximum wifi re-try

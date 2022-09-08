@@ -125,6 +125,17 @@ void Wifi::reset() {
     esp_wifi_deinit();
 }
 
+int32_t Wifi::getSignalStrength() const {
+    if (!m_wifiSm.isCurrentState(WifiStateMachine::State::STA_CONNECTED)) {
+        return -127;
+    }
+
+    wifi_ap_record_t ap;
+    esp_wifi_sta_get_ap_info(&ap);
+
+    return ap.rssi;
+}
+
 void Wifi::onClientConnected() {
     if (!m_wifiSm.isCurrentState(WifiStateMachine::State::AP_SERVICE_WAITING)) {
         // It's not allowd to connect to device when not in service waiting mode
@@ -162,10 +173,7 @@ void Wifi::onWifiConnected() {
     m_wifiSm.onGotIp();
     m_retryCounter = 0U;
 
-    // TODO use eventData from onWifiEventHandler
-    wifi_ap_record_t ap;
-    esp_wifi_sta_get_ap_info(&ap);
-    m_sender.sendWifiStatus(WifiStatus::CONNECTED, ap.rssi);
+    m_sender.sendWifiStatus(WifiStatus::CONNECTED);
 }
 
 void Wifi::onWifiDisconnected() {
