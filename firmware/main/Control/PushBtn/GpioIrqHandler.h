@@ -41,6 +41,19 @@ private:
      */
     ~GpioIrqHandler();
 
+    /**
+     * Deleted copy constructor.
+     * @param other The copied instance.
+     */
+    GpioIrqHandler(const GpioIrqHandler& other) = delete;
+
+    /**
+     * Deleted assignment operator.
+     * @param other the assignator instance.
+     */
+    GpioIrqHandler& operator=(const GpioIrqHandler& other) = delete;
+
+    // Members
     static GpioIrqHandler s_pInstance;
 };
 

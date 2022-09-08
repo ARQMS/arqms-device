@@ -21,6 +21,7 @@ idf_component_register(
           "Control/CoreSM/CoreSM.cpp"
           "Control/PushBtn/PushBtnCtrlTask.cpp"
           "Control/PushBtn/GpioIrqHandler.cpp"
+          "Control/PushBtn/ButtonSM.cpp"
           
           "GuiUpdater/GuiUpdaterTask.cpp"
           "GuiUpdater/AirIndicatorDriver.cpp"

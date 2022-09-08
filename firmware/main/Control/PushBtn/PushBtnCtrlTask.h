@@ -8,7 +8,9 @@
 #include <HumiDevice.Rtos/TimerEvent.h>
 
 // Project includes
-#include <Events/ButtonEvent.h>
+#include "Events/ButtonEvent.h"
+#include "ButtonSM.h"
+#include "ButtonSMIfc.h"
 
 
 /**
@@ -16,7 +18,7 @@
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class PushBtnCtrlTask : public TaskBase<2, 10/*TODO sizeof(ButtonEvent)*/ >{
+class PushBtnCtrlTask : public TaskBase<2, sizeof(ButtonEvent)>, public ButtonSMIfc {
 public:
     EventPublisherSingle Control;
 
@@ -30,6 +32,11 @@ public:
      * Destructor
      */
     ~PushBtnCtrlTask();
+
+    /**
+     * @see ButtonSMIfc::onButtonPressed
+     */
+    virtual void onButtonPressed(const ButtonId id, const ButtonStatus status) override;
 
 protected:
     /**
@@ -51,6 +58,10 @@ protected:
 private:
     // Helper
     void onHandleButtonEvent(const ButtonEvent& event);
+
+    // Members
+    ButtonSM m_swRstBtn;
+    ButtonSM m_usrBtn;
 };
 
 

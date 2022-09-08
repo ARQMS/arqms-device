@@ -46,6 +46,10 @@ void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             onHandleWifiStatus(WifiStatusEvent(*pEvent));
             break;
 
+        case EventIdentifiers::BTN_CTRL_EVENT: 
+            onHandleButton(ButtonEvent(*pEvent));
+            break;
+
         // TODO job done, check if all jobs done configure sleep timer
         case EventIdentifiers::SENSOR_STATUS: {
             SensorStatusEvent status(*pEvent);
@@ -91,3 +95,8 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
         }
     }
 }
+
+void ControlTask::onHandleButton(const ButtonEvent& button) {
+    ESP_LOGI("Control", "BTN %i, %i", button.getButtonId(), button.getStatus());
+}
+

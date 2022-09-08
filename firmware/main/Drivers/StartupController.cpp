@@ -73,7 +73,7 @@ void StartupController::initializeAdc1() {
 
 void StartupController::initializeIrq() {
     gpio_config_t gpioConfig = gpio_config_t();
-    gpioConfig.intr_type = GPIO_INTR_POSEDGE;
+    gpioConfig.intr_type = GPIO_INTR_ANYEDGE;
     gpioConfig.pin_bit_mask = (1ULL << USR_BTN)
                             | (1ULL << PRG_SW_RST_BTN);
     gpioConfig.mode = GPIO_MODE_INPUT;

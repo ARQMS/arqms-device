@@ -7,16 +7,18 @@
 #include <Drivers/ApplicationHardwareConfig.h>
 #include <Events/EventIdentifiers.h>
 
-
 PushBtnCtrlTask::PushBtnCtrlTask() :
-    Control() {
+    Control(),
+    m_swRstBtn(ButtonId::SW_RESET, *this),
+    m_usrBtn(ButtonId::USER, *this) {
 }
 
 PushBtnCtrlTask::~PushBtnCtrlTask() {
 }
 
 void PushBtnCtrlTask::onInitialize() {
-    // nothing to do
+    m_swRstBtn.initialize(*this);
+    m_usrBtn.initialize(*this);
 }
 
 void PushBtnCtrlTask::onStart() {
@@ -24,22 +26,35 @@ void PushBtnCtrlTask::onStart() {
 }
 
 void PushBtnCtrlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
-    ESP_LOGI("PushBtn", "receive msg %i", eventId);
-
     switch (eventId) {
     case EventIdentifiers::BTN_CTRL_EVENT:
         onHandleButtonEvent(ButtonEvent(*pEvent));
-        break;
-    
-    default:
         break;
     }
 }
 
 void PushBtnCtrlTask::onHandleTimer(TimerId timerId) {
-    // TODO
+    m_swRstBtn.onHandleTimer(timerId);
+    m_usrBtn.onHandleTimer(timerId);
 }
 
 void PushBtnCtrlTask::onHandleButtonEvent(const ButtonEvent& event) {
-    ESP_LOGI("PushBtn", "Pressed BTN %i: %i", event.getButtonId(), event.getStatus());
+    switch (event.getButtonId()) {
+        case ButtonId::USER: 
+            m_usrBtn.onStateChanged();
+            break;
+
+        case ButtonId::SW_RESET: 
+            m_swRstBtn.onStateChanged();
+            break;
+
+        default:
+            ESP_LOGW("BtnCtrl", "PushBtnCtrlTask can not handle ButtonId %i", event.getButtonId());
+            break;
+    }
+}
+
+void PushBtnCtrlTask::onButtonPressed(const ButtonId id, const ButtonStatus status) {
+    ButtonEvent event(id, status);
+    Control.send(EventIdentifiers::BTN_CTRL_EVENT, &event);
 }

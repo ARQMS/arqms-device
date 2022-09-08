@@ -22,9 +22,12 @@ GpioIrqHandler::~GpioIrqHandler() {
 }
 
 void GpioIrqHandler::onGpioIsr(void* arg) {
-    const uint32_t num = (uint32_t)arg;
-    EventPublisherSingle& sender = GpioIrqHandler::getInstance().PushBtn;
+    const gpio_num_t gpioNum = static_cast<gpio_num_t>((uint32_t)arg);
+    
+    // gpio_get_level(gpioNum) does not return always correct gpio level
+    // se we send always a SHORT_PRESS state and handle it by software
+    ButtonEvent event(static_cast<ButtonId>(gpioNum), ButtonStatus::SHORT_PRESS);
 
-    ButtonEvent event(static_cast<ButtonId>(num), ButtonStatus::SHORT_PRESS);
+    EventPublisherSingle& sender = GpioIrqHandler::getInstance().PushBtn;
     sender.send(EventIdentifiers::BTN_CTRL_EVENT, &event);
 }
