@@ -8,6 +8,7 @@
 GuiUpdaterTask::GuiUpdaterTask() :
     m_airIndicator(LED_AIR_GOOD, LED_AIR_MOD, LED_AIR_POOR),
     m_ctrlIndicator(0, LED_WLAN),
+    m_isActive(true),
     m_pRefreshTimer(NULL) {
 }
 
@@ -20,7 +21,7 @@ void GuiUpdaterTask::onInitialize()  {
 }
 
 void GuiUpdaterTask::onStart() {
-    m_pRefreshTimer->start();
+    enable();
 }
 
 void GuiUpdaterTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
@@ -39,6 +40,10 @@ void GuiUpdaterTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
         
         case EventIdentifiers::SENSOR_STATUS: 
             onHandleSensorStatus(SensorStatusEvent(*pEvent));
+            break;
+
+        case EventIdentifiers::BTN_CTRL_EVENT: 
+            onHandleButton(ButtonEvent(*pEvent));
             break;
 
     default:
@@ -80,6 +85,10 @@ void GuiUpdaterTask::onHandleWifiStatus(const WifiStatusEvent& wifiStatus) {
         m_ctrlIndicator.setColor({0, 0, 50}, 100);
     } 
     else if (wifiStatus.getStatus() == WifiStatus::UNKNOWN_ERROR) {
+        if (!m_isActive) {
+            enable();
+        }
+
         m_ctrlIndicator.setColor({255, 0, 0}, 100);
     }
 }
@@ -89,12 +98,45 @@ void GuiUpdaterTask::onHandleSensorStatus(const SensorStatusEvent& status) {
         m_ctrlIndicator.setColor({255, 255, 0}, 50);
     } else if (status.getStatus() == SensorStatus::IDLE) {
         m_ctrlIndicator.setColor({0, 0, 255});
-    } else if (status.getStatus() == SensorStatus::ERROR){
+    } else if (status.getStatus() == SensorStatus::ERROR) {
+        if (!m_isActive) {
+            enable();
+        }
+
         m_ctrlIndicator.setColor({255, 0, 0}, 100);
     }
 }
 
 void GuiUpdaterTask::onHandleRefresh() {
     m_ctrlIndicator.refresh();
+    m_airIndicator.refresh();
+}
+
+void GuiUpdaterTask::onHandleButton(const ButtonEvent& button) {
+    if (button.getButtonId() == ButtonId::USER) {
+        m_isActive ? disable() : enable();
+    }
+}
+
+void GuiUpdaterTask::disable() {
+    m_isActive = false;
+    
+    m_ctrlIndicator.disable();
+    m_airIndicator.disable();
+
+    m_pRefreshTimer->stop();
+
+    ESP_LOGI("GUI", "Disable UI");
+}
+
+void GuiUpdaterTask::enable() {
+    m_isActive = true;
+
+    m_ctrlIndicator.enable();
+    m_airIndicator.enable();
+
+    m_pRefreshTimer->start();
+
+    ESP_LOGI("GUI", "Enable UI");
 }
 

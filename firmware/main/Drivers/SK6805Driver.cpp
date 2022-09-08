@@ -65,7 +65,8 @@ extern "C" void IRAM_ATTR rmtAdapterCallback(const void* src,
 
 SK6805Driver::SK6805Driver(const uint8_t rmtChannel, const uint8_t gpio) : 
     m_info(),
-    m_lastRefreshTick(0) {
+    m_lastRefreshTick(0),
+    m_isActive(true) {
     m_info.rmtChannel = (rmt_channel_t)rmtChannel;
     m_info.gpioPin = (gpio_num_t)gpio;
 }
@@ -110,7 +111,7 @@ void SK6805Driver::refresh() {
         m_info.tickCounter = 0;
     }
 
-    uint8_t* pData = m_info.isOn ? m_info.colorBuffer : DISABLED_BUFFER;
+    uint8_t* pData = m_info.isOn && m_isActive ? m_info.colorBuffer : DISABLED_BUFFER;
     
     rmt_write_sample(m_info.rmtChannel, pData, sizeof(m_info.colorBuffer), true);
     rmt_wait_tx_done(m_info.rmtChannel, 40 / portTICK_PERIOD_MS);
@@ -120,6 +121,18 @@ void SK6805Driver::clear() {
     setColor({0, 0, 0}); // disable LED
 
     m_lastRefreshTick = xTaskGetTickCount();
+    refresh();
+}
+
+void SK6805Driver::enable() {
+    m_isActive = true;
+
+    refresh();
+}
+
+void SK6805Driver::disable() {
+    m_isActive = false;
+
     refresh();
 }
 

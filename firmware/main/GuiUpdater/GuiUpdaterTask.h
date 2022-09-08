@@ -11,6 +11,7 @@
 #include "Events/WifiStatusEvent.h"
 #include "Events/SensorDataEvent.h"
 #include "Events/SensorStatusEvent.h"
+#include "Events/ButtonEvent.h"
 
 #include "Drivers/SK6805Driver.h"
 
@@ -20,7 +21,7 @@
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  * @see https://github.com/ARQMS/arqms-device/wiki/Mechanics#hmi-interface
  */
-class GuiUpdaterTask : public TaskBase<10, sizeof(AirQualityEvent)> {
+class GuiUpdaterTask : public TaskBase<10, sizeof(SensorDataEvent)> {
 public:
     // no outputs
 
@@ -61,7 +62,11 @@ private:
     void onHandleWifiStatus(const WifiStatusEvent& wifiStatus);
     void onHandleSensorData(const SensorDataEvent& data);
     void onHandleSensorStatus(const SensorStatusEvent& status);
+    void onHandleButton(const ButtonEvent& button);
     void onHandleRefresh();
+
+    void disable();
+    void enable();
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
@@ -76,6 +81,7 @@ private:
     // Private Members
     AirIndicatorDriver m_airIndicator;
     SK6805Driver m_ctrlIndicator;
+    bool m_isActive;
 
     Timer* m_pRefreshTimer;
 };

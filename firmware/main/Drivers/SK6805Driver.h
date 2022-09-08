@@ -115,6 +115,16 @@ public:
      */
     void clear();
 
+    /**
+     * Enable driver
+     */
+    void enable();
+
+    /**
+     * Disable disable
+     */
+    void disable();
+
     // Ticks configuration. Available after initialize() is called
     static uint32_t T0hTicks;
     static uint32_t T1hTicks;
@@ -150,6 +160,7 @@ private:
 
     LedInfo m_info;
     uint32_t m_lastRefreshTick;
+    bool m_isActive;
 };
 
 #endif // SK6805DRIVER_H_

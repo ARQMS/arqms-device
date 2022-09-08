@@ -26,6 +26,11 @@ public:
     ~AirIndicatorDriver();
 
     /**
+     * Display current state to led
+     */
+    void refresh();
+
+    /**
      * Set the air quality
      * 
      * @param quality is used for led indication.     
@@ -33,6 +38,16 @@ public:
      *          - 1 means best quality
      */
     void setQuality(const float32_t quality);
+
+    /**
+     * Enable air indicator 
+     */
+    void enable();
+
+    /**
+     * Disable air indicator
+     */
+    void disable();
 
 private:
 
@@ -51,7 +66,7 @@ private:
     const static uint8_t OFF;
 
     // Helper method
-    AirQuality calculateAirQuality(const float32_t quality);
+    static AirQuality calculateAirQuality(const float32_t quality);
 
     /**
      * Private default constructor
@@ -69,9 +84,11 @@ private:
     AirIndicatorDriver& operator=(const AirIndicatorDriver& other);
 
     // Private Members
+    bool m_isActive;
     const gpio_num_t m_goodPin;
     const gpio_num_t m_modPin; 
     const gpio_num_t m_poorPin; 
+    AirQuality m_quality;
 };
 
 

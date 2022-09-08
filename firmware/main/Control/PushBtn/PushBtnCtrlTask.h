@@ -4,7 +4,7 @@
 // Platform include
 #include <HumiDevice.Platform/Platform.h>
 #include <HumiDevice.Rtos/TaskBase.h>
-#include <HumiDevice.Rtos/EventPublisherSingle.h>
+#include <HumiDevice.Rtos/EventPublisherMultiple.h>
 #include <HumiDevice.Rtos/TimerEvent.h>
 
 // Project includes
@@ -20,7 +20,7 @@
  */
 class PushBtnCtrlTask : public TaskBase<2, sizeof(ButtonEvent)>, public ButtonSMIfc {
 public:
-    EventPublisherSingle Control;
+    EventPublisherMultiple<2> Control;
 
 public:
     /**

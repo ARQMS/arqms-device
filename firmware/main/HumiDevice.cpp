@@ -66,6 +66,7 @@ extern "C" void app_main(void) {
     measFilter.Measurement.connect(control);
     gpioHandler.PushBtn.connect(btnCtrl);
     btnCtrl.Control.connect(control);
+    btnCtrl.Control.connect(guiUpdater);
 
     // start tasks
     startGuiUpdaterTask();
