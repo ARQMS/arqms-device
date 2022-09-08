@@ -42,7 +42,7 @@ public:
      */
     virtual void send(EventId eventId, EventIfc* pEvent = NULL) override {
         if (m_subId <= INVALID_SUBSCRIBER_ID) {
-            ESP_LOGE("HumiDevice", "Subscriber is invalid. No events sent");
+            ESP_DRAM_LOGE("HumiDevice", "Subscriber is invalid. No events sent");
             return;
         }
 

@@ -50,6 +50,10 @@ void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
     pDeviceParam->setInterval(m_layout.interval);
 }
 
+void NvsStorageDriver::reset() {
+    m_layout.reset();
+}
+
 esp_err_t NvsStorageDriver::fetch() {
     return m_layout.fetch();
 }

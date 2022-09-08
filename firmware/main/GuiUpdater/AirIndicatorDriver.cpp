@@ -7,6 +7,7 @@ const uint8_t AirIndicatorDriver::ON                = 0;
 const uint8_t AirIndicatorDriver::OFF               = 1;
 
 AirIndicatorDriver::AirIndicatorDriver(const gpio_num_t goodPin, const gpio_num_t modPin, const gpio_num_t poorPin) :
+    m_isActive(true),
     m_goodPin(goodPin),
     m_modPin(modPin),
     m_poorPin(poorPin) {
@@ -16,10 +17,16 @@ AirIndicatorDriver::AirIndicatorDriver(const gpio_num_t goodPin, const gpio_num_
 AirIndicatorDriver::~AirIndicatorDriver() {
 }
 
-void AirIndicatorDriver::setQuality(const float32_t quality) {
-    AirQuality indicator = calculateAirQuality(quality);
+void AirIndicatorDriver::refresh() {
+    if (!m_isActive) {
+        gpio_set_level(m_goodPin, OFF);
+        gpio_set_level(m_modPin, OFF);
+        gpio_set_level(m_poorPin, OFF);
 
-    switch (indicator) {
+        return;
+    } 
+
+    switch (m_quality) {
         case AirQuality::GOOD: 
             gpio_set_level(m_goodPin, ON);
             gpio_set_level(m_modPin, OFF);
@@ -44,6 +51,20 @@ void AirIndicatorDriver::setQuality(const float32_t quality) {
             gpio_set_level(m_poorPin, OFF);
             break;
     }
+}
+
+void AirIndicatorDriver::setQuality(const float32_t quality) {
+    m_quality = calculateAirQuality(quality);
+}
+
+void AirIndicatorDriver::enable() {
+    m_isActive = true;
+    refresh();
+}
+
+void AirIndicatorDriver::disable() {
+    m_isActive = false;
+    refresh();
 }
 
 AirIndicatorDriver::AirQuality AirIndicatorDriver::calculateAirQuality(const float32_t quality) {

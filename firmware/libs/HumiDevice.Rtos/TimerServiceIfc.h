@@ -4,6 +4,7 @@
 // Platform includes
 #include <HumiDevice.Platform/Platform.h>
 #include <HumiDevice.Rtos/EventIfc.h>
+#include <HumiDevice.Rtos/EventRuntime.h>
 
 // FreeRTOS
 #include <freertos/FreeRTOS.h>

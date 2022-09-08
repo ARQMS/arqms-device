@@ -32,6 +32,11 @@ public:
      */
     static void initializeAdc1();
 
+    /**
+     * Initialize gpio interrupts
+     */
+    static void initializeIrq();
+
 private:
     
     /**

@@ -31,8 +31,10 @@ extern "C" void taskProcess(void* parameter) {
 
     do {
         // Block thread until any event is received. weak at least every second to check shutdown request
-        size_t receivedBytes = xMessageBufferReceive(queueHandle, (void*)dataStream, MAX_MESSAGE_SIZE, 1000 / portTICK_PERIOD_MS);
-        EventRuntime::process(*pTask, dataStream, receivedBytes);
+        size_t receivedBytes = xMessageBufferReceive(queueHandle, (void*)dataStream, MAX_MESSAGE_SIZE, portMAX_DELAY);
+        if (receivedBytes > 0) {
+            EventRuntime::process(*pTask, dataStream, receivedBytes);
+        }
     } while (!pTask->isShutdownRequested());
 }
 
@@ -54,10 +56,8 @@ void EventRuntime::send(const SubscriberId handle, const EventId id, const Event
         pData->serialize(serializer);
     }
 
-    ESP_LOGV("HumiDevice", "Sending ID %i to %p", id, handle);
-
-    if (xMessageBufferSend(handle, (void*)dataStream, serializer.getBufferPos(), 0) == 0) {
-        ESP_LOGE("HumiDevice", "Queue full. No eventid %i to %p sent", id, handle);
+    if (xMessageBufferSendFromISR(handle, (void*)dataStream, serializer.getBufferPos(), 0) == 0) {
+        ESP_DRAM_LOGE("HumiDevice", "Queue full. No eventid %i to %p sent", id, handle);
     }
 }
 
@@ -69,13 +69,11 @@ void EventRuntime::process(TaskIfc& task, const void* pData, const size_t dataLe
 
     deserializer >> id;
 
-    ESP_LOGV("HumiDevice", "Received ID %i in %p", id, task.getSubscriberId());
-
     task.execute(id, &deserializer);
 }
 
 Timer* EventRuntime::createTimer(const SubscriberId subId, const uint32_t period, bool isPeriodic) {
-    if (g_timerCounter - 1 >= MAX_TIMER) {
+    if (g_timerCounter + 1 > MAX_TIMER) {
         ESP_LOGE("HumiDevice", "EventRuntime out of Timer. Increase MAX_TIMER define!");
         return NULL;
     }

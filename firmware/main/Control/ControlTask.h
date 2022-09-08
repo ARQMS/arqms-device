@@ -9,6 +9,7 @@
 
 // Project includes
 #include "Events/WifiStatusEvent.h"
+#include "Events/ButtonEvent.h"
 #include "Control/Persistency/StorageDriverIfc.h"
 #include "Control/CoreSM/CoreSM.h"
 
@@ -17,7 +18,7 @@
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
+class ControlTask : public TaskBase<20, sizeof(WifiStatusEvent)> {
 public:
     EventPublisherSingle Gui;
     EventPublisherSingle CloudLink;
@@ -64,6 +65,7 @@ protected:
 private:
     // Helper methods
     void onHandleWifiStatus(const WifiStatusEvent& status);
+    void onHandleButton(const ButtonEvent& button);
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.

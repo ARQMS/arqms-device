@@ -46,6 +46,10 @@ void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             onHandleWifiStatus(WifiStatusEvent(*pEvent));
             break;
 
+        case EventIdentifiers::BTN_CTRL_EVENT: 
+            onHandleButton(ButtonEvent(*pEvent));
+            break;
+
         // TODO job done, check if all jobs done configure sleep timer
         case EventIdentifiers::SENSOR_STATUS: {
             SensorStatusEvent status(*pEvent);
@@ -91,3 +95,14 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
         }
     }
 }
+
+void ControlTask::onHandleButton(const ButtonEvent& button) {
+    if (button.getButtonId() == ButtonId::SW_RESET) {
+        if (button.getStatus() == ButtonStatus::LONG_PRESS) {
+            s_pNvsStorageDriver->reset();
+        }
+        
+        esp_restart();
+    }
+}
+
