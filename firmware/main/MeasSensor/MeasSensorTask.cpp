@@ -1,19 +1,29 @@
 #include "MeasSensorTask.h"
 
 #include "Events/EventIdentifiers.h"
-#include "Events/SensorDataEvent.h"
     
-MeasSensorTask::MeasSensorTask() {
+MeasSensorTask::MeasSensorTask() : 
+    m_bosch680Sensor(),
+    m_pWaitDataTimer(NULL),
+    m_burstIdx(0U),
+    m_initialized(false) {
 }
 
 MeasSensorTask::~MeasSensorTask() {
 }
 
 void MeasSensorTask::onInitialize() {
-    // TODO initialize BME680 Driver
+    m_bosch680Sensor.initialize();
+
+    m_pWaitDataTimer = createOneShotTimer(2500);
 }
 
 void MeasSensorTask::onStart() {
+    m_initialized = m_bosch680Sensor.selfCheck();
+    if (!m_initialized) {
+        ESP_LOGE("MeasSensor", "Self-Check for BME680 sensor failed!");
+        sendStatus(SensorStatus::ERROR);
+    }
 }
 
 void MeasSensorTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
@@ -21,29 +31,55 @@ void MeasSensorTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     case EventIdentifiers::SENSOR_SNAPSHOT:
         onHandleSnapshot();
         break;
-        
-    default:
-        break;
     }
 }
 
 void MeasSensorTask::onHandleTimer(const TimerId timerId) {
-    // nothing to do
+    if (timerId == m_pWaitDataTimer->id) {
+        onHandleDataAvailable();
+    }
 }
 
 void MeasSensorTask::onHandleSnapshot() {
-    // TODO request data from BME680
+    // Sensor is already acquiring data, so do not start again
+    if (m_burstIdx != 0) return;
 
-    // TODO send data to Measurement
+    startSnapshot();
+}
+
+void MeasSensorTask::onHandleDataAvailable() {
     SensorDataEvent event;
-    event.setCo2(0.04f);
-    event.setPressure(1024.0f);
-    event.setRelativeHumidity(0.25f);
-    event.setTemperature(24.4f);
-    event.setVoc(98.4f);
+    m_bosch680Sensor.getData(event);
 
-    for (int i = 0; i < 5; i++) {
-        Measurement.send(EventIdentifiers::SENSOR_DATA_EVENT, &event);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    Measurement.send(EventIdentifiers::SENSOR_DATA_EVENT, &event);
+
+    // start over READ_SENSOR_BURST_NO times
+    if (m_burstIdx < READ_SENSOR_BURST_NO) {
+        startSnapshot();
     }
+    else {
+        sendStatus(SensorStatus::IDLE);
+        m_burstIdx = 0;
+    }
+}
+
+void MeasSensorTask::startSnapshot() {
+    if (!m_initialized) {
+        ESP_LOGW("MeasSensor", "Sensor is not initialized, no data acquired!");
+        return;
+    }
+
+    m_burstIdx++;
+    sendStatus(SensorStatus::ACQUIRE);
+
+    ESP_LOGI("MeasSensor", "Start snapshot (%i/%i)", m_burstIdx, READ_SENSOR_BURST_NO);
+
+    m_bosch680Sensor.startSnapshot();
+    m_pWaitDataTimer->start();
+}
+
+void MeasSensorTask::sendStatus(const SensorStatus status) {
+    SensorStatusEvent event(status);
+
+    Status.send(EventIdentifiers::SENSOR_STATUS, &event);
 }

@@ -2,13 +2,14 @@
 
 #include "Events/EventIdentifiers.h"
 #include "Events/WifiSettingsEvent.h"
+#include "Events/SensorStatusEvent.h"
 #include "Events/DeviceSettingsEvent.h"
     
 StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
 
 ControlTask::ControlTask() :
-    GuiSettings(),
-    WifiSettings(),
+    Gui(),
+    CloudLink(),
     m_coreSm() {
 }
 
@@ -33,24 +34,37 @@ void ControlTask::onStart() {
         m_coreSm.onRunning();
     }
 
-    WifiSettings.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
-    WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
+    CloudLink.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
+    CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
+
+    m_pDelayTimer = createOneShotTimer(deviceSettings.getInterval() * 1000);
 }
 
 void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
-        case EventIdentifiers::WIFI_STATUS_EVENT: {
-            WifiStatusEvent msg(*pEvent);
-            onHandleWifiStatus(msg);
+        case EventIdentifiers::WIFI_STATUS_EVENT: 
+            onHandleWifiStatus(WifiStatusEvent(*pEvent));
+            break;
+
+        // TODO job done, check if all jobs done configure sleep timer
+        case EventIdentifiers::SENSOR_STATUS: {
+            SensorStatusEvent status(*pEvent);
+            if (status.getStatus() == SensorStatus::IDLE) {
+                m_pDelayTimer->start();
+            }
         }
         break;
+
     default:
         break;
     }
 }
 
 void ControlTask::onHandleTimer(const TimerId timerId) {
-    // nothing to do
+    // TODO remove demo code
+    if (m_pDelayTimer->id == timerId) {
+        MeasSensor.send(EventIdentifiers::SENSOR_SNAPSHOT);
+    }
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
@@ -70,7 +84,7 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
 
             WifiSettingsEvent event;
             event.setMode(WifiMode::AP);
-            WifiSettings.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &event);
+            CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &event);
         }
         else if (status.getStatus() == WifiStatus::MQTT_CONNECTED) {
             MeasSensor.send(EventIdentifiers::SENSOR_SNAPSHOT);

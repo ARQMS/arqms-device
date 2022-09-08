@@ -1,6 +1,7 @@
 #include "MqttService.h"
 
 #include "MqttUtil.h"
+#include <cJSON.h>
 
 MqttService::MqttService(CloudLinkSenderIfc& sender) :
     m_pMqttClient(NULL),
@@ -41,11 +42,25 @@ esp_err_t MqttService::stopService() {
 void MqttService::publish(const SensorDataEvent& data) {
     m_sender.sendWifiStatus(WifiStatus::MQTT_SENDING);
 
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/humidity", data.getRelativeHumidity());
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/pressure", data.getPressure());
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/temperature", data.getTemperature());
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/voc", data.getVoc());
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/co2", data.getCo2());
+    cJSON* obj = cJSON_CreateObject();
+    cJSON* item = NULL;
+
+    item = cJSON_CreateNumber(data.getRelativeHumidity());
+    cJSON_AddItemToObject(obj, "Humidity", item);
+
+    item = cJSON_CreateNumber(data.getPressure());
+    cJSON_AddItemToObject(obj, "Pressure", item);
+
+    item = cJSON_CreateNumber(data.getTemperature());
+    cJSON_AddItemToObject(obj, "Temperature", item);
+
+    item = cJSON_CreateNumber(data.getGasResistance());
+    cJSON_AddItemToObject(obj, "GasResistance", item);
+
+    char8_t* json = cJSON_Print(obj);
+    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/info", json);
+
+    cJSON_Delete(obj);
 
     m_sender.sendWifiStatus(WifiStatus::MQTT_SENDED);
 }
@@ -56,9 +71,6 @@ void MqttService::onConnected() {
     MqttUtil::subscribe(m_pMqttClient, "devices/$sn/config");
 
     m_sender.sendWifiStatus(WifiStatus::MQTT_CONNECTED);
-
-    // TODO, remove demo
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/status", "Device online: But data not decoded");
 }
 
 void MqttService::onDisconnected() {
@@ -72,19 +84,14 @@ void MqttService::onFailure(const esp_mqtt_event_handle_t event) {
 void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
     m_sender.sendWifiStatus(WifiStatus::MQTT_RECEIVED);
 
-    ESP_LOGI("Humi", "Received %.*s", event->topic_len, event->topic);
-
-    // Demo
-    SensorDataEvent msg(1.2, 98.8, 20.5, 12.2, 0.5);
-    publish(msg);
-
-    // TODO handle new firmware, Attention: update has a placehlder 'device/$sn/config
-    // if (strcmp(event->topic, MQTT_SUB_DEVICE_CONFIGURATION)) {
-    // }
-
-    // TODO handle new firmware, Attention: update has a placehlder 'device/$channel/update
-    // if (strcmp(event->topic, MQTT_SUB_NEW_FIRMWARE)) {
-    // }
+    if (MqttUtil::isTopic("devices/$sn/config", event->topic)) {
+        // TODO
+        ESP_LOGW("MQTTService", "Received new configuration. Not implemented yet");
+    } 
+    else if (MqttUtil::isTopic("devices/$channel/update", event->topic)) {
+        // TODO
+        ESP_LOGW("MQTTService", "Received new firmware. Not implemented yet");
+    }
 }
 
 void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data) {

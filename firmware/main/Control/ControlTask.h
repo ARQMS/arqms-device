@@ -19,9 +19,10 @@
  */
 class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
 public:
-    EventPublisherSingle GuiSettings;
-    EventPublisherSingle WifiSettings;
+    EventPublisherSingle Gui;
+    EventPublisherSingle CloudLink;
     EventPublisherSingle MeasSensor;
+    EventPublisherSingle MeasFilter;
 
 public:
     /**
@@ -76,6 +77,7 @@ private:
 
     // Members
     static StorageDriverIfc* s_pNvsStorageDriver;
+    Timer* m_pDelayTimer;
     CoreSM m_coreSm;
 };
 

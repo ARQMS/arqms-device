@@ -7,7 +7,7 @@
 
 GuiUpdaterTask::GuiUpdaterTask() :
     m_airIndicator(LED_AIR_GOOD, LED_AIR_MOD, LED_AIR_POOR),
-    m_wlanIndicator(0, LED_WLAN),
+    m_ctrlIndicator(0, LED_WLAN),
     m_pRefreshTimer(NULL) {
 }
 
@@ -16,7 +16,7 @@ GuiUpdaterTask::~GuiUpdaterTask() {
 
 void GuiUpdaterTask::onInitialize()  {
     m_pRefreshTimer = createPeriodicTimer(REFRESH_RATE);
-    m_wlanIndicator.initialize();
+    m_ctrlIndicator.initialize();
 }
 
 void GuiUpdaterTask::onStart() {
@@ -25,17 +25,21 @@ void GuiUpdaterTask::onStart() {
 
 void GuiUpdaterTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
-        case EventIdentifiers::QUALITY_EVENT: {
-            AirQualityEvent event(*pEvent);
-            onHandleAirQuality(event);
-        }
-        break;
+        case EventIdentifiers::QUALITY_EVENT: 
+            onHandleAirQuality(AirQualityEvent(*pEvent));
+            break;
 
-        case EventIdentifiers::WIFI_STATUS_EVENT: {
-            WifiStatusEvent event(*pEvent);
-            onHandleWifiStatus(event);
-        }
-        break;
+        case EventIdentifiers::WIFI_STATUS_EVENT: 
+            onHandleWifiStatus(WifiStatusEvent(*pEvent));
+            break;
+
+        case EventIdentifiers::SENSOR_DATA_EVENT: 
+            onHandleSensorData(SensorDataEvent(*pEvent));
+            break;
+        
+        case EventIdentifiers::SENSOR_STATUS: 
+            onHandleSensorStatus(SensorStatusEvent(*pEvent));
+            break;
 
     default:
         break;
@@ -52,42 +56,45 @@ void GuiUpdaterTask::onHandleAirQuality(const AirQualityEvent& qualityEvent) {
     m_airIndicator.setQuality(qualityEvent.getQuality());
 }
 
+void GuiUpdaterTask::onHandleSensorData(const SensorDataEvent& data) {
+    // nothing to do
+}
+
 void GuiUpdaterTask::onHandleWifiStatus(const WifiStatusEvent& wifiStatus) {
     if (wifiStatus.getStatus() == WifiStatus::CLIENT_SEARCHING) {
-        m_wlanIndicator.setColor({0, 0, 255}, 500);
+        m_ctrlIndicator.setColor({0, 0, 255}, 500);
     }
     if (wifiStatus.getStatus() == WifiStatus::CONNECTING) {
-        m_wlanIndicator.setColor({0, 0, 255}, 100);
+        m_ctrlIndicator.setColor({0, 0, 255}, 100);
     }
     else if (wifiStatus.getStatus() == WifiStatus::CLIENT_CONNECTED) {
-        m_wlanIndicator.setColor({0, 0, 255});
+        m_ctrlIndicator.setColor({0, 0, 255});
     } 
     else if (wifiStatus.getStatus() == WifiStatus::CONNECTED) {
-        m_wlanIndicator.setColor({0, 0, 50}, 100);
+        m_ctrlIndicator.setColor({0, 0, 50}, 100);
     } 
     else if (wifiStatus.getStatus() == WifiStatus::MQTT_CONNECTED) {
-        m_wlanIndicator.setColor({0, 0, 255});
+        m_ctrlIndicator.setColor({0, 0, 255});
     } 
     else if (wifiStatus.getStatus() == WifiStatus::MQTT_DISCONNECTED) {
-        m_wlanIndicator.setColor({0, 0, 50}, 100);
-    } 
-    else if (wifiStatus.getStatus() == WifiStatus::MQTT_SENDING) {
-        m_wlanIndicator.setColor({255, 255, 0}, 50);
-    } 
-    else if (wifiStatus.getStatus() == WifiStatus::MQTT_SENDED) {
-        m_wlanIndicator.setColor({0, 0, 255});
+        m_ctrlIndicator.setColor({0, 0, 50}, 100);
     } 
     else if (wifiStatus.getStatus() == WifiStatus::UNKNOWN_ERROR) {
-        m_wlanIndicator.setColor({255, 0, 0}, 100);
-    } 
-    // else if (wifiStatus.getStatus() == WifiStatus::SENDING) {
-    //     // m_wlanIndicator.startBlink(50, yellow); // blink yellow
-    // } 
-    else {
+        m_ctrlIndicator.setColor({255, 0, 0}, 100);
+    }
+}
+
+void GuiUpdaterTask::onHandleSensorStatus(const SensorStatusEvent& status) {
+    if (status.getStatus() == SensorStatus::ACQUIRE) {
+        m_ctrlIndicator.setColor({255, 255, 0}, 50);
+    } else if (status.getStatus() == SensorStatus::IDLE) {
+        m_ctrlIndicator.setColor({0, 0, 255});
+    } else if (status.getStatus() == SensorStatus::ERROR){
+        m_ctrlIndicator.setColor({255, 0, 0}, 100);
     }
 }
 
 void GuiUpdaterTask::onHandleRefresh() {
-    m_wlanIndicator.refresh();
+    m_ctrlIndicator.refresh();
 }
 

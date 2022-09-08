@@ -27,7 +27,7 @@ void StartupController::initializeGpio() {
     // TODO
 
     // BME680 SPI GPIO
-    // TODO
+    // nothing to do
 
     // Usr Button GPIO  
     // TODO
@@ -40,7 +40,29 @@ void StartupController::initializeGpio() {
 }
 
 void StartupController::initializeSpi1() {
-    // TODO
+    // Datasheet [0] https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bme680-ds001.pdf
+    // https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/peripherals/spi_slave.html
+    spi_bus_config_t spiBusCfg = {
+        .mosi_io_num     = static_cast<int32_t>(BME680_SPI_MOSI),
+        .miso_io_num     = static_cast<int32_t>(BME680_SPI_MISO),
+        .sclk_io_num     = static_cast<int32_t>(BME680_SPI_SCK),
+        .data2_io_num    = -1,
+        .data3_io_num    = -1,
+        .data4_io_num    = -1,
+        .data5_io_num    = -1,
+        .data6_io_num    = -1,
+        .data7_io_num    = -1,
+    };
+    spi_device_interface_config_t spiDevCfg = {
+        .command_bits    = 0,
+        .address_bits    = 0,
+        .mode            = 0,                                       // Datasheet [0] page 40
+        .clock_speed_hz  = SPI_MASTER_FREQ_10M,                     // Datasheet [0] page 3
+        .spics_io_num    = static_cast<int32_t>(BME680_SPI_SS),
+        .queue_size      = 5
+    };
+    spi_bus_initialize(BME680_SPI_BUS, &spiBusCfg, SPI_DMA_DISABLED);
+    spi_bus_add_device(BME680_SPI_BUS, &spiDevCfg, &s_pSpi);
 }
 
 void StartupController::initializeAdc1() {

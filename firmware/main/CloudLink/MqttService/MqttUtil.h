@@ -69,12 +69,7 @@ public:
      * @param data the data to send (must be convertable to string)
      * @return message_id of the publish message (for QoS 0 message_id will always be zero) on success.
      *         -1 on failure.
-      */
-    template<typename T>
-    static int32_t publish(esp_mqtt_client_handle_t client, const char8_t* topic, const T& data) {
-        std::string valueStr(std::to_string(data));
-        return publish(client, topic, valueStr.c_str());
-    }
+     */
     static int32_t publish(esp_mqtt_client_handle_t client, const char8_t* topic, const char8_t* data) {
         if (client == NULL) return -1;
 
@@ -86,6 +81,20 @@ public:
         ESP_LOGD("Humi publish", "Publish to %s with %s", topicStr.c_str(), valueStr.c_str());
 
         return esp_mqtt_client_publish(client, topicStr.c_str(), valueStr.c_str(), 0, AT_MOST_ONCE, false);
+    }
+
+    /**
+     * Compares expected topic with placeholders and actual topic
+     * 
+     * @param expected the expected topic (with placeholder)
+     * @param topic the actual topic
+     * @return true whenever expected topic matches with actual topic
+     */
+    static bool isTopic(const char8_t* expected, const char8_t* topic) {
+        std::string expectedTopicStr(expected);
+        replacePlaceholders(expectedTopicStr);
+
+        return expectedTopicStr.compare(topic) == 0;
     }
 
 private:

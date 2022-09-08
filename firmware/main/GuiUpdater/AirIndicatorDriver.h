@@ -45,7 +45,7 @@ private:
     };
 
     // Constants
-    const static float32_t POOR_THRESHOLD;
+    const static float32_t GOOD_THRESHOLD;
     const static float32_t MOD_THRESHOLD;
     const static uint8_t ON;
     const static uint8_t OFF;
