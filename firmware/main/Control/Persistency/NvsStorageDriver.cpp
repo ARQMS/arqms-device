@@ -46,7 +46,6 @@ void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
     
     pDeviceParam->setBrokerUri(m_layout.brokerUri);
     pDeviceParam->setSn(m_layout.sn);
-    pDeviceParam->setRoom(m_layout.room);
     pDeviceParam->setInterval(m_layout.interval);
 }
 
@@ -67,10 +66,6 @@ bool NvsStorageDriver::get(const char8_t* name, void** data, size_t* const size)
         *data = m_layout.sn;
         *size = sizeof(m_layout.sn);
     }
-    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_ROOM)) {
-        *data = m_layout.room;
-        *size = sizeof(m_layout.room);
-    } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_INTERVAL)) {
         *data = &m_layout.interval;
         *size = sizeof(m_layout.interval);

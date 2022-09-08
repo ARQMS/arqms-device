@@ -37,12 +37,6 @@ menu "HumiDevice Configuration"
         help
             Serial number from device. Must be changed in production!
 
-    config DEVICE_ROOM
-        string "Default Room"
-        default "Office"
-        help
-            Default room. Is used when reseting flash
-
     config DEVICE_BROKER
         string "Default Broker URL"
         default "mqtt://192.168.0.16:1883"
