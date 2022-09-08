@@ -18,7 +18,7 @@
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class ControlTask : public TaskBase<5, sizeof(WifiStatusEvent)> {
+class ControlTask : public TaskBase<20, sizeof(WifiStatusEvent)> {
 public:
     EventPublisherSingle Gui;
     EventPublisherSingle CloudLink;
