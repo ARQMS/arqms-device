@@ -45,15 +45,15 @@ menu "HumiDevice Configuration"
 
     config DEVICE_BROKER
         string "Default Broker URL"
-        default "mqtt://192.168.0.16:8883"
+        default "mqtt://192.168.0.16:1883"
         help
             Default broker url. At the moment no DNS are supported. Eg mqtt://192.168.0.16:8883
 
     config DEVICE_INTERVAL
         int "Send interval"
         range 1 1440
-        default 15
+        default 300
         help
-            Default send interval. (In min)
+            Default send interval. (In sec)
         
 endmenu
