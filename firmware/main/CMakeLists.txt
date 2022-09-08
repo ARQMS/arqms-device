@@ -38,6 +38,8 @@ idf_component_register(
 
           "MeasFilter/MeasFilterTask.cpp"
           "MeasFilter/MovingAvgFilter.cpp"
+          
+          "PowerManagement/PowerManagementTask.cpp"
      INCLUDE_DIRS "."
      REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform Bosch68x.Api esp_local_ctrl mdns mqtt json
      EMBED_TXTFILES "../certs/cacert.pem" "../certs/prvtkey.pem"

@@ -40,9 +40,7 @@ bool BatteryStatusEvent::operator!=(const BatteryStatusEvent& right) const{
 }
 
 void BatteryStatusEvent::deserialize(Deserializer& deserializer){
-    uint8_t level;
-    deserializer >> level;
-    m_level = level; 
+    deserializer >> m_level;
 }
 
 void BatteryStatusEvent::serialize(Serializer& serializer) const{

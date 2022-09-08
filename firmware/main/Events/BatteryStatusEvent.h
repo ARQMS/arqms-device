@@ -72,6 +72,8 @@ public:
     uint8_t getLevel(void) const;
 
 private:
+    // Indicator for Battery Level
+    // Range 0..100
     uint8_t m_level;
 };
 
