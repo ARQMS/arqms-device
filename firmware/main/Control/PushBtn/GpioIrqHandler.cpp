@@ -30,4 +30,12 @@ void GpioIrqHandler::onGpioIsr(void* arg) {
 
     EventPublisherSingle& sender = GpioIrqHandler::getInstance().PushBtn;
     sender.send(EventIdentifiers::BTN_CTRL_EVENT, &event);
+
+    // Strange behavior, some times interrupt is fired twice, even osczilloscope can not detect any
+    // spikes. When a log is written, this issue does not occure. So it seems it in't a hardware issue.
+    // Furthermore, 'Queue full. No eventid %i to 0x00000040 sent' is written as error to output without
+    // the following log which indicates interrupt is called many times...
+    //
+    // For the moment, log any interrupt and avoid strange behavior
+    ESP_DRAM_LOGI("Btn", "Gpio ISR Edge detected");
 }
