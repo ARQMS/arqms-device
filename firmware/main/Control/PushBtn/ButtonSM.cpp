@@ -3,28 +3,25 @@
 ButtonSM::ButtonSM(const ButtonId id, ButtonSMIfc& sender) : 
     m_sender(sender),
     m_id(id),
-    m_pTimerLongPress(NULL),
+    m_pressTick(0U),
     m_currentState(State::RELEASED),
     m_nextState(State::RELEASED),
+    m_isShortPressed(false),
     m_isLongPressed(false),
-    m_stateChanged(false) {
-};
-
-ButtonSM::~ButtonSM() {
-};
-
-void ButtonSM::initialize(TimerServiceIfc& timerService) {
-    m_pTimerLongPress = timerService.createOneShotTimer(5000);
+    m_stateChangePending(false) {
 }
 
-void ButtonSM::onHandleTimer(TimerId timerId) {
-    m_isLongPressed = m_pTimerLongPress->id == timerId;
-
-    runStateMachine();
+ButtonSM::~ButtonSM() {
 }
 
 void ButtonSM::onStateChanged() {
-    m_stateChanged = true;
+    m_stateChangePending = true;
+
+    if (m_currentState == State::WAITING) {
+        m_isLongPressed = (xTaskGetTickCount() - m_pressTick) >= pdMS_TO_TICKS(LONG_PRESS_DURATION_MS);
+        m_isShortPressed = !m_isLongPressed && m_stateChangePending;
+    }
+
     runStateMachine();
 }
 
@@ -35,17 +32,20 @@ void ButtonSM::runStateMachine() {
         stateChanged = false;
         switch (m_currentState) {
             case State::RELEASED:
-                handleEvent(&m_stateChanged, State::WAITING);
+                handleEvent(&m_stateChangePending, State::WAITING);
                 break;
             
             case State::WAITING:
-                handleEvent(&m_stateChanged, State::SHORT_PRESSED);
+                handleEvent(&m_isShortPressed, State::SHORT_PRESSED);
                 handleEvent(&m_isLongPressed, State::LONG_PRESSED);
                 break;
 
-            case State::SHORT_PRESSED: // fall through
+            case State::SHORT_PRESSED:
+                handleEvent(&m_stateChangePending, State::RELEASED);
+                break;
+
             case State::LONG_PRESSED:
-                m_nextState = State::RELEASED;
+                handleEvent(&m_stateChangePending, State::RELEASED);
                 break;
 
             default:
@@ -60,18 +60,22 @@ void ButtonSM::runStateMachine() {
             onEnterState(m_currentState);
         }
 
-        // Run current state
-        onRunState(m_currentState);
-
     } while (stateChanged);
 }
 
 void ButtonSM::onEnterState(const State state) {
     switch (state) {
         case State::WAITING:
-            m_pTimerLongPress->start();
+            m_pressTick = xTaskGetTickCount();
             break;
 
+        default:
+            break;
+    }
+}
+
+void ButtonSM::onLeaveState(const State state) {
+    switch (state) {            
         case State::SHORT_PRESSED:
             m_sender.onButtonPressed(m_id, ButtonStatus::SHORT_PRESS);
             break;
@@ -80,21 +84,6 @@ void ButtonSM::onEnterState(const State state) {
             m_sender.onButtonPressed(m_id, ButtonStatus::LONG_PRESS);
             break;
 
-        default:
-            break;
-    }
-}
-
-void ButtonSM::onRunState(const State state) const {
-    // nothing to do
-}
-
-void ButtonSM::onLeaveState(const State state) {
-    switch (state) {
-        case State::WAITING:
-            m_pTimerLongPress->stop();
-            break;
-            
         default:
             break;
     }

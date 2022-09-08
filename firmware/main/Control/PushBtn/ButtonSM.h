@@ -10,16 +10,15 @@
 #include "ButtonSMIfc.h"
 
 /**
- * A software button driver which handles all states and actions fof a single button
+ * A button state machine which handles all states and actions for a single button. Debouncing is done in hardware
  */
 class ButtonSM {
 public:
     /**
      * Constructor 
      * 
-     * @param sender 
-     * @param timer 
-     * @param id 
+     * @param sender The sm callback interface
+     * @param id the button id which represented by this sm
      */
     ButtonSM(const ButtonId id, ButtonSMIfc& sender);
 
@@ -28,13 +27,15 @@ public:
      */
     ~ButtonSM();
 
-    void initialize(TimerServiceIfc& timerService);
-
-    void onHandleTimer(TimerId timerId);
-
+    /**
+     * Button state changed
+     */
     void onStateChanged();
 
 private:
+    // Constants
+    const static uint32_t LONG_PRESS_DURATION_MS = 5000; //< duration of long press in ms
+
     /**
      * Internal states of a button
      */
@@ -52,22 +53,21 @@ private:
 
     // state transitions
     void onEnterState(const State state);
-    void onRunState(const State state) const;
     void onLeaveState(const State state);
     // transitions
     void handleEvent(bool* const pFlag, const State nextState);
 
     ButtonSMIfc& m_sender;
-    ButtonId m_id;
-
-    Timer* m_pTimerLongPress;
+    const ButtonId m_id;
+    uint32_t m_pressTick;
 
     // state
     State m_currentState;
     State m_nextState;
 
+    bool m_isShortPressed;
     bool m_isLongPressed;
-    bool m_stateChanged;
+    bool m_stateChangePending;
 };
 
 #endif // BUTTON_DRIVER_H_

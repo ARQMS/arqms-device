@@ -17,8 +17,7 @@ PushBtnCtrlTask::~PushBtnCtrlTask() {
 }
 
 void PushBtnCtrlTask::onInitialize() {
-    m_swRstBtn.initialize(*this);
-    m_usrBtn.initialize(*this);
+    // nothing to do
 }
 
 void PushBtnCtrlTask::onStart() {
@@ -34,8 +33,7 @@ void PushBtnCtrlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
 }
 
 void PushBtnCtrlTask::onHandleTimer(TimerId timerId) {
-    m_swRstBtn.onHandleTimer(timerId);
-    m_usrBtn.onHandleTimer(timerId);
+    // nothing to do
 }
 
 void PushBtnCtrlTask::onHandleButtonEvent(const ButtonEvent& event) {
