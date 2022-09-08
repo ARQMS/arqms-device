@@ -10,6 +10,8 @@
 #include "Drivers/ApplicationHardwareConfig.h"
 #include "Drivers/StartupController.h"
 #include "Control/ControlTask.h"
+#include "Control/PushBtn/PushBtnCtrlTask.h"
+#include "Control/PushBtn/GpioIrqHandler.h"
 #include "GuiUpdater/GuiUpdaterTask.h"
 #include "CloudLink/CloudLinkTask.h"
 #include "MeasSensor/MeasSensorTask.h"
@@ -21,6 +23,7 @@ CREATE_TASK_DEF(GuiUpdater, 0xC00, 10) // 3kB Stack
 CREATE_TASK_DEF(MeasSensor, 0xC00, 10) // 3kB Stack
 CREATE_TASK_DEF(MeasFilter, 0x8000, 10) // 4kB Stack
 CREATE_TASK_DEF(CloudLink, 0x8000, 11) // 4kB Stack
+CREATE_TASK_DEF(PushBtnCtrl, 0xC00, 9) // 3kB Stack
 
 /**
  * The entry point for humi device. This is called after second bootloader has 
@@ -37,6 +40,7 @@ extern "C" void app_main(void) {
     StartupController::initializeGpio();
     StartupController::initializeSpi1();
     StartupController::initializeAdc1();
+    StartupController::initializeIrq();
 
     // create tasks
     ControlTask& control = *createControlTask();
@@ -44,6 +48,8 @@ extern "C" void app_main(void) {
     CloudLinkTask& cloudLink = *createCloudLinkTask();
     MeasSensorTask& measSensor = *createMeasSensorTask();
     MeasFilterTask& measFilter = *createMeasFilterTask();
+    PushBtnCtrlTask& btnCtrl = *createPushBtnCtrlTask();
+    GpioIrqHandler& gpioHandler = GpioIrqHandler::getInstance();
 
     // connect tasks
     control.Gui.connect(guiUpdater);
@@ -58,6 +64,8 @@ extern "C" void app_main(void) {
     measFilter.Measurement.connect(cloudLink);
     measFilter.Measurement.connect(guiUpdater);
     measFilter.Measurement.connect(control);
+    gpioHandler.PushBtn.connect(btnCtrl);
+    btnCtrl.Control.connect(control);
 
     // start tasks
     startGuiUpdaterTask();
@@ -65,5 +73,6 @@ extern "C" void app_main(void) {
     startCloudLinkTask();
     startMeasSensorTask();
     startMeasFilterTask();
+    startPushBtnCtrlTask();
 }
 

@@ -6,6 +6,7 @@ idf_component_register(
           "Events/DeviceSettingsEvent.cpp"
           "Events/SensorDataEvent.cpp"
           "Events/SensorStatusEvent.cpp"
+          "Events/ButtonEvent.cpp"
 
           "HumiDevice.cpp"
           "Drivers/ApplicationHardwareConfig.cpp"
@@ -18,6 +19,8 @@ idf_component_register(
           "Control/Persistency/NvsLayout.cpp"
           "Control/Persistency/NvsUtil.cpp"
           "Control/CoreSM/CoreSM.cpp"
+          "Control/PushBtn/PushBtnCtrlTask.cpp"
+          "Control/PushBtn/GpioIrqHandler.cpp"
           
           "GuiUpdater/GuiUpdaterTask.cpp"
           "GuiUpdater/AirIndicatorDriver.cpp"
