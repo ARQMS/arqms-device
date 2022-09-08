@@ -27,8 +27,8 @@ idf_component_register(
           "GuiUpdater/AirIndicatorDriver.cpp"
 
           "CloudLink/CloudLinkTask.cpp"
-          "CloudLink/Wifi.cpp"
-          "CloudLink/WifiStateMachine.cpp"
+          "CloudLink/Wifi/Wifi.cpp"
+          "CloudLink/Wifi/WifiStateMachine.cpp"
           "CloudLink/ConfigurationService/ConfigurationService.cpp"
           "CloudLink/MqttService/MqttService.cpp"
 

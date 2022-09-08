@@ -8,12 +8,12 @@
 #include "esp_wifi.h"
 
 // Project includes
-#include "ConfigurationService/ConfigurationServiceIfc.h"
-#include "WifiStateMachine.h"
-#include "CloudLinkSenderIfc.h"
-#include "MqttService/MqttServiceIfc.h"
+#include "CloudLink/ConfigurationService/ConfigurationServiceIfc.h"
+#include "CloudLink/CloudLinkSenderIfc.h"
+#include "CloudLink/MqttService/MqttServiceIfc.h"
 #include "Events/WifiSettingsEvent.h"
 #include "Events/DeviceSettingsEvent.h"
+#include "WifiStateMachine.h"
 
 /**
  * Represents the wifi phy
