@@ -10,7 +10,11 @@ StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
 ControlTask::ControlTask() :
     Gui(),
     CloudLink(),
-    m_coreSm() {
+    m_coreSm(),
+    m_lastWifiStatus(),
+    m_lastBatteryStatus(),
+    m_wifiReceived(false),
+    m_batteryReceived(false) {
 }
 
 ControlTask::~ControlTask() {
@@ -72,6 +76,9 @@ void ControlTask::onHandleTimer(const TimerId timerId) {
 }
 
 void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
+    m_lastWifiStatus = status;
+    m_wifiReceived = true;
+
     if (m_coreSm.isCurrentState(CoreSM::State::Service)) {
         if (status.getStatus() == WifiStatus::TIMEOUT
          || status.getStatus() == WifiStatus::CLIENT_DISCONNECTED) {
@@ -93,6 +100,8 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
         else if (status.getStatus() == WifiStatus::MQTT_CONNECTED) {
             MeasSensor.send(EventIdentifiers::SENSOR_SNAPSHOT);
         }
+
+        sendDeviceStatus();
     }
 }
 
@@ -106,3 +115,11 @@ void ControlTask::onHandleButton(const ButtonEvent& button) {
     }
 }
 
+void ControlTask::sendDeviceStatus() {
+    if (!m_wifiReceived || !m_batteryReceived) return;
+
+    uint64_t uptime = pdTICKS_TO_MS(xTaskGetTickCount());
+    DeviceInfoEvent deviceInfo(m_lastWifiStatus.getRssi(), m_lastBatteryStatus.getLevel(), uptime);
+
+    CloudLink.send(EventIdentifiers::DEVICE_INFO_EVENT, &deviceInfo);
+}

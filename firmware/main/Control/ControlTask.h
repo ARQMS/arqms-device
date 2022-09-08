@@ -10,6 +10,7 @@
 // Project includes
 #include "Events/WifiStatusEvent.h"
 #include "Events/ButtonEvent.h"
+#include "Events/BatteryStatusEvent.h"
 #include "Control/Persistency/StorageDriverIfc.h"
 #include "Control/CoreSM/CoreSM.h"
 
@@ -66,6 +67,7 @@ private:
     // Helper methods
     void onHandleWifiStatus(const WifiStatusEvent& status);
     void onHandleButton(const ButtonEvent& button);
+    void sendDeviceStatus();
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
@@ -79,8 +81,15 @@ private:
 
     // Members
     static StorageDriverIfc* s_pNvsStorageDriver;
+    
     Timer* m_pDelayTimer;
     CoreSM m_coreSm;
+
+    WifiStatusEvent m_lastWifiStatus;
+    BatteryStatusEvent m_lastBatteryStatus;
+
+    bool m_wifiReceived;
+    bool m_batteryReceived;
 };
 
 
