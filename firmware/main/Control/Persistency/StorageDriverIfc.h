@@ -32,6 +32,11 @@ public:
      * @param const DeviceParameters* 
      */
     virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) = 0;
+
+    /**
+     * Resets underlaying storage to default values. This action can not be undo!
+     */
+    virtual void reset() = 0;
 };
 
 

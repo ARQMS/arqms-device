@@ -97,6 +97,9 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
 }
 
 void ControlTask::onHandleButton(const ButtonEvent& button) {
-    ESP_LOGI("Control", "BTN %i, %i", button.getButtonId(), button.getStatus());
+    if (button.getButtonId() == ButtonId::SW_RESET && button.getStatus() == ButtonStatus::LONG_PRESS) {
+        s_pNvsStorageDriver->reset();
+        esp_restart();
+    }
 }
 

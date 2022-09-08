@@ -63,6 +63,11 @@ public:
      */
     virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) override;
     
+    /**
+     * @see StorageDriverIfc::reset
+     */
+    virtual void reset() override;
+
 private:
     // Helper Method
     bool checkVersion();
