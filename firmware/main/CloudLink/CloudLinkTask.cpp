@@ -23,22 +23,16 @@ void CloudLinkTask::onStart() {
 
 void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
-        case EventIdentifiers::WIFI_SETTINGS_EVENT: {
-            WifiSettingsEvent msg(*pEvent);
-            onHandleWifiSettings(msg);
-        }
+    case EventIdentifiers::WIFI_SETTINGS_EVENT: 
+        onHandleWifiSettings(WifiSettingsEvent(*pEvent));
         break;
 
-        case EventIdentifiers::DEVICE_SETTINGS_EVENT: {
-            DeviceSettingsEvent msg(*pEvent);
-            onHandleDeviceSettings(msg);
-        }
+    case EventIdentifiers::DEVICE_SETTINGS_EVENT: 
+        onHandleDeviceSettings(DeviceSettingsEvent(*pEvent));
         break;
-        
-        case EventIdentifiers::SENSOR_DATA_EVENT: {
-            SensorDataEvent msg(*pEvent);
-            onHandleSensorDataEvent(msg);
-        }
+    
+    case EventIdentifiers::SENSOR_DATA_EVENT: 
+        onHandleSensorDataEvent(SensorDataEvent(*pEvent));
         break;
 
     default:
