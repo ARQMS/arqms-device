@@ -11,6 +11,7 @@
 #include "MqttServiceIfc.h"
 #include "CloudLink/CloudLinkSenderIfc.h"
 #include "Events/SensorDataEvent.h"
+#include "Events/DeviceInfoEvent.h"
 
 /**
  * MQTT handler to publish and receive any supported mqtt packages
@@ -45,6 +46,13 @@ public:
      * @param data to publish
      */
     void publish(const SensorDataEvent& data);
+
+    /**
+     * Publishes the device info event data
+     * 
+     * @param data to publish
+     */
+    void publish(const DeviceInfoEvent& data);
 
 private:
     /**

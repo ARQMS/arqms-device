@@ -65,6 +65,29 @@ void MqttService::publish(const SensorDataEvent& data) {
     m_sender.sendWifiStatus(WifiStatus::MQTT_SENDED);
 }
 
+void MqttService::publish(const DeviceInfoEvent& data) {
+    m_sender.sendWifiStatus(WifiStatus::MQTT_SENDING);
+
+    cJSON* obj = cJSON_CreateObject();
+    cJSON* item = NULL;
+
+    item = cJSON_CreateNumber(data.getBatteryStatus().getLevel());
+    cJSON_AddItemToObject(obj, "BatteryLevel", item);
+
+    item = cJSON_CreateNumber(data.getWifiStatus().getRssi());
+    cJSON_AddItemToObject(obj, "ConnectivityStrength", item);
+
+    item = cJSON_CreateNumber(data.getUptime());
+    cJSON_AddItemToObject(obj, "RunningTime", item);
+    
+    char8_t* json = cJSON_Print(obj);
+    MqttUtil::publish(m_pMqttClient, "devices/$sn/status", json);
+
+    cJSON_Delete(obj);
+
+    m_sender.sendWifiStatus(WifiStatus::MQTT_SENDED);
+}
+
 void MqttService::onConnected() {
     // Register subscriptions
     MqttUtil::subscribe(m_pMqttClient, "devices/$channel/update");

@@ -8,6 +8,7 @@ idf_component_register(
           "Events/SensorStatusEvent.cpp"
           "Events/ButtonEvent.cpp"
           "Events/BatteryStatusEvent.cpp"
+          "Events/DeviceInfoEvent.cpp"
 
           "HumiDevice.cpp"
           "Drivers/ApplicationHardwareConfig.cpp"

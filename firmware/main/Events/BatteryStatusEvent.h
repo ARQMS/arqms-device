@@ -64,12 +64,12 @@ public:
     /**
      * Setter for Battery Level
      */
-    void setLevel(uint8_t level);
+    void setLevel(const uint8_t level);
 
     /**
      * Getter for Battery Level
      */
-    uint8_t getLevel(void);
+    uint8_t getLevel(void) const;
 
 private:
     uint8_t m_level;

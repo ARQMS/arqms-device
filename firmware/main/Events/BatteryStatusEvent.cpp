@@ -50,10 +50,10 @@ void BatteryStatusEvent::serialize(Serializer& serializer) const{
 }
 
 
-void BatteryStatusEvent::setLevel(uint8_t level){
+void BatteryStatusEvent::setLevel(const uint8_t level){
     m_level = level;
 }
 
-uint8_t BatteryStatusEvent::getLevel(){
+uint8_t BatteryStatusEvent::getLevel() const {
     return m_level;
 }

@@ -39,6 +39,10 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
         onHandleSensorDataEvent(SensorDataEvent(*pEvent));
         break;
 
+    case EventIdentifiers::DEVICE_INFO_EVENT: 
+        onHandleDeviceInfo(DeviceInfoEvent(*pEvent));
+        break;
+
     default:
         break;
     }
@@ -75,6 +79,10 @@ void CloudLinkTask::onHandleSensorDataEvent(const SensorDataEvent& settings) {
 
 void CloudLinkTask::onHandleDeviceSettings(const DeviceSettingsEvent& settings) {
     m_wifi.updateDeviceSettings(settings);
+}
+
+void CloudLinkTask::onHandleDeviceInfo(const DeviceInfoEvent& status) {
+    m_mqttService.publish(status);
 }
 
 void CloudLinkTask::onHandleTimeout() {

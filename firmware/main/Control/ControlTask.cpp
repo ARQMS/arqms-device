@@ -4,6 +4,7 @@
 #include "Events/WifiSettingsEvent.h"
 #include "Events/SensorStatusEvent.h"
 #include "Events/DeviceSettingsEvent.h"
+#include "Events/DeviceInfoEvent.h"
     
 StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
 
@@ -48,6 +49,10 @@ void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
         case EventIdentifiers::WIFI_STATUS_EVENT: 
             onHandleWifiStatus(WifiStatusEvent(*pEvent));
+            break;
+        
+        case EventIdentifiers::BATTERY_LEVEL_EVENT:
+            onHandleBatteryStatus(BatteryStatusEvent(*pEvent));
             break;
 
         case EventIdentifiers::BTN_CTRL_EVENT: 
@@ -105,6 +110,15 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
     }
 }
 
+void ControlTask::onHandleBatteryStatus(const BatteryStatusEvent& status) {
+    m_lastBatteryStatus = status;
+    m_batteryReceived = true;
+
+    ESP_LOGI("Control Task", "Handle Battery Status Event");
+
+    sendDeviceStatus();
+}
+
 void ControlTask::onHandleButton(const ButtonEvent& button) {
     if (button.getButtonId() == ButtonId::SW_RESET) {
         if (button.getStatus() == ButtonStatus::LONG_PRESS) {
@@ -118,8 +132,11 @@ void ControlTask::onHandleButton(const ButtonEvent& button) {
 void ControlTask::sendDeviceStatus() {
     if (!m_wifiReceived || !m_batteryReceived) return;
 
-    uint64_t uptime = pdTICKS_TO_MS(xTaskGetTickCount());
-    DeviceInfoEvent deviceInfo(m_lastWifiStatus.getRssi(), m_lastBatteryStatus.getLevel(), uptime);
+    m_wifiReceived = false;
+    m_batteryReceived = false;
+
+    uint32_t uptime = pdTICKS_TO_MS(xTaskGetTickCount());
+    DeviceInfoEvent deviceInfo(m_lastBatteryStatus, m_lastWifiStatus, uptime);
 
     CloudLink.send(EventIdentifiers::DEVICE_INFO_EVENT, &deviceInfo);
 }

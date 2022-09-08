@@ -11,6 +11,7 @@
 #include "Events/WifiSettingsEvent.h"
 #include "Events/WifiStatusEvent.h"
 #include "Events/SensorDataEvent.h"
+#include "Events/DeviceInfoEvent.h"
 #include "Wifi/Wifi.h"
 #include "CloudLinkSenderIfc.h"
 #include "ConfigurationService/ConfigurationService.h"
@@ -66,6 +67,7 @@ private:
     // Helper methods
     void onHandleWifiSettings(const WifiSettingsEvent& settings);
     void onHandleDeviceSettings(const DeviceSettingsEvent& settings);
+    void onHandleDeviceInfo(const DeviceInfoEvent& status);
     void onHandleSensorDataEvent(const SensorDataEvent& settings);
     void onHandleTimeout();
     void onHandleRssiUpdate();

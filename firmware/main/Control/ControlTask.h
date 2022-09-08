@@ -66,6 +66,7 @@ protected:
 private:
     // Helper methods
     void onHandleWifiStatus(const WifiStatusEvent& status);
+    void onHandleBatteryStatus(const BatteryStatusEvent& status);
     void onHandleButton(const ButtonEvent& button);
     void sendDeviceStatus();
 
