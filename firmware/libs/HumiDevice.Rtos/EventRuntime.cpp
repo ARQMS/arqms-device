@@ -57,7 +57,7 @@ void EventRuntime::send(const SubscriberId handle, const EventId id, const Event
     }
 
     if (xMessageBufferSendFromISR(handle, (void*)dataStream, serializer.getBufferPos(), 0) == 0) {
-        ESP_LOGE("HumiDevice", "Queue full. No eventid %i to %p sent", id, handle);
+        ESP_DRAM_LOGE("HumiDevice", "Queue full. No eventid %i to %p sent", id, handle);
     }
 }
 
