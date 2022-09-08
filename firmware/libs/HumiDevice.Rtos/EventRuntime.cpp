@@ -56,9 +56,7 @@ void EventRuntime::send(const SubscriberId handle, const EventId id, const Event
         pData->serialize(serializer);
     }
 
-    ESP_LOGV("HumiDevice", "Sending ID %i to %p", id, handle);
-
-    if (xMessageBufferSend(handle, (void*)dataStream, serializer.getBufferPos(), 0) == 0) {
+    if (xMessageBufferSendFromISR(handle, (void*)dataStream, serializer.getBufferPos(), 0) == 0) {
         ESP_LOGE("HumiDevice", "Queue full. No eventid %i to %p sent", id, handle);
     }
 }
@@ -70,8 +68,6 @@ void EventRuntime::process(TaskIfc& task, const void* pData, const size_t dataLe
     EventId id;
 
     deserializer >> id;
-
-    ESP_LOGV("HumiDevice", "Received ID %i in %p", id, task.getSubscriberId());
 
     task.execute(id, &deserializer);
 }
