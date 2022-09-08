@@ -80,6 +80,7 @@ float32_t MeasFilterTask::calcAirIndex(const float32_t humidity, const float32_t
     const static float32_t WEIGHT_TEMP = 0.05f;
 
     // air quality index 0..1 is calcualted based on custom formula without any science background
+    // see https://github.com/ARQMS/arqms-device/wiki/Air-Quality-Index for more details
     const static float32_t TARGET_HUMIDITY = 45.f;
     const static float32_t TARGET_TEMP = 23.f;
 
