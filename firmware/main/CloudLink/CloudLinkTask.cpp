@@ -11,8 +11,7 @@ CloudLinkTask::CloudLinkTask() :
     m_mqttService(*this),
     m_wifi(*this, m_ctrlHandler, m_mqttService),
     m_lastWifiEvent(),
-    m_pTimeoutTimer(NULL),
-    m_pWifiStateUpdater(NULL) {
+    m_pTimeoutTimer(NULL) {
 }
 
 CloudLinkTask::~CloudLinkTask() {
@@ -20,7 +19,6 @@ CloudLinkTask::~CloudLinkTask() {
 
 void CloudLinkTask::onInitialize()  {
     m_pTimeoutTimer = createOneShotTimer(TIMEOUT_SERVICE_MODE_MS);
-    m_pWifiStateUpdater = createOneShotTimer(RSSI_UPDATE_PERIOD_MS);
 }
 
 void CloudLinkTask::onStart() {
@@ -54,9 +52,6 @@ void CloudLinkTask::onHandleTimer(TimerId timerId) {
     if (m_pTimeoutTimer->id == timerId) {
         onHandleTimeout();
     }
-    else if (m_pWifiStateUpdater->id == timerId) {
-        onHandleWifiStateUpdate();
-    }
 }
 
 void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
@@ -69,6 +64,9 @@ void CloudLinkTask::onHandleWifiSettings(const WifiSettingsEvent& settings) {
     else if (settings.getMode() == WifiMode::STA) {
         m_wifi.startNormalMode();
         m_pTimeoutTimer->start();
+    }
+    else if (settings.getMode() == WifiMode::NONE) {
+        m_wifi.reset();
     }
     else {
         ESP_LOGW("CloudLinkTask", "Mode %i not supported", settings.getMode());
@@ -93,6 +91,9 @@ void CloudLinkTask::onHandleSensorDataEvent(const SensorDataEvent& settings) {
     );
 
     m_mqttService.publish("devices/$sn/room/info", roomStatus);
+    
+    m_lastWifiEvent.setLastSentMsg(EventIdentifiers::SENSOR_DATA_EVENT);
+    onHandleWifiStateUpdate();
 }
 
 void CloudLinkTask::onHandleDeviceInfo(const DeviceStatusEvent& status) {
@@ -108,6 +109,9 @@ void CloudLinkTask::onHandleDeviceInfo(const DeviceStatusEvent& status) {
     );
 
     m_mqttService.publish("devices/$sn/status", deviceInfo);
+
+    m_lastWifiEvent.setLastSentMsg(EventIdentifiers::DEVICE_STATUS_EVENT);
+    onHandleWifiStateUpdate();
 }
 
 void CloudLinkTask::onHandleTimeout() {
@@ -123,9 +127,6 @@ void CloudLinkTask::sendWifiStatus(const WifiStatus status, int32_t rssi) {
     m_lastWifiEvent.setRssi(rssi);
 
     Status.send(EventIdentifiers::WIFI_STATUS_EVENT, &m_lastWifiEvent);
-
-    // start new timeout, just ensure wifi status is updated periodicaly
-    m_pWifiStateUpdater->start();
 }
 
 void CloudLinkTask::onDeviceConfig(const HDPDeviceConfig& msg) {

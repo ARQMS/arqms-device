@@ -73,7 +73,6 @@ protected:
 private:
     // constant
     static const uint32_t TIMEOUT_SERVICE_MODE_MS = 60 * 1000; // 1min
-    static const uint32_t RSSI_UPDATE_PERIOD_MS = 30 * 1000; // 30sec
 
     // Helper methods
     void onHandleWifiSettings(const WifiSettingsEvent& settings);
@@ -100,7 +99,6 @@ private:
     WifiStatusEvent m_lastWifiEvent;
 
     Timer* m_pTimeoutTimer;
-    Timer* m_pWifiStateUpdater;
 };
 
 

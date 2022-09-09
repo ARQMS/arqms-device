@@ -10,6 +10,7 @@ idf_component_register(
           "Events/DeviceInfoEvent.cpp"
           "Events/DeviceStatusEvent.cpp"
           "Events/DeviceConfigEvent.cpp"
+          "Events/DisplayInfoEvent.cpp"
 
           "HumiDevice.cpp"
           "Drivers/ApplicationHardwareConfig.cpp"

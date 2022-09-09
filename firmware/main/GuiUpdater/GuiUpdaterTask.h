@@ -4,6 +4,7 @@
 // Platform
 #include <HumiDevice.Platform/Platform.h>
 #include <HumiDevice.Rtos/TaskBase.h>
+#include <HumiDevice.Rtos/EventPublisherSingle.h>
 
 // Project includes
 #include "AirIndicatorDriver.h"
@@ -23,7 +24,7 @@
  */
 class GuiUpdaterTask : public TaskBase<10, sizeof(SensorDataEvent)> {
 public:
-    // no outputs
+    EventPublisherSingle Control;
 
 public:
     /**
@@ -56,6 +57,7 @@ protected:
 private:
     // refresh rate of ui
     static const uint32_t REFRESH_RATE = (1 / 20.f) * 1000; // 50ms
+    static const uint32_t DELAY_MS = 15000; // 15s
 
     // Helper methods
     void onHandleAirQuality(const AirQualityEvent& quality);
@@ -64,6 +66,7 @@ private:
     void onHandleSensorStatus(const SensorStatusEvent& status);
     void onHandleButton(const ButtonEvent& button);
     void onHandleRefresh();
+    void onHandleDelay();
 
     void disable();
     void enable();
@@ -81,9 +84,9 @@ private:
     // Private Members
     AirIndicatorDriver m_airIndicator;
     SK6805Driver m_ctrlIndicator;
-    bool m_isActive;
 
     Timer* m_pRefreshTimer;
+    Timer* m_pDelayTimer;
 };
 
 

@@ -22,7 +22,8 @@ struct EventIdentifiers {
     const static EventId DEVICE_UPDATE_EVENT    = 64;
     const static EventId SENSOR_DATA_EVENT      = 65;
     const static EventId SENSOR_SNAPSHOT        = 66;
-    const static EventId SENSOR_STATUS          = 67;
+    const static EventId SENSOR_STATUS_EVENT    = 67;
+    const static EventId DISPLAY_INFO_EVENT     = 68;
 
     const static EventId BATTERY_LEVEL_EVENT    = 70;
 

@@ -59,11 +59,11 @@ extern "C" void app_main(void) {
     control.CloudLink.connect(cloudLink);
     control.MeasSensor.connect(measSensor);
     control.MeasFilter.connect(measFilter);
+    guiUpdater.Control.connect(control);
     cloudLink.Status.connect(control);
     cloudLink.Status.connect(guiUpdater);
     cloudLink.Control.connect(control);
     measSensor.Measurement.connect(measFilter);
-    measSensor.Status.connect(control);
     measSensor.Status.connect(guiUpdater);
     measFilter.Measurement.connect(cloudLink);
     measFilter.Measurement.connect(guiUpdater);

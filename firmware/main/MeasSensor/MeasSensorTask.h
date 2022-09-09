@@ -22,7 +22,7 @@
 class MeasSensorTask : public TaskBase<10, sizeof(EventId)> {
 public:
     EventPublisherSingle Measurement;
-    EventPublisherMultiple<2> Status;
+    EventPublisherSingle Status;
 
 public:
     /**
