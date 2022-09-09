@@ -26,7 +26,7 @@ void PushBtnCtrlTask::onStart() {
 
 void PushBtnCtrlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
     switch (eventId) {
-    case EventIdentifiers::BTN_CTRL_EVENT:
+    case EventIdentifiers::DEVICE_BTN_EVENT:
         onHandleButtonEvent(ButtonEvent(*pEvent));
         break;
     }
@@ -54,5 +54,5 @@ void PushBtnCtrlTask::onHandleButtonEvent(const ButtonEvent& event) {
 
 void PushBtnCtrlTask::onButtonPressed(const ButtonId id, const ButtonStatus status) {
     ButtonEvent event(id, status);
-    Control.send(EventIdentifiers::BTN_CTRL_EVENT, &event);
+    Control.send(EventIdentifiers::DEVICE_BTN_EVENT, &event);
 }

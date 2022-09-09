@@ -18,9 +18,6 @@ enum class WifiStatus : uint8_t {
     // Protocol
     MQTT_CONNECTED,
     MQTT_DISCONNECTED,
-    MQTT_RECEIVED,
-    MQTT_SENDING,
-    MQTT_SENDED,
 
     // AP mode
     CLIENT_SEARCHING,
@@ -47,7 +44,7 @@ public:
     /**
      * Custom constructor.
      */
-    WifiStatusEvent(const int32_t rssi, const WifiStatus status);
+    WifiStatusEvent(const int32_t rssi, const uint8_t lastSentMsg, const WifiStatus status);
 
     /**
      * Copy constructor.
@@ -102,6 +99,16 @@ public:
     int32_t getRssi(void) const;
 
     /**
+     * Setter for sentMsg
+     */
+    void setLastSentMsg(const uint8_t sentMsg);
+
+    /**
+     * Getter for sentMsg
+     */
+    uint8_t getLastSentMsg(void) const;
+
+    /**
      * Setter for status
      */
     void setStatus(const WifiStatus status);
@@ -113,6 +120,7 @@ public:
     
 private:
     int32_t m_rssi; 
+    uint8_t m_lastSentMsg;
     WifiStatus m_status;
 };
 

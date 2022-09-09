@@ -29,7 +29,7 @@ void GpioIrqHandler::onGpioIsr(void* arg) {
     ButtonEvent event(static_cast<ButtonId>(gpioNum), ButtonStatus::SHORT_PRESS);
 
     EventPublisherSingle& sender = GpioIrqHandler::getInstance().PushBtn;
-    sender.send(EventIdentifiers::BTN_CTRL_EVENT, &event);
+    sender.send(EventIdentifiers::DEVICE_BTN_EVENT, &event);
 
     // Strange behavior, some times interrupt is fired twice, even osczilloscope can not detect any
     // spikes. When a log is written, this issue does not occure. So it seems it in't a hardware issue.

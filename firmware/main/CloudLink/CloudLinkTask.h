@@ -11,7 +11,8 @@
 #include "Events/WifiSettingsEvent.h"
 #include "Events/WifiStatusEvent.h"
 #include "Events/SensorDataEvent.h"
-#include "Wifi.h"
+#include "Events/DeviceStatusEvent.h"
+#include "Wifi/Wifi.h"
 #include "CloudLinkSenderIfc.h"
 #include "ConfigurationService/ConfigurationService.h"
 #include "MqttService/MqttService.h"
@@ -21,9 +22,10 @@
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class CloudLinkTask : public TaskBase<10, sizeof(DeviceSettingsEvent)>, CloudLinkSenderIfc {
+class CloudLinkTask : public TaskBase<10, sizeof(DeviceInfoEvent)>, CloudLinkSenderIfc {
 public:
-    EventPublisherMultiple<2> StatusEvent;
+    EventPublisherMultiple<2> Status;
+    EventPublisherSingle Control;
 
 public:
     /**
@@ -39,7 +41,17 @@ public:
     /**
      * @see CloudLinkSenderIfc::sendWifiStatus
      */
-    virtual void sendWifiStatus(const WifiStatus status, const int32_t rssi = 0) override;
+    virtual void sendWifiStatus(const WifiStatus status, int32_t rssi = 0) override;
+
+    /**
+     * @see CloudLinkSenderIfc::onDeviceConfig
+     */
+    virtual void onDeviceConfig(const HDPDeviceConfig& msg) override;
+
+    /**
+     * @see CloudLinkSenderIfc::onUpdateInfo
+     */
+    virtual void onUpdateInfo(const HDPUpdateInfo& msg) override;
 
 protected:
     /**
@@ -60,13 +72,15 @@ protected:
 
 private:
     // constant
-    static const uint32_t TIMEOUT_SERVICE_MODE = 60 * 1000; // 1min
+    static const uint32_t TIMEOUT_SERVICE_MODE_MS = 60 * 1000; // 1min
 
     // Helper methods
     void onHandleWifiSettings(const WifiSettingsEvent& settings);
-    void onHandleDeviceSettings(const DeviceSettingsEvent& settings);
+    void onHandleDeviceSettings(const DeviceInfoEvent& settings);
+    void onHandleDeviceInfo(const DeviceStatusEvent& status);
     void onHandleSensorDataEvent(const SensorDataEvent& settings);
     void onHandleTimeout();
+    void onHandleWifiStateUpdate();
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
@@ -82,6 +96,8 @@ private:
     ConfigurationService m_ctrlHandler;
     MqttService m_mqttService;
     Wifi m_wifi;
+    WifiStatusEvent m_lastWifiEvent;
+
     Timer* m_pTimeoutTimer;
 };
 

@@ -1,5 +1,5 @@
-#ifndef DEVICE_SETTING_EVENT_H_
-#define DEVICE_SETTING_EVENT_H_
+#ifndef DEVICE_INFO_EVENT_H_
+#define DEVICE_INFO_EVENT_H_
 
 // Platform
 #include <HumiDevice.Platform/Platform.h>
@@ -8,54 +8,54 @@
 /**
  * A device settings event which holds configuration for device
  */
-class DeviceSettingsEvent : public EventIfc {
+class DeviceInfoEvent : public EventIfc {
 public:
     // Constants
     static const size_t MAX_SN_LENGTH  = 32;
-    static const size_t MAX_ROOM_LENGTH  = 32;
+    static const size_t MAX_CHANNEL_LENGTH  = 32;
     static const size_t MAX_BROKER_URI_LENGTH  = 64;
 
     /**
      * Default constructor.
      */
-    DeviceSettingsEvent(void);
+    DeviceInfoEvent(void);
 
     /**
      * Custom constructor.
      */
-    DeviceSettingsEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t sn[MAX_SN_LENGTH], const char8_t room[MAX_ROOM_LENGTH], const uint32_t interval);
+    DeviceInfoEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t channel[MAX_CHANNEL_LENGTH], const char8_t sn[MAX_SN_LENGTH], const uint32_t interval);
 
     /**
      * Copy constructor.
      * @param other The copied instance.
      */
-    DeviceSettingsEvent(const DeviceSettingsEvent& other);
+    DeviceInfoEvent(const DeviceInfoEvent& other);
 
     /**
      * Constructor from deserializer.
      */
-    explicit DeviceSettingsEvent(Deserializer& deserializer);
+    explicit DeviceInfoEvent(Deserializer& deserializer);
 
     /**
      * Destructor.
      */
-    virtual ~DeviceSettingsEvent(void);
+    virtual ~DeviceInfoEvent(void);
 
     /**
      * Assignment operator.
      * @param other the assignator instance.
      */
-    DeviceSettingsEvent& operator=(const DeviceSettingsEvent& other);
+    DeviceInfoEvent& operator=(const DeviceInfoEvent& other);
 
     /**
      * Equality operator.
      */
-    bool operator==(const DeviceSettingsEvent& right) const;
+    bool operator==(const DeviceInfoEvent& right) const;
 
     /**
      * Inequality operator.
      */
-    bool operator!=(const DeviceSettingsEvent& right) const;
+    bool operator!=(const DeviceInfoEvent& right) const;
 
     /**
      * @see SerializableIfc
@@ -78,6 +78,16 @@ public:
     void getBrokerUri(char8_t brokerUri[MAX_BROKER_URI_LENGTH]) const;
 
     /**
+     * Setter for channel
+     */
+    void setChannel(const char8_t channel[MAX_CHANNEL_LENGTH]);
+
+    /**
+     * Getter for channel
+     */
+    void getChannel(char8_t channel[MAX_CHANNEL_LENGTH]) const;
+
+    /**
      * Setter for sn
      */
     void setSn(const char8_t sn[MAX_SN_LENGTH]);
@@ -86,16 +96,6 @@ public:
      * Getter for sn
      */
     void getSn(char8_t sn[MAX_SN_LENGTH]) const;
-
-    /**
-     * Setter for room
-     */
-    void setRoom(const char8_t room[MAX_ROOM_LENGTH]);
-
-    /**
-     * Getter for room
-     */
-    void getRoom(char8_t room[MAX_ROOM_LENGTH]) const;
 
     /**
      * Setter for interval
@@ -109,11 +109,11 @@ public:
 
 private:
     char8_t m_sn[MAX_SN_LENGTH];
-    char8_t m_room[MAX_ROOM_LENGTH];
+    char8_t m_channel[MAX_CHANNEL_LENGTH];
     char8_t m_brokerUri[MAX_BROKER_URI_LENGTH];
     uint32_t m_interval;
 };
 
 
 
-#endif // DEVICE_SETTING_EVENT_H_
+#endif // DEVICE_INFO_EVENT_H_

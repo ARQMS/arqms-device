@@ -8,12 +8,12 @@
 #include "esp_wifi.h"
 
 // Project includes
-#include "ConfigurationService/ConfigurationServiceIfc.h"
-#include "WifiStateMachine.h"
-#include "CloudLinkSenderIfc.h"
-#include "MqttService/MqttServiceIfc.h"
+#include "CloudLink/ConfigurationService/ConfigurationServiceIfc.h"
+#include "CloudLink/CloudLinkSenderIfc.h"
+#include "CloudLink/MqttService/MqttServiceIfc.h"
 #include "Events/WifiSettingsEvent.h"
-#include "Events/DeviceSettingsEvent.h"
+#include "Events/DeviceInfoEvent.h"
+#include "WifiStateMachine.h"
 
 /**
  * Represents the wifi phy
@@ -55,7 +55,7 @@ public:
      * Updates internal device structure
      * @param settings to apply
      */
-    void updateDeviceSettings(const DeviceSettingsEvent& settings);
+    void updateDeviceSettings(const DeviceInfoEvent& settings);
 
     /**
      * Called after timout is reached.
@@ -66,6 +66,13 @@ public:
      * Resets the wifi peripheral
      */
     void reset();
+
+    /**
+     * Gets the signal strength in rssi format
+     * 
+     * @return int32_t rssi strength
+     */
+    int32_t getSignalStrength() const;
 private:
     // Constants
     const static uint8_t MAXIMUM_RETRY = 5U;            //< maximum wifi re-try
@@ -86,7 +93,7 @@ private:
     bool m_deviceSettingsUpdated;
 
     WifiSettingsEvent m_wifiSettings;
-    DeviceSettingsEvent m_deviceSettings;
+    DeviceInfoEvent m_deviceSettings;
 
     WifiStateMachine m_wifiSm;
     CloudLinkSenderIfc& m_sender;
@@ -94,6 +101,9 @@ private:
 
     ConfigurationServiceIfc& m_ctrlHandler;
     MqttServiceIfc& m_mqttService;
+
+    // fix bug in IDF: https://github.com/espressif/esp-idf/issues/4411
+    esp_netif_t* m_pEspNet;
 };
 
 #endif // WIFI_H_

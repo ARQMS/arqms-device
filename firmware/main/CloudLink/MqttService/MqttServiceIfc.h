@@ -5,7 +5,7 @@
 #include <HumiDevice.Platform/Platform.h>
 
 // Project include
-#include "Events/DeviceSettingsEvent.h"
+#include "Events/DeviceInfoEvent.h"
 
 /**
  * MQTT handler to publish and receive any supported mqtt packages
@@ -24,7 +24,7 @@ public:
      * 
      * @param deviceSettings settings of the device for mqtt
      */
-    virtual esp_err_t startService(const DeviceSettingsEvent& deviceSettings) = 0;
+    virtual esp_err_t startService(const DeviceInfoEvent& deviceSettings) = 0;
 
     /**
      * Stops the mqtt service

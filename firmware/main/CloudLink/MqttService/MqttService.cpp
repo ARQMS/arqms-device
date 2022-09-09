@@ -3,20 +3,26 @@
 #include "MqttUtil.h"
 #include <cJSON.h>
 
+#define TOPIC_UPDATE_INFO "devices/update/$channel"
+#define TOPIC_CONFIG      "devices/$sn/config"
+
 MqttService::MqttService(CloudLinkSenderIfc& sender) :
     m_pMqttClient(NULL),
     m_sender(sender) {
 }
 
-esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
-    char8_t brokerUri[DeviceSettingsEvent::MAX_BROKER_URI_LENGTH];
-    char8_t sn[DeviceSettingsEvent::MAX_SN_LENGTH];
+esp_err_t MqttService::startService(const DeviceInfoEvent& deviceSettings) {
+    char8_t brokerUri[DeviceInfoEvent::MAX_BROKER_URI_LENGTH];
+    char8_t sn[DeviceInfoEvent::MAX_SN_LENGTH];
+    char8_t channel[DeviceInfoEvent::MAX_CHANNEL_LENGTH];
 
     deviceSettings.getBrokerUri(brokerUri);
     deviceSettings.getSn(sn);
+    deviceSettings.getChannel(channel);
 
     // just ensure broker is configured
-    if (strlen(brokerUri) <= 0) {
+    if (strlen(brokerUri) <= 0 || strlen(channel) <= 0 || strlen(sn) <= 0) {
+        ESP_LOGE("MQTT", "Invalid configuration:\n\tURI:%s\n\tSN:%s\n\tChannel:%s", brokerUri, sn, channel);
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -27,7 +33,7 @@ esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
 
     // register possible placeholders, just ensure MqttUtil::NUM_PLACEHOLDER matches and length is not longer than MqttUtil::MAX_PLACEHOLDER_LENGTH
     MqttUtil::registerPlaceholder("$sn", sn);
-    MqttUtil::registerPlaceholder("$channel", "dev");
+    MqttUtil::registerPlaceholder("$channel", channel);
 
     m_pMqttClient = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_register_event(m_pMqttClient, MQTT_EVENT_ANY, &MqttService::mqttEventHandler, this);
@@ -39,36 +45,22 @@ esp_err_t MqttService::stopService() {
     return esp_mqtt_client_stop(m_pMqttClient);
 }
 
-void MqttService::publish(const SensorDataEvent& data) {
-    m_sender.sendWifiStatus(WifiStatus::MQTT_SENDING);
-
+void MqttService::publish(const char8_t* topic, const HDPMessage& data) {
     cJSON* obj = cJSON_CreateObject();
-    cJSON* item = NULL;
 
-    item = cJSON_CreateNumber(data.getRelativeHumidity());
-    cJSON_AddItemToObject(obj, "Humidity", item);
-
-    item = cJSON_CreateNumber(data.getPressure());
-    cJSON_AddItemToObject(obj, "Pressure", item);
-
-    item = cJSON_CreateNumber(data.getTemperature());
-    cJSON_AddItemToObject(obj, "Temperature", item);
-
-    item = cJSON_CreateNumber(data.getGasResistance());
-    cJSON_AddItemToObject(obj, "GasResistance", item);
+    data.getJson(obj);
 
     char8_t* json = cJSON_Print(obj);
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/info", json);
+    MqttUtil::publish(m_pMqttClient, topic, json);
 
+    cJSON_free(json);
     cJSON_Delete(obj);
-
-    m_sender.sendWifiStatus(WifiStatus::MQTT_SENDED);
 }
 
 void MqttService::onConnected() {
     // Register subscriptions
-    MqttUtil::subscribe(m_pMqttClient, "devices/$channel/update");
-    MqttUtil::subscribe(m_pMqttClient, "devices/$sn/config");
+    MqttUtil::subscribe(m_pMqttClient, TOPIC_UPDATE_INFO);
+    MqttUtil::subscribe(m_pMqttClient, TOPIC_CONFIG);
 
     m_sender.sendWifiStatus(WifiStatus::MQTT_CONNECTED);
 }
@@ -82,20 +74,29 @@ void MqttService::onFailure(const esp_mqtt_event_handle_t event) {
 }
 
 void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
-    m_sender.sendWifiStatus(WifiStatus::MQTT_RECEIVED);
+    // do not parse event without any content
+    if (event->data_len <= 0) return;
 
-    if (MqttUtil::isTopic("devices/$sn/config", event->topic)) {
-        // TODO
-        ESP_LOGW("MQTTService", "Received new configuration. Not implemented yet");
+    cJSON* obj = cJSON_Parse(event->data);
+
+    if (MqttUtil::isTopic(TOPIC_CONFIG, event->topic)) {
+        m_sender.onDeviceConfig(HDPDeviceConfig(obj));
     } 
-    else if (MqttUtil::isTopic("devices/$channel/update", event->topic)) {
-        // TODO
-        ESP_LOGW("MQTTService", "Received new firmware. Not implemented yet");
+    else if (MqttUtil::isTopic(TOPIC_UPDATE_INFO, event->topic)) {
+        m_sender.onUpdateInfo(HDPUpdateInfo(obj));
+    }
+
+    cJSON_Delete(obj);
+    
+    // we have received message once. so we clear retained message https://stackoverflow.com/a/36729560/7110375
+    if (event->retain) {
+        esp_mqtt_client_publish(m_pMqttClient, event->topic, 0, 0, AT_LEAST_ONCE, true);
     }
 }
 
 void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data) {
     MqttService* pHandler = static_cast<MqttService*>(handler_args);
+    esp_mqtt_event_handle_t handle = static_cast<esp_mqtt_event_handle_t>(event_data);
 
     switch ((esp_mqtt_event_id_t)event_id) {
         case MQTT_EVENT_CONNECTED:
@@ -107,11 +108,14 @@ void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, in
             break;
 
         case MQTT_EVENT_DATA: 
-            pHandler->onMqttReceived(static_cast<esp_mqtt_event_handle_t>(event_data));
+            pHandler->onMqttReceived(handle);
             break;
 
-        case MQTT_EVENT_ERROR:
-            pHandler->onFailure(static_cast<esp_mqtt_event_handle_t>(event_data));
+        case MQTT_EVENT_ERROR: 
+            // ignore TSL and TCP errors
+            if (handle->error_handle->error_type == MQTT_ERROR_TYPE_CONNECTION_REFUSED) {
+                pHandler->onFailure(handle);
+            }
             break;
 
         default:

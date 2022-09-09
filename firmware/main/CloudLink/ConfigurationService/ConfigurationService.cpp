@@ -56,7 +56,6 @@ esp_err_t ConfigurationService::startService(void) {
 
     // register properties after service is started
     registerProperty(ESP_CTRL_PROP_DEVICE_SN, PropertyType::PROP_TYPE_CHAR_STRING, true);
-    registerProperty(ESP_CTRL_PROP_DEVICE_ROOM, PropertyType::PROP_TYPE_CHAR_STRING);
     registerProperty(ESP_CTRL_PROP_DEVICE_INTERVAL, PropertyType::PROP_TYPE_UINT32);
     registerProperty(ESP_CTRL_PROP_DEVICE_BROKER_URI, PropertyType::PROP_TYPE_CHAR_STRING);
     registerProperty(ESP_CTRL_PROP_WIFI_SSID, PropertyType::PROP_TYPE_CHAR_STRING);

@@ -37,7 +37,27 @@ public:
         return value;
     }
 
-    
+    /**
+     * Re-maps a number from on range to another (y = m*value + b). That is, a value of xStart would get mapped to yStart,
+     * a value of xEnd to yEnd, values in-between to values in-between, etc.
+     * 
+     * @note Does not constrain values to within the range, because out-of-range values are sometimes intended and useful.
+     * 
+     * @tparam Type expected input and output type
+     * @param value the number to map
+     * @param xStart the lower bound of the value’s current range.
+     * @param xEnd the upper bound of the value’s current range.
+     * @param yStart the lower bound of the value’s target range.
+     * @param yEnd the upper bound of the value’s target range.
+     * @return the mapped vlaue
+     */
+    template<typename Type>
+    static inline Type linearMap(const Type value, const Type xStart, const Type xEnd, const Type yStart, const Type yEnd) {
+        const float32_t m = (yEnd - static_cast<float32_t>(yStart)) / (xEnd - static_cast<float32_t>(xStart));
+        const float32_t b = yStart - m * xStart;
+
+        return static_cast<Type>(m * value + b);
+    }
 private:
     /**
      * Provide the private default constructor so the compiler does not generate the default one.

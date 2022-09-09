@@ -11,6 +11,8 @@
 #include "MqttServiceIfc.h"
 #include "CloudLink/CloudLinkSenderIfc.h"
 #include "Events/SensorDataEvent.h"
+#include "Events/DeviceStatusEvent.h"
+#include "HDP/HDP.h"
 
 /**
  * MQTT handler to publish and receive any supported mqtt packages
@@ -32,7 +34,7 @@ public:
     /**
      * @see MqttServiceIfc::startService
      */
-    virtual esp_err_t startService(const DeviceSettingsEvent& deviceSettings) override;
+    virtual esp_err_t startService(const DeviceInfoEvent& deviceSettings) override;
 
     /**
      * @see MqttServiceIfc::stopService
@@ -40,11 +42,12 @@ public:
     virtual esp_err_t stopService(void) override;
 
     /**
-     * Publishes the sensor event data
+     * Publishes a hdp message to given topic
      * 
      * @param data to publish
+     * @param topic the topic where data is published too. Can contain placeholders
      */
-    void publish(const SensorDataEvent& data);
+    void publish(const char8_t* topic, const HDPMessage& data);
 
 private:
     /**

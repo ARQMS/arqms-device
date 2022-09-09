@@ -41,12 +41,12 @@ void NvsStorageDriver::readWifiConfig(WifiSettingsEvent* pWifiParam) {
     pWifiParam->setMode(mode);
 }
 
-void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
+void NvsStorageDriver::readDeviceConfig(DeviceInfoEvent* pDeviceParam) {
     if (pDeviceParam == NULL) return;
     
     pDeviceParam->setBrokerUri(m_layout.brokerUri);
     pDeviceParam->setSn(m_layout.sn);
-    pDeviceParam->setRoom(m_layout.room);
+    pDeviceParam->setChannel(m_layout.channel);
     pDeviceParam->setInterval(m_layout.interval);
 }
 
@@ -67,10 +67,6 @@ bool NvsStorageDriver::get(const char8_t* name, void** data, size_t* const size)
         *data = m_layout.sn;
         *size = sizeof(m_layout.sn);
     }
-    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_ROOM)) {
-        *data = m_layout.room;
-        *size = sizeof(m_layout.room);
-    } 
     else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_INTERVAL)) {
         *data = &m_layout.interval;
         *size = sizeof(m_layout.interval);
@@ -86,6 +82,10 @@ bool NvsStorageDriver::get(const char8_t* name, void** data, size_t* const size)
     else if (CHECK_PROP(name, ESP_CTRL_PROP_WIFI_PASSPHRASE)) {
         *data = m_layout.password;
         *size = sizeof(m_layout.password);
+    }
+    else if (CHECK_PROP(name, ESP_CTRL_PROP_DEVICE_CHANNEL)) {
+        *data = m_layout.channel;
+        *size = sizeof(m_layout.channel);
     }
     else {
         ESP_LOGW("NvsStorageDriver", "Configuration '%s' is not supported by NVS Storage", name);

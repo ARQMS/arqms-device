@@ -3,10 +3,14 @@ idf_component_register(
           "Events/AirQualityEvent.cpp"
           "Events/WifiStatusEvent.cpp"
           "Events/WifiSettingsEvent.cpp"
-          "Events/DeviceSettingsEvent.cpp"
           "Events/SensorDataEvent.cpp"
           "Events/SensorStatusEvent.cpp"
           "Events/ButtonEvent.cpp"
+          "Events/BatteryStatusEvent.cpp"
+          "Events/DeviceInfoEvent.cpp"
+          "Events/DeviceStatusEvent.cpp"
+          "Events/DeviceConfigEvent.cpp"
+          "Events/DisplayInfoEvent.cpp"
 
           "HumiDevice.cpp"
           "Drivers/ApplicationHardwareConfig.cpp"
@@ -27,8 +31,8 @@ idf_component_register(
           "GuiUpdater/AirIndicatorDriver.cpp"
 
           "CloudLink/CloudLinkTask.cpp"
-          "CloudLink/Wifi.cpp"
-          "CloudLink/WifiStateMachine.cpp"
+          "CloudLink/Wifi/Wifi.cpp"
+          "CloudLink/Wifi/WifiStateMachine.cpp"
           "CloudLink/ConfigurationService/ConfigurationService.cpp"
           "CloudLink/MqttService/MqttService.cpp"
 
@@ -36,6 +40,8 @@ idf_component_register(
 
           "MeasFilter/MeasFilterTask.cpp"
           "MeasFilter/MovingAvgFilter.cpp"
+          
+          "PowerManagement/PowerManagementTask.cpp"
      INCLUDE_DIRS "."
      REQUIRES HumiDevice.Rtos HumiDevice.Serialization HumiDevice.Platform Bosch68x.Api esp_local_ctrl mdns mqtt json
      EMBED_TXTFILES "../certs/cacert.pem" "../certs/prvtkey.pem"

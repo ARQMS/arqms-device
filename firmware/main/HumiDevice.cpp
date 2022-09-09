@@ -16,6 +16,7 @@
 #include "CloudLink/CloudLinkTask.h"
 #include "MeasSensor/MeasSensorTask.h"
 #include "MeasFilter/MeasFilterTask.h"
+#include "PowerManagement/PowerManagementTask.h"
 
 // Create task definitions
 CREATE_TASK_DEF(Control, 0xC00, 10) // 3kB Stack
@@ -24,6 +25,7 @@ CREATE_TASK_DEF(MeasSensor, 0xC00, 10) // 3kB Stack
 CREATE_TASK_DEF(MeasFilter, 0xC00, 10) // 3kB Stack
 CREATE_TASK_DEF(CloudLink, 0x8000, 11) // 4kB Stack
 CREATE_TASK_DEF(PushBtnCtrl, 0xC00, 9) // 3kB Stack
+CREATE_TASK_DEF(PowerManagement, 0x800, 11) // 2kB Stack
 
 /**
  * The entry point for humi device. This is called after second bootloader has 
@@ -48,6 +50,7 @@ extern "C" void app_main(void) {
     CloudLinkTask& cloudLink = *createCloudLinkTask();
     MeasSensorTask& measSensor = *createMeasSensorTask();
     MeasFilterTask& measFilter = *createMeasFilterTask();
+    PowerManagementTask& powerManagement = *createPowerManagementTask();
     PushBtnCtrlTask& btnCtrl = *createPushBtnCtrlTask();
     GpioIrqHandler& gpioHandler = GpioIrqHandler::getInstance();
 
@@ -56,10 +59,11 @@ extern "C" void app_main(void) {
     control.CloudLink.connect(cloudLink);
     control.MeasSensor.connect(measSensor);
     control.MeasFilter.connect(measFilter);
-    cloudLink.StatusEvent.connect(control);
-    cloudLink.StatusEvent.connect(guiUpdater);
+    guiUpdater.Control.connect(control);
+    cloudLink.Status.connect(control);
+    cloudLink.Status.connect(guiUpdater);
+    cloudLink.Control.connect(control);
     measSensor.Measurement.connect(measFilter);
-    measSensor.Status.connect(control);
     measSensor.Status.connect(guiUpdater);
     measFilter.Measurement.connect(cloudLink);
     measFilter.Measurement.connect(guiUpdater);
@@ -67,6 +71,7 @@ extern "C" void app_main(void) {
     gpioHandler.PushBtn.connect(btnCtrl);
     btnCtrl.Control.connect(control);
     btnCtrl.Control.connect(guiUpdater);
+    powerManagement.Control.connect(control);
 
     // start tasks
     startGuiUpdaterTask();
@@ -75,5 +80,6 @@ extern "C" void app_main(void) {
     startMeasSensorTask();
     startMeasFilterTask();
     startPushBtnCtrlTask();
+    startPowerManagementTask();
 }
 

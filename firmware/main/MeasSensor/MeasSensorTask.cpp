@@ -81,5 +81,5 @@ void MeasSensorTask::startSnapshot() {
 void MeasSensorTask::sendStatus(const SensorStatus status) {
     SensorStatusEvent event(status);
 
-    Status.send(EventIdentifiers::SENSOR_STATUS, &event);
+    Status.send(EventIdentifiers::SENSOR_STATUS_EVENT, &event);
 }

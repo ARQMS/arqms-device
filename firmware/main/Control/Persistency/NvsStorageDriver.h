@@ -12,7 +12,7 @@
 /**
  * This Storage Driver handles access to underlaying NVS architecture.
  */
-class NvsStorageDriver : public StorageDriverIfc, public KeyValueStorageIfc {
+class NvsStorageDriver : public StorageDriverIfc {
 public:
     /**
      * Constructor
@@ -61,7 +61,7 @@ public:
     /**
      * @see StorageDriverIfc::readDeviceConfig
      */
-    virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) override;
+    virtual void readDeviceConfig(DeviceInfoEvent* pDeviceParam) override;
     
     /**
      * @see StorageDriverIfc::reset
