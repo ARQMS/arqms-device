@@ -44,12 +44,32 @@ public:
     }
 
     /**
+     * Getter for channel
+     * 
+     * @param channel to get
+     */
+    void getChannel(char8_t channel[MAX_CHANNEL_LENGTH]) const {
+        if (channel != NULL) {
+            memcpy(channel, m_channel, MAX_CHANNEL_LENGTH);
+        }
+    }
+
+    /**
      * Setter for interval 
      * 
-     * @param interval to set
+     * @param interval to set in sec
      */
     void setInterval(const uint32_t interval) {
         m_interval = interval;
+    }
+
+    /**
+     * Getter for interval
+     * 
+     * @return uint32_t the interval in sec
+     */
+    uint32_t getInterval() const {
+        return m_interval;
     }
 
     /**

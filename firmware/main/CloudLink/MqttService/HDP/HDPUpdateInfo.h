@@ -42,6 +42,17 @@ public:
             memset(m_downloadUri, 0, MAX_DOWNLOAD_URI);
         }
     }
+    
+    /**
+     * Getter for download uri
+     * 
+     * @param uri to get
+     */
+    void getDownloadUri(char8_t uri[MAX_DOWNLOAD_URI]) const {
+        if (uri != NULL) {
+            memcpy(uri, m_downloadUri, MAX_DOWNLOAD_URI);
+        }
+    }
 
     /**
      * Setter for version 
@@ -50,6 +61,15 @@ public:
      */
     void setVersion(const uint32_t version) {
         m_version = version;
+    }
+
+    /**
+     * Getter for version
+     * 
+     * @return uint32_t the version
+     */
+    uint32_t getVersion() const {
+        return m_version;
     }
 
     /**
