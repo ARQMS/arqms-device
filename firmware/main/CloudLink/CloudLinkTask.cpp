@@ -139,6 +139,6 @@ void CloudLinkTask::onDeviceConfig(const HDPDeviceConfig& msg) {
 
 void CloudLinkTask::onUpdateInfo(const HDPUpdateInfo& msg) {
     ESP_LOGW("CloudLink", "onUpdateInfo. Not implemented yet");
-    // TODO
+    // TODO implement UpdaterTask and send this to it
 }
     
