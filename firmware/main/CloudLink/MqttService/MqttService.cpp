@@ -95,6 +95,7 @@ void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
 
 void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data) {
     MqttService* pHandler = static_cast<MqttService*>(handler_args);
+    esp_mqtt_event_handle_t handle = static_cast<esp_mqtt_event_handle_t>(event_data);
 
     switch ((esp_mqtt_event_id_t)event_id) {
         case MQTT_EVENT_CONNECTED:
@@ -106,11 +107,14 @@ void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, in
             break;
 
         case MQTT_EVENT_DATA: 
-            pHandler->onMqttReceived(static_cast<esp_mqtt_event_handle_t>(event_data));
+            pHandler->onMqttReceived(handle);
             break;
 
-        case MQTT_EVENT_ERROR:
-            pHandler->onFailure(static_cast<esp_mqtt_event_handle_t>(event_data));
+        case MQTT_EVENT_ERROR: 
+            // ignore TSL and TCP errors
+            if (handle->error_handle->error_type == MQTT_ERROR_TYPE_CONNECTION_REFUSED) {
+                pHandler->onFailure(handle);
+            }
             break;
 
         default:
