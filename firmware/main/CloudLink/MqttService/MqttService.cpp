@@ -69,6 +69,9 @@ void MqttService::onFailure(const esp_mqtt_event_handle_t event) {
 }
 
 void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
+    // do not parse event without any content
+    if (event->data_len <= 0) return;
+
     cJSON *obj = cJSON_Parse(event->data);
     cJSON* item = NULL;
 
@@ -104,6 +107,11 @@ void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
     }
 
     cJSON_Delete(obj);
+    
+    // we have received message once. so we clear retained message https://stackoverflow.com/a/36729560/7110375
+    if (event->retain) {
+        esp_mqtt_client_publish(m_pMqttClient, event->topic, 0, 0, AT_LEAST_ONCE, true);
+    }
 }
 
 void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data) {
