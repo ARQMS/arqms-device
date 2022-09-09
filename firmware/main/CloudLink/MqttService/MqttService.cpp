@@ -3,6 +3,9 @@
 #include "MqttUtil.h"
 #include <cJSON.h>
 
+#define TOPIC_UPDATE_INFO "devices/update/$channel"
+#define TOPIC_CONFIG      "devices/$sn/config"
+
 MqttService::MqttService(CloudLinkSenderIfc& sender) :
     m_pMqttClient(NULL),
     m_sender(sender) {
@@ -55,8 +58,8 @@ void MqttService::publish(const char8_t* topic, const HDPMessage& data) {
 
 void MqttService::onConnected() {
     // Register subscriptions
-    MqttUtil::subscribe(m_pMqttClient, "devices/update/$channel");
-    MqttUtil::subscribe(m_pMqttClient, "devices/$sn/config");
+    MqttUtil::subscribe(m_pMqttClient, TOPIC_UPDATE_INFO);
+    MqttUtil::subscribe(m_pMqttClient, TOPIC_CONFIG);
 
     m_sender.sendWifiStatus(WifiStatus::MQTT_CONNECTED);
 }
@@ -73,38 +76,13 @@ void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
     // do not parse event without any content
     if (event->data_len <= 0) return;
 
-    cJSON *obj = cJSON_Parse(event->data);
-    cJSON* item = NULL;
+    cJSON* obj = cJSON_Parse(event->data);
 
-    if (MqttUtil::isTopic("devices/$sn/config", event->topic)) {
-        HDPDeviceConfig deviceConfig;
-
-        item = cJSON_GetObjectItem(obj, "Channel");
-        if (item != NULL) {
-            deviceConfig.setChannel(item->valuestring);
-        }
-
-        item = cJSON_GetObjectItem(obj, "Interval");
-        if (item != NULL) {
-            deviceConfig.setInterval(item->valueint);
-        }
-
-        m_sender.onDeviceConfig(deviceConfig);
+    if (MqttUtil::isTopic(TOPIC_CONFIG, event->topic)) {
+        m_sender.onDeviceConfig(HDPDeviceConfig(obj));
     } 
-    else if (MqttUtil::isTopic("devices/$channel/update", event->topic)) {
-        HDPUpdateInfo updateInfo;
-
-        item = cJSON_GetObjectItem(obj, "DownloadURI");
-        if (item != NULL) {
-            updateInfo.setDownloadUri(item->valuestring);
-        }
-
-        item = cJSON_GetObjectItem(obj, "Version");
-        if (item != NULL) {
-            updateInfo.setVersion(item->valueint);
-        }
-
-        m_sender.onUpdateInfo(updateInfo);
+    else if (MqttUtil::isTopic(TOPIC_UPDATE_INFO, event->topic)) {
+        m_sender.onUpdateInfo(HDPUpdateInfo(obj));
     }
 
     cJSON_Delete(obj);

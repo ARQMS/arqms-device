@@ -25,6 +25,25 @@ public:
     };
 
     /**
+     * Factory constructor from json object
+     * 
+     * @param json the json object which contains attributes
+     */
+    HDPDeviceConfig(const cJSON* json) {
+        cJSON* item = NULL;
+
+        item = cJSON_GetObjectItem(json, "Channel");
+        if (item != NULL) {
+            setChannel(item->valuestring);
+        }
+
+        item = cJSON_GetObjectItem(json, "Interval");
+        if (item != NULL) {
+            setInterval(item->valueint);
+        }
+    };
+
+    /**
      * Destructor
      */
     virtual ~HDPDeviceConfig() {

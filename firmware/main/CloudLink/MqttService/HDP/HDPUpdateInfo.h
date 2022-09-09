@@ -24,6 +24,25 @@ public:
     };
 
     /**
+     * Factory constructor from json object
+     * 
+     * @param json the json object which contains attributes
+     */
+    HDPUpdateInfo(const cJSON* json) {
+        cJSON* item = NULL;
+
+        item = cJSON_GetObjectItem(json, "DownloadURI");
+        if (item != NULL) {
+            setDownloadUri(item->valuestring);
+        }
+
+        item = cJSON_GetObjectItem(json, "Version");
+        if (item != NULL) {
+            setVersion(item->valueint);
+        }
+    };
+
+    /**
      * Destructor
      */
     virtual ~HDPUpdateInfo() {
