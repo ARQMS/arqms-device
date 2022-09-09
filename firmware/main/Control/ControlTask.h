@@ -70,6 +70,9 @@ private:
     void onHandleButton(const ButtonEvent& button);
     void sendDeviceStatus();
 
+    // starts all jobs which should be run single time per running instance
+    void startJobs();
+
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
      */

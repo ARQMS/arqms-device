@@ -34,14 +34,13 @@ void ControlTask::onStart() {
 
     if (wifiSettings.getMode() == WifiMode::AP) {
         m_coreSm.onServiceMode();
-    } 
-    else if (wifiSettings.getMode() == WifiMode::STA) {
-        m_coreSm.onRunning();
     }
 
     CloudLink.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
     CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
 
+    // TODO not used anymore, when device goes to sleep mode for deviceSettings.getInterval() ms.
+    // after wake up, run all jobs again
     m_pDelayTimer = createOneShotTimer(deviceSettings.getInterval() * 1000);
 }
 
@@ -76,7 +75,7 @@ void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
 void ControlTask::onHandleTimer(const TimerId timerId) {
     // TODO remove demo code
     if (m_pDelayTimer->id == timerId) {
-        MeasSensor.send(EventIdentifiers::SENSOR_SNAPSHOT);
+        startJobs();
     }
 }
 
@@ -93,7 +92,7 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
             esp_restart();
         }
     }
-    else if (m_coreSm.isCurrentState(CoreSM::State::Running)) {
+    else if (m_coreSm.isCurrentState(CoreSM::State::BootUp)) {
         if (status.getStatus() == WifiStatus::TIMEOUT
          || status.getStatus() == WifiStatus::DISCONNECTED) {
             m_coreSm.onServiceMode();
@@ -103,7 +102,19 @@ void ControlTask::onHandleWifiStatus(const WifiStatusEvent& status) {
             CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &event);
         }
         else if (status.getStatus() == WifiStatus::MQTT_CONNECTED) {
-            MeasSensor.send(EventIdentifiers::SENSOR_SNAPSHOT);
+            m_coreSm.onRunning();
+
+            startJobs();
+        }
+    }
+    else if (m_coreSm.isCurrentState(CoreSM::State::Running)) {
+        if (status.getStatus() == WifiStatus::TIMEOUT
+         || status.getStatus() == WifiStatus::DISCONNECTED) {
+            m_coreSm.onServiceMode();
+
+            WifiSettingsEvent event;
+            event.setMode(WifiMode::AP);
+            CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &event);
         }
 
         sendDeviceStatus();
@@ -127,8 +138,16 @@ void ControlTask::onHandleButton(const ButtonEvent& button) {
     }
 }
 
+void ControlTask::startJobs() {
+    MeasSensor.send(EventIdentifiers::SENSOR_SNAPSHOT);
+    sendDeviceStatus();
+}
+
 void ControlTask::sendDeviceStatus() {
-    if (!m_wifiReceived || !m_batteryReceived) return;
+    // pre condition for sending device status
+    if (!m_wifiReceived || !m_batteryReceived || !m_coreSm.isCurrentState(CoreSM::State::Running)) return;
+
+    ESP_LOGI("Control", "DeviceInfo");
 
     m_wifiReceived = false;
     m_batteryReceived = false;
