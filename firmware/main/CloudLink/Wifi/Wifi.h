@@ -101,6 +101,9 @@ private:
 
     ConfigurationServiceIfc& m_ctrlHandler;
     MqttServiceIfc& m_mqttService;
+
+    // fix bug in IDF: https://github.com/espressif/esp-idf/issues/4411
+    esp_netif_t* m_pEspNet;
 };
 
 #endif // WIFI_H_

@@ -15,7 +15,8 @@ Wifi::Wifi(CloudLinkSenderIfc& wifiCallback, ConfigurationServiceIfc& ctrlHandle
     m_sender(wifiCallback),
     m_retryCounter(0U),
     m_ctrlHandler(ctrlHandler),
-    m_mqttService(mqttService) {
+    m_mqttService(mqttService),
+    m_pEspNet(NULL) {
 }
 
 Wifi::~Wifi() {
@@ -41,7 +42,7 @@ void Wifi::initialize() {
 void Wifi::startServiceMode() {
     m_wifiSm.onApMode();
 
-    esp_netif_create_default_wifi_ap();
+    m_pEspNet = esp_netif_create_default_wifi_ap();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     checkEspError(esp_wifi_init(&cfg));
     checkEspError(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &Wifi::onWifiEventHandler, (void*)this, NULL));
@@ -62,7 +63,7 @@ void Wifi::startServiceMode() {
 void Wifi::startNormalMode() {
     m_wifiSm.onStaMode();
 
-    esp_netif_create_default_wifi_sta();
+    m_pEspNet = esp_netif_create_default_wifi_sta();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     checkEspError(esp_wifi_init(&cfg));
     checkEspError(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &Wifi::onWifiEventHandler, (void*)this, NULL));
@@ -119,6 +120,9 @@ void Wifi::reset() {
 
     esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &Wifi::onWifiEventHandler);
 
+    if (m_pEspNet != NULL) {
+        esp_netif_destroy(m_pEspNet);
+    }
     esp_wifi_disconnect();
     esp_wifi_stop();
     esp_netif_deinit();
