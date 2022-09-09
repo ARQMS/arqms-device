@@ -77,10 +77,7 @@ void Wifi::startNormalMode() {
     wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
     memcpy(&wifiConfig.sta.ssid, ssid, m_wifiSettings.MAX_SSID_LENGTH);
     memcpy(&wifiConfig.sta.password, pwd, m_wifiSettings.MAX_PWD_LENGTH);
-
-    // TODO enable Power save mode
-    // https://github.com/espressif/esp-idf/blob/867745a05c5cb1fe5eb212200580626ad0fa839d/examples/wifi/power_save/main/power_save.c#L73
-
+    
     checkEspError(esp_wifi_set_mode(WIFI_MODE_STA));
     checkEspError(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
     checkEspError(esp_wifi_start());
