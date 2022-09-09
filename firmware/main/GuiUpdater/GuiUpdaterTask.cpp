@@ -79,8 +79,11 @@ void GuiUpdaterTask::onHandleWifiStatus(const WifiStatusEvent& wifiStatus) {
         m_ctrlIndicator.setColor({0, 0, 50}, 100);
     } 
     else if (wifiStatus.getStatus() == WifiStatus::MQTT_CONNECTED) {
-        m_ctrlIndicator.setColor({0, 0, 255});
-    } 
+        // blue indicator is calculated based on following article
+        // https://www.metageek.com/training/resources/understanding-rssi/
+        const uint32_t blue = Math::truncateToRange(Math::linearMap((int)wifiStatus.getRssi(), -90, -50, 50, 255), 0, 255);
+        m_ctrlIndicator.setColor({0, 0, blue});
+    }
     else if (wifiStatus.getStatus() == WifiStatus::MQTT_DISCONNECTED) {
         m_ctrlIndicator.setColor({0, 0, 50}, 100);
     } 
