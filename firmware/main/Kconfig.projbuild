@@ -30,6 +30,12 @@ menu "HumiDevice Configuration"
         default ""
         help
             WiFi password (WPA or WPA2).
+
+    config DEVICE_CHANNEL
+        string "Update channel name"
+        default "DEV"
+        help
+            The channel name which is used to get updates! See https://github.com/ARQMS/arqms-device/wiki/HumiDevice-Protocol
             
     config DEVICE_SN
         string "Serial Number"

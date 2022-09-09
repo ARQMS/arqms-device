@@ -12,6 +12,7 @@ class DeviceInfoEvent : public EventIfc {
 public:
     // Constants
     static const size_t MAX_SN_LENGTH  = 32;
+    static const size_t MAX_CHANNEL_LENGTH  = 32;
     static const size_t MAX_BROKER_URI_LENGTH  = 64;
 
     /**
@@ -22,7 +23,7 @@ public:
     /**
      * Custom constructor.
      */
-    DeviceInfoEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t sn[MAX_SN_LENGTH], const uint32_t interval);
+    DeviceInfoEvent(const char8_t brokerUri[MAX_BROKER_URI_LENGTH], const char8_t channel[MAX_CHANNEL_LENGTH], const char8_t sn[MAX_SN_LENGTH], const uint32_t interval);
 
     /**
      * Copy constructor.
@@ -77,6 +78,16 @@ public:
     void getBrokerUri(char8_t brokerUri[MAX_BROKER_URI_LENGTH]) const;
 
     /**
+     * Setter for channel
+     */
+    void setChannel(const char8_t channel[MAX_CHANNEL_LENGTH]);
+
+    /**
+     * Getter for channel
+     */
+    void getChannel(char8_t channel[MAX_CHANNEL_LENGTH]) const;
+
+    /**
      * Setter for sn
      */
     void setSn(const char8_t sn[MAX_SN_LENGTH]);
@@ -98,6 +109,7 @@ public:
 
 private:
     char8_t m_sn[MAX_SN_LENGTH];
+    char8_t m_channel[MAX_CHANNEL_LENGTH];
     char8_t m_brokerUri[MAX_BROKER_URI_LENGTH];
     uint32_t m_interval;
 };

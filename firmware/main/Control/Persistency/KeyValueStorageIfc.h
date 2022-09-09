@@ -6,6 +6,7 @@
 
 #define ESP_CTRL_PROP_DEVICE_SN             "SerialNumber"
 #define ESP_CTRL_PROP_DEVICE_INTERVAL       "Interval"
+#define ESP_CTRL_PROP_DEVICE_CHANNEL        "Channel"
 #define ESP_CTRL_PROP_DEVICE_BROKER_URI     "BrokerUri"
 #define ESP_CTRL_PROP_WIFI_SSID             "Wifi_SSID"
 #define ESP_CTRL_PROP_WIFI_PASSPHRASE       "Wifi_PWD"

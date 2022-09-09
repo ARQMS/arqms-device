@@ -6,6 +6,7 @@
 
 // Project includes
 #include "HDPMessage.h"
+#include "Events/DeviceConfigEvent.h"
 
 /**
  * Immutable device config object for HDP.
@@ -15,7 +16,7 @@
 class HDPDeviceConfig : public HDPMessage {
 public:
     // constants
-    const static uint32_t MAX_CHANNEL_LENGTH = 32;
+    const static uint32_t MAX_CHANNEL_LENGTH = DeviceConfigEvent::MAX_CHANNEL_LENGTH;
 
     /**
      * Constructor

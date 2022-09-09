@@ -24,7 +24,8 @@
  */
 class CloudLinkTask : public TaskBase<10, sizeof(DeviceInfoEvent)>, CloudLinkSenderIfc {
 public:
-    EventPublisherMultiple<2> StatusEvent;
+    EventPublisherMultiple<2> Status;
+    EventPublisherSingle Control;
 
 public:
     /**

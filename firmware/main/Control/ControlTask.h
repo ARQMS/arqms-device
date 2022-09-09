@@ -11,6 +11,7 @@
 #include "Events/WifiStatusEvent.h"
 #include "Events/ButtonEvent.h"
 #include "Events/BatteryStatusEvent.h"
+#include "Events/DeviceConfigEvent.h"
 #include "Control/Persistency/StorageDriverIfc.h"
 #include "Control/CoreSM/CoreSM.h"
 
@@ -68,6 +69,7 @@ private:
     void onHandleWifiStatus(const WifiStatusEvent& status);
     void onHandleBatteryStatus(const BatteryStatusEvent& status);
     void onHandleButton(const ButtonEvent& button);
+    void onHandleDeviceConfig(const DeviceConfigEvent& config);
     void sendDeviceStatus();
 
     // starts all jobs which should be run single time per running instance

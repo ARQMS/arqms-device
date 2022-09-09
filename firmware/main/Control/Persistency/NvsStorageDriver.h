@@ -12,7 +12,7 @@
 /**
  * This Storage Driver handles access to underlaying NVS architecture.
  */
-class NvsStorageDriver : public StorageDriverIfc, public KeyValueStorageIfc {
+class NvsStorageDriver : public StorageDriverIfc {
 public:
     /**
      * Constructor

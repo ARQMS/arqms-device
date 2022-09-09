@@ -7,11 +7,12 @@
 // Project include
 #include "Events/DeviceInfoEvent.h"
 #include "Events/WifiSettingsEvent.h"
+#include "KeyValueStorageIfc.h"
 
 /**
  * Storage driver provides access to configuration
  */
-class StorageDriverIfc {
+class StorageDriverIfc : public KeyValueStorageIfc {
 public:
 
     /**

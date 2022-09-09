@@ -2,10 +2,11 @@
 
 #include "Events/EventIdentifiers.h"
 #include "Events/WifiStatusEvent.h"
+#include "Events/DeviceConfigEvent.h"
 #include "MqttService/HDP/HDP.h"
 
 CloudLinkTask::CloudLinkTask() :
-    StatusEvent(),
+    Status(),
     m_ctrlHandler(),
     m_mqttService(*this),
     m_wifi(*this, m_ctrlHandler, m_mqttService),
@@ -121,15 +122,18 @@ void CloudLinkTask::sendWifiStatus(const WifiStatus status, int32_t rssi) {
     m_lastWifiEvent.setStatus(status);
     m_lastWifiEvent.setRssi(rssi);
 
-    StatusEvent.send(EventIdentifiers::WIFI_STATUS_EVENT, &m_lastWifiEvent);
+    Status.send(EventIdentifiers::WIFI_STATUS_EVENT, &m_lastWifiEvent);
 
     // start new timeout, just ensure wifi status is updated periodicaly
     m_pWifiStateUpdater->start();
 }
 
 void CloudLinkTask::onDeviceConfig(const HDPDeviceConfig& msg) {
-    ESP_LOGW("CloudLink", "onDeviceConfig. Not implemented yet");
-    // TODO
+    char8_t channel[HDPDeviceConfig::MAX_CHANNEL_LENGTH];
+    msg.getChannel(channel);
+
+    DeviceConfigEvent config(channel, msg.getInterval());
+    Control.send(EventIdentifiers::DEVICE_CONFIG_EVENT, &config);
 }
 
 void CloudLinkTask::onUpdateInfo(const HDPUpdateInfo& msg) {

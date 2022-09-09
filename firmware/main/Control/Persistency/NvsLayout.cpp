@@ -11,6 +11,7 @@ const char8_t* g_versionKey           = "version";
 const char8_t* g_wifiSsidKey          = "wifi.ssid";
 const char8_t* g_wifiPasswordKey      = "wifi.pwd";
 const char8_t* g_deviceSnKey          = "dev.sn";
+const char8_t* g_deviceChannelKey     = "dev.channel";
 const char8_t* g_deviceBrokerKey      = "dev.broker";
 const char8_t* g_intervalKey          = "dev.interval";
 
@@ -66,6 +67,7 @@ esp_err_t NvsLayout::commit() {
 
     NvsUtil::setU8(g_versionKey, version);
     NvsUtil::setString(g_deviceSnKey, sn);
+    NvsUtil::setString(g_deviceChannelKey, channel);
     NvsUtil::setString(g_deviceBrokerKey, brokerUri);
     NvsUtil::setU32(g_intervalKey, interval);
     NvsUtil::setString(g_wifiSsidKey, ssid);
@@ -79,6 +81,7 @@ esp_err_t NvsLayout::fetch() {
 
     NvsUtil::getU8(g_versionKey, &version, LAYOUT_VERSION);
     NvsUtil::getString(g_deviceSnKey, sn, sizeof(sn), CONFIG_DEVICE_SN, sizeof(CONFIG_DEVICE_SN));
+    NvsUtil::getString(g_deviceChannelKey, channel, sizeof(channel), CONFIG_DEVICE_CHANNEL, sizeof(CONFIG_DEVICE_CHANNEL));
     NvsUtil::getString(g_deviceBrokerKey, brokerUri, sizeof(brokerUri), CONFIG_DEVICE_BROKER, sizeof(CONFIG_DEVICE_BROKER));
     NvsUtil::getU32(g_intervalKey, &interval, CONFIG_DEVICE_INTERVAL);
     NvsUtil::getString(g_wifiSsidKey, ssid, sizeof(ssid), CONFIG_WIFI_SSID, sizeof(CONFIG_WIFI_SSID));

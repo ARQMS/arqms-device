@@ -11,13 +11,14 @@ MqttService::MqttService(CloudLinkSenderIfc& sender) :
 esp_err_t MqttService::startService(const DeviceInfoEvent& deviceSettings) {
     char8_t brokerUri[DeviceInfoEvent::MAX_BROKER_URI_LENGTH];
     char8_t sn[DeviceInfoEvent::MAX_SN_LENGTH];
+    char8_t channel[DeviceInfoEvent::MAX_CHANNEL_LENGTH];
 
     deviceSettings.getBrokerUri(brokerUri);
     deviceSettings.getSn(sn);
-    // TODO get channel
+    deviceSettings.getChannel(channel);
 
     // just ensure broker is configured
-    if (strlen(brokerUri) <= 0) {
+    if (strlen(brokerUri) <= 0 || strlen(channel) <= 0 || strlen(sn) <= 0) {
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -28,7 +29,7 @@ esp_err_t MqttService::startService(const DeviceInfoEvent& deviceSettings) {
 
     // register possible placeholders, just ensure MqttUtil::NUM_PLACEHOLDER matches and length is not longer than MqttUtil::MAX_PLACEHOLDER_LENGTH
     MqttUtil::registerPlaceholder("$sn", sn);
-    MqttUtil::registerPlaceholder("$channel", "DEV");
+    MqttUtil::registerPlaceholder("$channel", channel);
 
     m_pMqttClient = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_register_event(m_pMqttClient, MQTT_EVENT_ANY, &MqttService::mqttEventHandler, this);

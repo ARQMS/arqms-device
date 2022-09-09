@@ -58,6 +58,10 @@ void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             onHandleButton(ButtonEvent(*pEvent));
             break;
 
+        case EventIdentifiers::DEVICE_CONFIG_EVENT:
+            onHandleDeviceConfig(DeviceConfigEvent(*pEvent));
+            break;
+
         // TODO job done, check if all jobs done configure sleep timer
         case EventIdentifiers::SENSOR_STATUS: {
             SensorStatusEvent status(*pEvent);
@@ -136,6 +140,22 @@ void ControlTask::onHandleButton(const ButtonEvent& button) {
         
         esp_restart();
     }
+}
+
+void ControlTask::onHandleDeviceConfig(const DeviceConfigEvent& config) {
+    char8_t channel[DeviceConfigEvent::MAX_CHANNEL_LENGTH];
+    config.getChannel(channel);
+    uint32_t interval = config.getInterval();
+
+    if (strlen(channel) > 0) {
+        s_pNvsStorageDriver->put(ESP_CTRL_PROP_DEVICE_CHANNEL, channel, sizeof(channel));
+    }
+    if (interval > 0) {
+        s_pNvsStorageDriver->put(ESP_CTRL_PROP_DEVICE_INTERVAL, &interval, sizeof(interval));
+    }
+    s_pNvsStorageDriver->commit();
+
+    // NOTE: configuration is only applied to application on bootUp process, so restart device manualy
 }
 
 void ControlTask::startJobs() {
