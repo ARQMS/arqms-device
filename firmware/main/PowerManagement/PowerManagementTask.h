@@ -48,7 +48,7 @@ protected:
 
 private:
     // Refresh Rate of Battery Level
-    static const uint32_t REFRESH_RATE = 1000;
+    static const uint32_t REFRESH_RATE = 30000;
     // Helper Methods
     void onHandleBatteryLevel(const BatteryStatusEvent& quality);
 
