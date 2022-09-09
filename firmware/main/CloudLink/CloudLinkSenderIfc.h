@@ -7,6 +7,9 @@
 // Project include
 #include "Events/WifiStatusEvent.h"
 
+// represents an invalid rssi
+const static int32_t INVALID_RSSI = -127;
+
 /**
  * Represents the state machine callback interface
  */
@@ -22,8 +25,9 @@ public:
      * Sends a wifi status event to callback
      * 
      * @param status the current status
+     * @param rssi (optional) signal strength. 0 means not connected
      */
-    virtual void sendWifiStatus(const WifiStatus status) = 0;
+    virtual void sendWifiStatus(const WifiStatus status, int32_t rssi = INVALID_RSSI) = 0;
 };
 
 

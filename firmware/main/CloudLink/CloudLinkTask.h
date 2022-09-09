@@ -40,7 +40,7 @@ public:
     /**
      * @see CloudLinkSenderIfc::sendWifiStatus
      */
-    virtual void sendWifiStatus(const WifiStatus status) override;
+    virtual void sendWifiStatus(const WifiStatus status, int32_t rssi = 0) override;
 
 protected:
     /**
@@ -70,7 +70,7 @@ private:
     void onHandleDeviceInfo(const DeviceInfoEvent& status);
     void onHandleSensorDataEvent(const SensorDataEvent& settings);
     void onHandleTimeout();
-    void onHandleRssiUpdate();
+    void onHandleWifiStateUpdate();
 
     /**
      * Provide the private copy constructor so the compiler does not generate the default one.
@@ -89,7 +89,7 @@ private:
     WifiStatusEvent m_lastWifiEvent;
 
     Timer* m_pTimeoutTimer;
-    Timer* m_pRssiUpdater;
+    Timer* m_pWifiStateUpdater;
 };
 
 

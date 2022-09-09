@@ -127,7 +127,7 @@ void Wifi::reset() {
 
 int32_t Wifi::getSignalStrength() const {
     if (!m_wifiSm.isCurrentState(WifiStateMachine::State::STA_CONNECTED)) {
-        return -127;
+        return INVALID_RSSI;
     }
 
     wifi_ap_record_t ap;
@@ -163,7 +163,7 @@ void Wifi::onApStarted() {
 }
 
 void Wifi::onStaStarted() {
-    m_sender.sendWifiStatus(WifiStatus::CONNECTING);
+    m_sender.sendWifiStatus(WifiStatus::CONNECTING, getSignalStrength());
     esp_wifi_connect();
 }
 
@@ -173,7 +173,7 @@ void Wifi::onWifiConnected() {
     m_wifiSm.onGotIp();
     m_retryCounter = 0U;
 
-    m_sender.sendWifiStatus(WifiStatus::CONNECTED);
+    m_sender.sendWifiStatus(WifiStatus::CONNECTED, getSignalStrength());
 }
 
 void Wifi::onWifiDisconnected() {
@@ -184,12 +184,12 @@ void Wifi::onWifiDisconnected() {
     m_wifiSm.onLostIp();
 
     if (m_retryCounter < MAXIMUM_RETRY) {
-        m_sender.sendWifiStatus(WifiStatus::CONNECTING);
+        m_sender.sendWifiStatus(WifiStatus::CONNECTING, getSignalStrength());
         esp_wifi_connect();
         m_retryCounter++;
     }
     else {
-        m_sender.sendWifiStatus(WifiStatus::DISCONNECTED);
+        m_sender.sendWifiStatus(WifiStatus::DISCONNECTED, getSignalStrength());
     }
 }
 
