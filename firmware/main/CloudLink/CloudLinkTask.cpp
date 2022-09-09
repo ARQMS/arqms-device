@@ -32,7 +32,7 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
         onHandleWifiSettings(WifiSettingsEvent(*pEvent));
         break;
 
-    case EventIdentifiers::DEVICE_SETTINGS_EVENT: 
+    case EventIdentifiers::DEVICE_INFO_EVENT: 
         onHandleDeviceSettings(DeviceInfoEvent(*pEvent));
         break;
     
@@ -40,7 +40,7 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
         onHandleSensorDataEvent(SensorDataEvent(*pEvent));
         break;
 
-    case EventIdentifiers::DEVICE_INFO_EVENT: 
+    case EventIdentifiers::DEVICE_STATUS_EVENT: 
         onHandleDeviceInfo(DeviceStatusEvent(*pEvent));
         break;
 

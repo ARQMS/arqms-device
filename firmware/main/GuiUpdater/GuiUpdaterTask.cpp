@@ -42,7 +42,7 @@ void GuiUpdaterTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             onHandleSensorStatus(SensorStatusEvent(*pEvent));
             break;
 
-        case EventIdentifiers::BTN_CTRL_EVENT: 
+        case EventIdentifiers::DEVICE_BTN_EVENT: 
             onHandleButton(ButtonEvent(*pEvent));
             break;
 

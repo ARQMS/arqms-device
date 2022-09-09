@@ -36,7 +36,7 @@ void ControlTask::onStart() {
         m_coreSm.onServiceMode();
     }
 
-    CloudLink.send(EventIdentifiers::DEVICE_SETTINGS_EVENT, &deviceSettings);
+    CloudLink.send(EventIdentifiers::DEVICE_INFO_EVENT, &deviceSettings);
     CloudLink.send(EventIdentifiers::WIFI_SETTINGS_EVENT, &wifiSettings);
 
     // TODO not used anymore, when device goes to sleep mode for deviceSettings.getInterval() ms.
@@ -54,7 +54,7 @@ void ControlTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
             onHandleBatteryStatus(BatteryStatusEvent(*pEvent));
             break;
 
-        case EventIdentifiers::BTN_CTRL_EVENT: 
+        case EventIdentifiers::DEVICE_BTN_EVENT: 
             onHandleButton(ButtonEvent(*pEvent));
             break;
 
@@ -155,5 +155,5 @@ void ControlTask::sendDeviceStatus() {
     uint32_t uptime = pdTICKS_TO_MS(xTaskGetTickCount());
     DeviceStatusEvent deviceInfo(m_lastBatteryStatus, m_lastWifiStatus, uptime);
 
-    CloudLink.send(EventIdentifiers::DEVICE_INFO_EVENT, &deviceInfo);
+    CloudLink.send(EventIdentifiers::DEVICE_STATUS_EVENT, &deviceInfo);
 }

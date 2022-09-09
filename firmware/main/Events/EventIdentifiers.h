@@ -15,9 +15,9 @@ struct EventIdentifiers {
     const static EventId TIMER_EVENT            = TimerEventId;
 
     // DEVICE 60..79
-    const static EventId DEVICE_SETTINGS_EVENT  = 60;
-    const static EventId DEVICE_INFO_EVENT      = 61;
-    const static EventId BTN_CTRL_EVENT         = 62;
+    const static EventId DEVICE_INFO_EVENT      = 60;
+    const static EventId DEVICE_STATUS_EVENT    = 61;
+    const static EventId DEVICE_BTN_EVENT       = 62;
     const static EventId DEVICE_CONFIG_EVENT    = 63;
     const static EventId DEVICE_UPDATE_EVENT    = 64;
     const static EventId SENSOR_DATA_EVENT      = 65;
