@@ -77,6 +77,7 @@ void MqttService::publish(const DeviceInfoEvent& data) {
     char8_t* json = cJSON_Print(obj);
     MqttUtil::publish(m_pMqttClient, "devices/$sn/status", json);
 
+    cJSON_free(json);
     cJSON_Delete(obj);
 }
 
