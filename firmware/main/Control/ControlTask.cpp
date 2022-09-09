@@ -4,7 +4,7 @@
 #include "Events/WifiSettingsEvent.h"
 #include "Events/SensorStatusEvent.h"
 #include "Events/DeviceSettingsEvent.h"
-#include "Events/DeviceInfoEvent.h"
+#include "Events/DeviceStatusEvent.h"
     
 StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
 
@@ -153,7 +153,7 @@ void ControlTask::sendDeviceStatus() {
     m_batteryReceived = false;
 
     uint32_t uptime = pdTICKS_TO_MS(xTaskGetTickCount());
-    DeviceInfoEvent deviceInfo(m_lastBatteryStatus, m_lastWifiStatus, uptime);
+    DeviceStatusEvent deviceInfo(m_lastBatteryStatus, m_lastWifiStatus, uptime);
 
     CloudLink.send(EventIdentifiers::DEVICE_INFO_EVENT, &deviceInfo);
 }

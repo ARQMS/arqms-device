@@ -1,5 +1,5 @@
-#ifndef DEVICE_INFO_EVENT_H_
-#define DEVICE_INFO_EVENT_H_
+#ifndef DEVICE_STATUS_EVENT_H_
+#define DEVICE_STATUS_EVENT_H_
 
 // Platform
 #include <HumiDevice.Platform/Platform.h>
@@ -9,51 +9,51 @@
 #include "WifiStatusEvent.h"
 
 /**
- * Device info event
+ * Device status info event
  */
-class DeviceInfoEvent : public EventIfc {
+class DeviceStatusEvent : public EventIfc {
 public:
     /**
      * Default Constructor
      */
-    DeviceInfoEvent(void);
+    DeviceStatusEvent(void);
 
     /**
      * Custom Constructor
      */
-    DeviceInfoEvent(BatteryStatusEvent& batteryStatus, WifiStatusEvent& wifiStatus, uint32_t uptime);
+    DeviceStatusEvent(BatteryStatusEvent& batteryStatus, WifiStatusEvent& wifiStatus, uint32_t uptime);
 
     /**
      * Copy Constructor
      * @param other The copied instance
      */
-    DeviceInfoEvent(const DeviceInfoEvent& other);
+    DeviceStatusEvent(const DeviceStatusEvent& other);
 
     /**
      * Constructor from deserializer
      */
-    explicit DeviceInfoEvent(Deserializer& deserializer);
+    explicit DeviceStatusEvent(Deserializer& deserializer);
 
     /**
      * Destructor
      */
-    virtual ~DeviceInfoEvent(void);
+    virtual ~DeviceStatusEvent(void);
 
     /**
      * Assignment operator
      * @param other the assignator instance
      */
-    DeviceInfoEvent& operator=(const DeviceInfoEvent& other);
+    DeviceStatusEvent& operator=(const DeviceStatusEvent& other);
 
     /**
      * Equality operator.
      */
-    bool operator==(const DeviceInfoEvent& right) const;
+    bool operator==(const DeviceStatusEvent& right) const;
 
     /**
      * Inequality operator.
      */
-    bool operator!=(const DeviceInfoEvent& right) const;
+    bool operator!=(const DeviceStatusEvent& right) const;
 
     /**
      * @see SerializableIfc
@@ -101,4 +101,4 @@ private:
     uint32_t m_uptime;
 };
 
-#endif
+#endif // DEVICE_STATUS_EVENT_H_

@@ -41,7 +41,7 @@ void CloudLinkTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
         break;
 
     case EventIdentifiers::DEVICE_INFO_EVENT: 
-        onHandleDeviceInfo(DeviceInfoEvent(*pEvent));
+        onHandleDeviceInfo(DeviceStatusEvent(*pEvent));
         break;
 
     default:
@@ -94,7 +94,7 @@ void CloudLinkTask::onHandleSensorDataEvent(const SensorDataEvent& settings) {
     m_mqttService.publish("devices/$sn/room/info", roomStatus);
 }
 
-void CloudLinkTask::onHandleDeviceInfo(const DeviceInfoEvent& status) {
+void CloudLinkTask::onHandleDeviceInfo(const DeviceStatusEvent& status) {
     if (m_lastWifiEvent.getStatus() != WifiStatus::MQTT_CONNECTED) {
         ESP_LOGW("CloudLink", "MQTT not connected, no device info sent to MQTT Broker");
         return;

@@ -11,7 +11,7 @@
 #include "MqttServiceIfc.h"
 #include "CloudLink/CloudLinkSenderIfc.h"
 #include "Events/SensorDataEvent.h"
-#include "Events/DeviceInfoEvent.h"
+#include "Events/DeviceStatusEvent.h"
 #include "HDP/HDP.h"
 
 /**

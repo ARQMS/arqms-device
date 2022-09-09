@@ -18,7 +18,8 @@ struct EventIdentifiers {
     const static EventId DEVICE_SETTINGS_EVENT  = 60;
     const static EventId DEVICE_INFO_EVENT      = 61;
     const static EventId BTN_CTRL_EVENT         = 62;
-
+    const static EventId DEVICE_CONFIG_EVENT    = 63;
+    const static EventId DEVICE_UPDATE_EVENT    = 64;
     const static EventId SENSOR_DATA_EVENT      = 65;
     const static EventId SENSOR_SNAPSHOT        = 66;
     const static EventId SENSOR_STATUS          = 67;
