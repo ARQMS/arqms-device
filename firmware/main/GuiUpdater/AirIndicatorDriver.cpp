@@ -6,12 +6,15 @@ const float32_t AirIndicatorDriver::MOD_THRESHOLD   = 0.33f;
 const uint8_t AirIndicatorDriver::ON                = 0;
 const uint8_t AirIndicatorDriver::OFF               = 1;
 
+// store this information in RTC memory, so on wake up last values are used
+RTC_DATA_ATTR AirIndicatorDriver::AirQuality g_quality;
+
 AirIndicatorDriver::AirIndicatorDriver(const gpio_num_t goodPin, const gpio_num_t modPin, const gpio_num_t poorPin) :
     m_isActive(true),
     m_goodPin(goodPin),
     m_modPin(modPin),
     m_poorPin(poorPin) {
-        setQuality(-1.f);
+    refresh();
 }
 
 AirIndicatorDriver::~AirIndicatorDriver() {
@@ -26,7 +29,7 @@ void AirIndicatorDriver::refresh() {
         return;
     } 
 
-    switch (m_quality) {
+    switch (g_quality) {
         case AirQuality::GOOD: 
             gpio_set_level(m_goodPin, ON);
             gpio_set_level(m_modPin, OFF);
@@ -54,7 +57,7 @@ void AirIndicatorDriver::refresh() {
 }
 
 void AirIndicatorDriver::setQuality(const float32_t quality) {
-    m_quality = calculateAirQuality(quality);
+    g_quality = calculateAirQuality(quality);
 }
 
 void AirIndicatorDriver::enable() {

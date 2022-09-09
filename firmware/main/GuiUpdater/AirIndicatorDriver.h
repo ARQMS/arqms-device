@@ -15,6 +15,14 @@
  */
 class AirIndicatorDriver {
 public:
+    // Enum for air quality 
+    enum AirQuality {
+        UNKNOWN = 0,
+        GOOD    = 1,
+        MOD     = 2,
+        POOR    = 3,
+    };
+    
     /**
      * Construtor
      */
@@ -51,14 +59,6 @@ public:
 
 private:
 
-    // Enum for air quality 
-    enum AirQuality {
-        UNKNOWN = 0,
-        GOOD    = 1,
-        MOD     = 2,
-        POOR    = 3,
-    };
-
     // Constants
     const static float32_t GOOD_THRESHOLD;
     const static float32_t MOD_THRESHOLD;
@@ -88,7 +88,6 @@ private:
     const gpio_num_t m_goodPin;
     const gpio_num_t m_modPin; 
     const gpio_num_t m_poorPin; 
-    AirQuality m_quality;
 };
 
 

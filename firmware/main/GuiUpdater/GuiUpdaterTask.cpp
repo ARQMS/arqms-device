@@ -21,10 +21,13 @@ void GuiUpdaterTask::onInitialize()  {
     m_pDelayTimer = createOneShotTimer(DELAY_MS);
 
     m_ctrlIndicator.initialize();
+
+    m_ctrlIndicator.disable();
+    m_airIndicator.disable();
 }
 
 void GuiUpdaterTask::onStart() {
-    disable();
+    // nothing to do
 }
 
 void GuiUpdaterTask::onHandleEvent(EventId eventId, Deserializer* pEvent) {
