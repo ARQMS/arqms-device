@@ -22,6 +22,7 @@ esp_err_t MqttService::startService(const DeviceInfoEvent& deviceSettings) {
 
     // just ensure broker is configured
     if (strlen(brokerUri) <= 0 || strlen(channel) <= 0 || strlen(sn) <= 0) {
+        ESP_LOGE("MQTT", "Invalid configuration:\n\tURI:%s\n\tSN:%s\n\tChannel:%s", brokerUri, sn, channel);
         return ESP_ERR_INVALID_ARG;
     }
 

@@ -35,6 +35,9 @@ public:
         if (item != NULL) {
             setDownloadUri(item->valuestring);
         }
+        else {
+            setDownloadUri(NULL);
+        }
 
         item = cJSON_GetObjectItem(json, "Version");
         if (item != NULL) {

@@ -36,6 +36,9 @@ public:
         if (item != NULL) {
             setChannel(item->valuestring);
         }
+        else {
+            setChannel(NULL);
+        }
 
         item = cJSON_GetObjectItem(json, "Interval");
         if (item != NULL) {
