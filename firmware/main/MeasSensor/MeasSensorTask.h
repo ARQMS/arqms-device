@@ -19,7 +19,7 @@
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class MeasSensorTask : public TaskBase<5, sizeof(DeviceSettingsEvent)> {
+class MeasSensorTask : public TaskBase<10, sizeof(EventId)> {
 public:
     EventPublisherSingle Measurement;
     EventPublisherMultiple<2> Status;
