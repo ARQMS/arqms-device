@@ -14,6 +14,7 @@ esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
 
     deviceSettings.getBrokerUri(brokerUri);
     deviceSettings.getSn(sn);
+    // TODO get channel
 
     // just ensure broker is configured
     if (strlen(brokerUri) <= 0) {
@@ -27,7 +28,7 @@ esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
 
     // register possible placeholders, just ensure MqttUtil::NUM_PLACEHOLDER matches and length is not longer than MqttUtil::MAX_PLACEHOLDER_LENGTH
     MqttUtil::registerPlaceholder("$sn", sn);
-    MqttUtil::registerPlaceholder("$channel", "dev");
+    MqttUtil::registerPlaceholder("$channel", "DEV");
 
     m_pMqttClient = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_register_event(m_pMqttClient, MQTT_EVENT_ANY, &MqttService::mqttEventHandler, this);
@@ -39,43 +40,13 @@ esp_err_t MqttService::stopService() {
     return esp_mqtt_client_stop(m_pMqttClient);
 }
 
-void MqttService::publish(const SensorDataEvent& data) {
+void MqttService::publish(const char8_t* topic, const HDPMessage& data) {
     cJSON* obj = cJSON_CreateObject();
-    cJSON* item = NULL;
 
-    item = cJSON_CreateNumber(data.getRelativeHumidity());
-    cJSON_AddItemToObject(obj, "Humidity", item);
-
-    item = cJSON_CreateNumber(data.getPressure());
-    cJSON_AddItemToObject(obj, "Pressure", item);
-
-    item = cJSON_CreateNumber(data.getTemperature());
-    cJSON_AddItemToObject(obj, "Temperature", item);
-
-    item = cJSON_CreateNumber(data.getGasResistance());
-    cJSON_AddItemToObject(obj, "GasResistance", item);
+    data.getJson(obj);
 
     char8_t* json = cJSON_Print(obj);
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/room/info", json);
-
-    cJSON_Delete(obj);
-}
-
-void MqttService::publish(const DeviceInfoEvent& data) {
-    cJSON* obj = cJSON_CreateObject();
-    cJSON* item = NULL;
-
-    item = cJSON_CreateNumber(data.getBatteryStatus().getLevel());
-    cJSON_AddItemToObject(obj, "BatteryLevel", item);
-
-    item = cJSON_CreateNumber(data.getWifiStatus().getRssi());
-    cJSON_AddItemToObject(obj, "ConnectivityStrength", item);
-
-    item = cJSON_CreateNumber(data.getUptime());
-    cJSON_AddItemToObject(obj, "RunningTime", item);
-    
-    char8_t* json = cJSON_Print(obj);
-    MqttUtil::publish(m_pMqttClient, "devices/$sn/status", json);
+    MqttUtil::publish(m_pMqttClient, topic, json);
 
     cJSON_free(json);
     cJSON_Delete(obj);
@@ -83,7 +54,7 @@ void MqttService::publish(const DeviceInfoEvent& data) {
 
 void MqttService::onConnected() {
     // Register subscriptions
-    MqttUtil::subscribe(m_pMqttClient, "devices/$channel/update");
+    MqttUtil::subscribe(m_pMqttClient, "devices/update/$channel");
     MqttUtil::subscribe(m_pMqttClient, "devices/$sn/config");
 
     m_sender.sendWifiStatus(WifiStatus::MQTT_CONNECTED);
@@ -98,14 +69,41 @@ void MqttService::onFailure(const esp_mqtt_event_handle_t event) {
 }
 
 void MqttService::onMqttReceived(const esp_mqtt_event_handle_t event) {
+    cJSON *obj = cJSON_Parse(event->data);
+    cJSON* item = NULL;
+
     if (MqttUtil::isTopic("devices/$sn/config", event->topic)) {
-        // TODO
-        ESP_LOGW("MQTTService", "Received new configuration. Not implemented yet");
+        HDPDeviceConfig deviceConfig;
+
+        item = cJSON_GetObjectItem(obj, "Channel");
+        if (item != NULL) {
+            deviceConfig.setChannel(item->valuestring);
+        }
+
+        item = cJSON_GetObjectItem(obj, "Interval");
+        if (item != NULL) {
+            deviceConfig.setInterval(item->valueint);
+        }
+
+        m_sender.onDeviceConfig(deviceConfig);
     } 
     else if (MqttUtil::isTopic("devices/$channel/update", event->topic)) {
-        // TODO
-        ESP_LOGW("MQTTService", "Received new firmware. Not implemented yet");
+        HDPUpdateInfo updateInfo;
+
+        item = cJSON_GetObjectItem(obj, "DownloadURI");
+        if (item != NULL) {
+            updateInfo.setDownloadUri(item->valuestring);
+        }
+
+        item = cJSON_GetObjectItem(obj, "Version");
+        if (item != NULL) {
+            updateInfo.setVersion(item->valueint);
+        }
+
+        m_sender.onUpdateInfo(updateInfo);
     }
+
+    cJSON_Delete(obj);
 }
 
 void MqttService::mqttEventHandler(void* handler_args, esp_event_base_t base, int32_t event_id, void* event_data) {

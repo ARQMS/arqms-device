@@ -42,6 +42,16 @@ public:
      */
     virtual void sendWifiStatus(const WifiStatus status, int32_t rssi = 0) override;
 
+    /**
+     * @see CloudLinkSenderIfc::onDeviceConfig
+     */
+    virtual void onDeviceConfig(const HDPDeviceConfig& msg) override;
+
+    /**
+     * @see CloudLinkSenderIfc::onUpdateInfo
+     */
+    virtual void onUpdateInfo(const HDPUpdateInfo& msg) override;
+
 protected:
     /**
      * @see TaskBase::onInitialize()

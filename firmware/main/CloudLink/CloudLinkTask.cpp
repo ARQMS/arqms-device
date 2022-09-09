@@ -2,6 +2,7 @@
 
 #include "Events/EventIdentifiers.h"
 #include "Events/WifiStatusEvent.h"
+#include "MqttService/HDP/HDP.h"
 
 CloudLinkTask::CloudLinkTask() :
     StatusEvent(),
@@ -83,7 +84,14 @@ void CloudLinkTask::onHandleSensorDataEvent(const SensorDataEvent& settings) {
         return;
     }
 
-    m_mqttService.publish(settings);
+    const HDPRoomStatus roomStatus(
+        settings.getRelativeHumidity(),
+        settings.getPressure(),
+        settings.getTemperature(),
+        settings.getGasResistance()
+    );
+
+    m_mqttService.publish("devices/$sn/room/info", roomStatus);
 }
 
 void CloudLinkTask::onHandleDeviceInfo(const DeviceInfoEvent& status) {
@@ -92,7 +100,13 @@ void CloudLinkTask::onHandleDeviceInfo(const DeviceInfoEvent& status) {
         return;
     }
 
-    m_mqttService.publish(status);
+    const HDPDeviceStatus deviceInfo(
+        status.getBatteryStatus().getLevel(),
+        status.getWifiStatus().getRssi(),
+        status.getUptime()
+    );
+
+    m_mqttService.publish("devices/$sn/status", deviceInfo);
 }
 
 void CloudLinkTask::onHandleTimeout() {
@@ -112,3 +126,14 @@ void CloudLinkTask::sendWifiStatus(const WifiStatus status, int32_t rssi) {
     // start new timeout, just ensure wifi status is updated periodicaly
     m_pWifiStateUpdater->start();
 }
+
+void CloudLinkTask::onDeviceConfig(const HDPDeviceConfig& msg) {
+    ESP_LOGW("CloudLink", "onDeviceConfig. Not implemented yet");
+    // TODO
+}
+
+void CloudLinkTask::onUpdateInfo(const HDPUpdateInfo& msg) {
+    ESP_LOGW("CloudLink", "onUpdateInfo. Not implemented yet");
+    // TODO
+}
+    
