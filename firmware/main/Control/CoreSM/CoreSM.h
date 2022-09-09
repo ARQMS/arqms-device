@@ -6,7 +6,7 @@
 
 // Project include
 #include "Events/WifiSettingsEvent.h"
-#include "Events/DeviceSettingsEvent.h"
+#include "Events/DeviceInfoEvent.h"
 
 /**
  * Represents the state machine for core control

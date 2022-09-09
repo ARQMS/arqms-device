@@ -91,7 +91,7 @@ void Wifi::updateWifiSettings(const WifiSettingsEvent& settings) {
     }
 }
 
-void Wifi::updateDeviceSettings(const DeviceSettingsEvent& settings) {
+void Wifi::updateDeviceSettings(const DeviceInfoEvent& settings) {
     m_deviceSettings = settings;
     m_deviceSettingsUpdated = true;
 

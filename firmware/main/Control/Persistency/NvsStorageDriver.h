@@ -61,7 +61,7 @@ public:
     /**
      * @see StorageDriverIfc::readDeviceConfig
      */
-    virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) override;
+    virtual void readDeviceConfig(DeviceInfoEvent* pDeviceParam) override;
     
     /**
      * @see StorageDriverIfc::reset

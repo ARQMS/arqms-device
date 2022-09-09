@@ -12,7 +12,7 @@
 #include "CloudLink/CloudLinkSenderIfc.h"
 #include "CloudLink/MqttService/MqttServiceIfc.h"
 #include "Events/WifiSettingsEvent.h"
-#include "Events/DeviceSettingsEvent.h"
+#include "Events/DeviceInfoEvent.h"
 #include "WifiStateMachine.h"
 
 /**
@@ -55,7 +55,7 @@ public:
      * Updates internal device structure
      * @param settings to apply
      */
-    void updateDeviceSettings(const DeviceSettingsEvent& settings);
+    void updateDeviceSettings(const DeviceInfoEvent& settings);
 
     /**
      * Called after timout is reached.
@@ -93,7 +93,7 @@ private:
     bool m_deviceSettingsUpdated;
 
     WifiSettingsEvent m_wifiSettings;
-    DeviceSettingsEvent m_deviceSettings;
+    DeviceInfoEvent m_deviceSettings;
 
     WifiStateMachine m_wifiSm;
     CloudLinkSenderIfc& m_sender;

@@ -8,9 +8,9 @@ MqttService::MqttService(CloudLinkSenderIfc& sender) :
     m_sender(sender) {
 }
 
-esp_err_t MqttService::startService(const DeviceSettingsEvent& deviceSettings) {
-    char8_t brokerUri[DeviceSettingsEvent::MAX_BROKER_URI_LENGTH];
-    char8_t sn[DeviceSettingsEvent::MAX_SN_LENGTH];
+esp_err_t MqttService::startService(const DeviceInfoEvent& deviceSettings) {
+    char8_t brokerUri[DeviceInfoEvent::MAX_BROKER_URI_LENGTH];
+    char8_t sn[DeviceInfoEvent::MAX_SN_LENGTH];
 
     deviceSettings.getBrokerUri(brokerUri);
     deviceSettings.getSn(sn);

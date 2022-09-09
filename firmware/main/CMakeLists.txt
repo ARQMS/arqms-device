@@ -3,7 +3,7 @@ idf_component_register(
           "Events/AirQualityEvent.cpp"
           "Events/WifiStatusEvent.cpp"
           "Events/WifiSettingsEvent.cpp"
-          "Events/DeviceSettingsEvent.cpp"
+          "Events/DeviceInfoEvent.cpp"
           "Events/SensorDataEvent.cpp"
           "Events/SensorStatusEvent.cpp"
           "Events/ButtonEvent.cpp"

@@ -34,7 +34,7 @@ public:
     /**
      * @see MqttServiceIfc::startService
      */
-    virtual esp_err_t startService(const DeviceSettingsEvent& deviceSettings) override;
+    virtual esp_err_t startService(const DeviceInfoEvent& deviceSettings) override;
 
     /**
      * @see MqttServiceIfc::stopService

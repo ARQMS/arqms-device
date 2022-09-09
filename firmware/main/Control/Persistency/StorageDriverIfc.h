@@ -5,7 +5,7 @@
 #include <HumiDevice.Platform/Platform.h>
 
 // Project include
-#include "Events/DeviceSettingsEvent.h"
+#include "Events/DeviceInfoEvent.h"
 #include "Events/WifiSettingsEvent.h"
 
 /**
@@ -31,7 +31,7 @@ public:
      * 
      * @param const DeviceParameters* 
      */
-    virtual void readDeviceConfig(DeviceSettingsEvent* pDeviceParam) = 0;
+    virtual void readDeviceConfig(DeviceInfoEvent* pDeviceParam) = 0;
 
     /**
      * Resets underlaying storage to default values. This action can not be undo!

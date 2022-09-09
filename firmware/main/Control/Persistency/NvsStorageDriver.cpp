@@ -41,7 +41,7 @@ void NvsStorageDriver::readWifiConfig(WifiSettingsEvent* pWifiParam) {
     pWifiParam->setMode(mode);
 }
 
-void NvsStorageDriver::readDeviceConfig(DeviceSettingsEvent* pDeviceParam) {
+void NvsStorageDriver::readDeviceConfig(DeviceInfoEvent* pDeviceParam) {
     if (pDeviceParam == NULL) return;
     
     pDeviceParam->setBrokerUri(m_layout.brokerUri);

@@ -22,7 +22,7 @@
  * 
  * @see https://github.com/ARQMS/arqms-device/wiki/Firmware#decomposition
  */
-class CloudLinkTask : public TaskBase<10, sizeof(DeviceSettingsEvent)>, CloudLinkSenderIfc {
+class CloudLinkTask : public TaskBase<10, sizeof(DeviceInfoEvent)>, CloudLinkSenderIfc {
 public:
     EventPublisherMultiple<2> StatusEvent;
 
@@ -76,7 +76,7 @@ private:
 
     // Helper methods
     void onHandleWifiSettings(const WifiSettingsEvent& settings);
-    void onHandleDeviceSettings(const DeviceSettingsEvent& settings);
+    void onHandleDeviceSettings(const DeviceInfoEvent& settings);
     void onHandleDeviceInfo(const DeviceStatusEvent& status);
     void onHandleSensorDataEvent(const SensorDataEvent& settings);
     void onHandleTimeout();

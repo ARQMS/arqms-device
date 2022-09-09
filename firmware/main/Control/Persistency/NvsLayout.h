@@ -6,7 +6,7 @@
 
 // Project includes
 #include "Events/WifiSettingsEvent.h"
-#include "Events/DeviceSettingsEvent.h"
+#include "Events/DeviceInfoEvent.h"
 
 /**
  * Represents a nvs layout version type
@@ -64,8 +64,8 @@ public:
     NvsVersion_t version;
     char8_t ssid[WifiSettingsEvent::MAX_SSID_LENGTH];
     char8_t password[WifiSettingsEvent::MAX_PWD_LENGTH];
-    char8_t sn[DeviceSettingsEvent::MAX_SN_LENGTH];
-    char8_t brokerUri[DeviceSettingsEvent::MAX_BROKER_URI_LENGTH];
+    char8_t sn[DeviceInfoEvent::MAX_SN_LENGTH];
+    char8_t brokerUri[DeviceInfoEvent::MAX_BROKER_URI_LENGTH];
     uint32_t interval;
 };
 

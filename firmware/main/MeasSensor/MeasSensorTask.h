@@ -11,7 +11,7 @@
 // Project includes
 #include "Drivers/BME680Driver.h"
 #include "Drivers/ApplicationHardwareConfig.h"
-#include "Events/DeviceSettingsEvent.h"
+#include "Events/DeviceInfoEvent.h"
 #include "Events/SensorStatusEvent.h"
 
 /**

@@ -3,7 +3,7 @@
 #include "Events/EventIdentifiers.h"
 #include "Events/WifiSettingsEvent.h"
 #include "Events/SensorStatusEvent.h"
-#include "Events/DeviceSettingsEvent.h"
+#include "Events/DeviceInfoEvent.h"
 #include "Events/DeviceStatusEvent.h"
     
 StorageDriverIfc* ControlTask::s_pNvsStorageDriver = NULL;
@@ -29,7 +29,7 @@ void ControlTask::onStart() {
     WifiSettingsEvent wifiSettings;
     s_pNvsStorageDriver->readWifiConfig(&wifiSettings);
 
-    DeviceSettingsEvent deviceSettings;
+    DeviceInfoEvent deviceSettings;
     s_pNvsStorageDriver->readDeviceConfig(&deviceSettings);
 
     if (wifiSettings.getMode() == WifiMode::AP) {
