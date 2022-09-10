@@ -55,7 +55,7 @@ public:
         std::string topicStr(topic);
         replacePlaceholders(topicStr);
 
-        ESP_LOGD("Humi publish", "Subscribed to %s", topicStr.c_str());
+        ESP_LOGI("Humi publish", "Subscribed to %s", topicStr.c_str());
 
         return esp_mqtt_client_subscribe(client, topicStr.c_str(), AT_LEAST_ONCE);
     }
@@ -78,7 +78,7 @@ public:
 
         std::string valueStr(data);
 
-        ESP_LOGD("Humi publish", "Publish to %s with %s", topicStr.c_str(), valueStr.c_str());
+        ESP_LOGI("Humi publish", "Publish to %s with %s", topicStr.c_str(), valueStr.c_str());
 
         return esp_mqtt_client_publish(client, topicStr.c_str(), valueStr.c_str(), 0, AT_MOST_ONCE, false);
     }

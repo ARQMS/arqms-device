@@ -1,8 +1,0 @@
-{
-    "idf.adapterTargetName": "esp32c3",
-    "files.associations": {
-        "atomic": "cpp",
-        "memory": "cpp",
-        "xstring": "cpp"
-    }
-}
