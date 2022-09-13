@@ -28,3 +28,4 @@ As standard IDE Visual Studio Code is used, open the `firmware` Folder.
 - [ ] PCB - USB Port is too small after JLCPCB fabrication
 - [ ] PCB - If HW Switch is soldered, ESP does not start anymore. Workaround remove R23
 - [ ] PCB - Green LED is very bright, increase resistor
+- [ ] PCB - Wrong Q1 footprint
